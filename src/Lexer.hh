@@ -16,6 +16,8 @@ class Lexer {
 
     void printTokens() const;
 
+    unsigned numberOfTokens() const { return tokens.size(); }
+
    private:
     void readWhitespace();
     void readAlpha(Token &token);

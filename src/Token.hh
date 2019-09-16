@@ -34,10 +34,15 @@ enum class TokenType {
     COMMA,
     DOT,
 
+    TILDE,
+
     SINGLE_QUOTE,
     DOUBLE_QUOTE,
 
     EXCL,
+    QUESTION,
+
+    POWER,
 
     COLON,
     SEMICOLON,
@@ -73,7 +78,8 @@ static std::unordered_map<std::string, TokenType> stringTokenMap {
     { ";", TokenType::SEMICOLON },    { "=", TokenType::EQ },
     { "'", TokenType::SINGLE_QUOTE }, { "\"", TokenType::DOUBLE_QUOTE },
     { "!", TokenType::EXCL },         { "&&", TokenType::AMP_AMP },
-    { "||", TokenType::PIPE_PIPE },
+    { "||", TokenType::PIPE_PIPE },   { "~", TokenType::TILDE },
+    { "?", TokenType::QUESTION },     { "^", TokenType::POWER },
 };
 
 TokenType stringToToken(const std::string &s);
