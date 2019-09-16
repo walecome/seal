@@ -1,0 +1,19 @@
+[
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -Wsuggest-attribute=const -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Lexer.cc.o -c /home/alexander/projects/compiler/src/Lexer.cc",
+  "file": "/home/alexander/projects/compiler/src/Lexer.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -Wsuggest-attribute=const -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Token.cc.o -c /home/alexander/projects/compiler/src/Token.cc",
+  "file": "/home/alexander/projects/compiler/src/Token.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -Wsuggest-attribute=const -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/main.cc.o -c /home/alexander/projects/compiler/src/main.cc",
+  "file": "/home/alexander/projects/compiler/src/main.cc"
+}
+]
