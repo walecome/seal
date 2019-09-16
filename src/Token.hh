@@ -4,6 +4,7 @@
 #include <iterator>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 enum class TokenType {
     LPARENS,
@@ -51,7 +52,13 @@ enum class TokenType {
     NUMBER,
     STRING,
 
-    UNEXPECTED
+    UNEXPECTED,
+
+    // Keywords
+    FUNC_IDENT,
+
+    TYPE
+
 };
 
 struct Token {
@@ -82,4 +89,14 @@ static std::unordered_map<std::string, TokenType> stringTokenMap {
     { "?", TokenType::QUESTION },     { "^", TokenType::POWER },
 };
 
+static std::unordered_map<std::string, TokenType> keywordMap {
+    { "func", TokenType::FUNC_IDENT }
+};
+
+static std::unordered_set<std::string> types { "int", "void" };
+
 TokenType stringToToken(const std::string &s);
+
+bool isType(const std::string &s);
+
+void tryReplaceKeywordOrType(Token &token);

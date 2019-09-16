@@ -6,7 +6,7 @@ void Lexer::readAll() {
     readWhitespace();
     while (current_index < source.size()) {
         Token token = readOne();
-        tokens.push_back(token);
+        tokens.addToken(token);
         readWhitespace();
     }
 }
@@ -49,7 +49,7 @@ void Lexer::readAlpha(Token &token) {
 
     token.value = cut(start_index, current_index);
 
-    // TODO: Check towards keywords
+    tryReplaceKeyword(token);
 }
 
 void Lexer::readNumber(Token &token) {
@@ -115,12 +115,6 @@ inline std::pair<TokenType, std::string> Lexer::findLongestMatchingToken() {
     };
 
     return { longest_symbol, longest };
-}
-
-void Lexer::printTokens() const {
-    for (auto token : tokens) {
-        token.print();
-    }
 }
 
 std::string Lexer::cut(unsigned start, unsigned end) const {

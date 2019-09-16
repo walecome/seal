@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "Token.hh"
+#include "TokenBuffer.hh"
 
 class Lexer {
    public:
@@ -14,9 +15,10 @@ class Lexer {
     void readAll();
     Token readOne();
 
-    void printTokens() const;
-
     unsigned numberOfTokens() const { return tokens.size(); }
+
+    // Get lexer tokens as reference
+    TokenBuffer &getTokens() { return tokens; }
 
    private:
     void readWhitespace();
@@ -33,5 +35,5 @@ class Lexer {
 
     const std::string source;
     unsigned current_index { 0 };
-    std::vector<Token> tokens {};
+    TokenBuffer tokens {};
 };

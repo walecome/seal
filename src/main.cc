@@ -5,8 +5,8 @@
 #include <string>
 
 #include "Lexer.hh"
+#include "TokenBuffer.hh"
 #include "argparse.h"
-
 
 ArgumentParser parseArgs(int argc, char **argv) {
     ArgumentParser parser("CLI argument parser");
@@ -34,6 +34,13 @@ long measureTime(Function f) {
     return duration;
 }
 
+void eatAllTokens(TokenBuffer &tokenBuffer) {
+    while (!tokenBuffer.empty()) {
+        std::cout << "Ate token with value: " << tokenBuffer.pop().value
+                  << std::endl;
+    }
+}
+
 int main(int argc, char **argv) {
     ArgumentParser parser = parseArgs(argc, argv);
 
@@ -45,12 +52,14 @@ int main(int argc, char **argv) {
 
     Lexer lexer { code_text };
 
-    long duration = measureTime([&] () {
-        lexer.readAll();
-    });
+    long duration = measureTime([&]() { lexer.readAll(); });
 
-    std::cout << "Lexed " << lexer.numberOfTokens() << " tokens in "
-              << duration << " milliseconds" << std::endl;
+    lexer.getTokens().printTokens();
+
+    std::cout << "Lexed " << lexer.numberOfTokens() << " tokens in " << duration
+              << " milliseconds" << std::endl;
+
+    eatAllTokens(lexer.getTokens());
 
     return 0;
 }
