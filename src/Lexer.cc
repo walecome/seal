@@ -1,6 +1,6 @@
 #include "Lexer.hh"
 
-bool isString(const char c) { return c == '"'; }
+bool isString(const char c) { return c == '"' || c == '\''; }
 
 void Lexer::readAll() {
     readWhitespace();
@@ -21,7 +21,7 @@ Token Lexer::readOne() {
     } else if (std::isdigit(c)) {
         readNumber(token);
     } else if (isString(c)) {
-        readString(token);
+        readString(token, c);
     } else {
         readSymbol(token);
     }
@@ -48,6 +48,8 @@ void Lexer::readAlpha(Token &token) {
     }
 
     token.value = cut(start_index, current_index);
+
+    // TODO: Check towards keywords
 }
 
 void Lexer::readNumber(Token &token) {
@@ -62,18 +64,19 @@ void Lexer::readNumber(Token &token) {
     token.value = cut(start_index, current_index);
 }
 
-void Lexer::readString(Token &token) {
+void Lexer::readString(Token &token, char string_opener) {
     token.type = TokenType::STRING;
     unsigned start_index = current_index;
 
     // Start of string
     char current_char = source[++current_index];
 
-    while (current_char != '"') {
-        ++current_index;
+    while (current_char != string_opener) {
+        if (current_char == '\\') ++current_index;
+        current_char = source[++current_index];
     }
 
-    token.value = cut(start_index, current_index);
+    token.value = cut(start_index, ++current_index);
 }
 
 void Lexer::readSymbol(Token &token) {
@@ -107,7 +110,9 @@ inline std::pair<TokenType, std::string> Lexer::findLongestMatchingToken() {
     }
     --current_index;
 
-    if (longest_symbol == TokenType::UNEXPECTED) throw 1;
+    if (longest_symbol == TokenType::UNEXPECTED) {
+        reportError(cut(start_index, current_index + 1));
+    };
 
     return { longest_symbol, longest };
 }
@@ -120,4 +125,9 @@ void Lexer::printTokens() const {
 
 std::string Lexer::cut(unsigned start, unsigned end) const {
     return source.substr(start, end - start);
+}
+
+void Lexer::reportError(const std::string &value) const {
+    std::cout << "Unable to parse token: " << value << std::endl;
+    exit(EXIT_FAILURE);
 }

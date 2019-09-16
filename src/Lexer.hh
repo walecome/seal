@@ -20,8 +20,10 @@ class Lexer {
     void readWhitespace();
     void readAlpha(Token &token);
     void readNumber(Token &token);
-    void readString(Token &token);
+    void readString(Token &token, char string_opener);
     void readSymbol(Token &token);
+
+    void reportError(const std::string &value) const;
 
     std::string cut(unsigned start, unsigned steps) const;
 
