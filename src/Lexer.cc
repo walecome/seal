@@ -37,7 +37,7 @@ void Lexer::readWhitespace() {
 }
 
 void Lexer::readAlpha(Token &token) {
-    token.type = TokenType::IDENTIFIER;
+    token.type = IDENTIFIER;
     unsigned start_index = current_index;
 
     char current_char = source[current_index];
@@ -49,11 +49,11 @@ void Lexer::readAlpha(Token &token) {
 
     token.value = cut(start_index, current_index);
 
-    tryReplaceKeyword(token);
+    tryReplaceKeywordOrType(token);
 }
 
 void Lexer::readNumber(Token &token) {
-    token.type = TokenType::NUMBER;
+    token.type = NUMBER;
     unsigned start_index = current_index;
 
     char current_char = source[current_index];
@@ -65,7 +65,7 @@ void Lexer::readNumber(Token &token) {
 }
 
 void Lexer::readString(Token &token, char string_opener) {
-    token.type = TokenType::STRING;
+    token.type = STRING;
     unsigned start_index = current_index;
 
     // Start of string
@@ -91,7 +91,7 @@ void Lexer::readSymbol(Token &token) {
 inline std::pair<TokenType, std::string> Lexer::findLongestMatchingToken() {
     unsigned start_index = current_index;
 
-    TokenType longest_symbol { TokenType::UNEXPECTED };
+    TokenType longest_symbol { UNEXPECTED };
     std::string longest = "";
 
     while (1) {
@@ -101,7 +101,7 @@ inline std::pair<TokenType, std::string> Lexer::findLongestMatchingToken() {
         std::string current_string = cut(start_index, current_index);
 
         TokenType found_symbol = stringToToken(current_string);
-        if (found_symbol == TokenType::UNEXPECTED) {
+        if (found_symbol == UNEXPECTED) {
             break;
         }
 
@@ -110,7 +110,7 @@ inline std::pair<TokenType, std::string> Lexer::findLongestMatchingToken() {
     }
     --current_index;
 
-    if (longest_symbol == TokenType::UNEXPECTED) {
+    if (longest_symbol == UNEXPECTED) {
         reportError(cut(start_index, current_index + 1));
     };
 

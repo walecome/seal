@@ -1,28 +1,39 @@
 #include "Parser.hh"
 
-void Parser::parse(TokenBuffer &tokens) { parseFunction(tokens); }
-
-void Parser::parseFunction(TokenBuffer &tokens) {
-    parseFunctionDefinition(tokens);
+void Parser::parse(TokenBuffer &tokens) {
+    while (parseFunction(tokens)) {
+        ;
+    };
 }
 
-void Parser::parseFunctionDefinition(TokenBuffer &tokens) {
-    if (!tokens.eat(TokenType::FUNC_IDENT)) {
-        throw std::runtime_error { "Error parsing function" };
+ParseNode *Parser::parseFunction(TokenBuffer &tokens) {
+    return parseFunctionDecl(tokens);
+    // parseBlock(tokens);
+}
+
+ParseNode *Parser::parseFunctionDecl(TokenBuffer &tokens) {
+    if (!tokens.eat(FUNC_IDENT)) {
+        return nullptr;
+    }
+    expect(tokens, IDENTIFIER);
+    expect(tokens, LPARENS);
+
+    while (tokens.eat(IDENTIFIER)) {
+        expect(tokens, COLON);
+        expect(tokens, TYPE);
     }
 
-    expect(tokens, TokenType::FUNC_IDENT);
-    expect(tokens, TokenType::IDENTIFIER);
-    expect(tokens, TokenType::LPARENS);
+    expect(tokens, RPARENS);
+    expect(tokens, ARROW);
+    expect(tokens, TYPE);
 
-    while (tokens.eat(TokenType::IDENTIFIER)) {
-        expect(tokens, TokenType::COLON);
-        expect(tokens, TokenType::TYPE);
-    }
+    return new ParseNode {};
+}
 
-    expect(tokens, TokenType::RPARENS);
-    expect(tokens, TokenType::ARROW);
-    expect(tokens, TokenType::TYPE);
+void Parser::parseBlock(TokenBuffer &tokens) {
+    expect(tokens, LBRACE);
+
+    expect(tokens, RBRACE);
 }
 
 // TODO: Should tokenbuffer expect instead?

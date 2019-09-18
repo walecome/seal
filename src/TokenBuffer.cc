@@ -3,8 +3,9 @@
 void TokenBuffer::addToken(const Token token) { tokens.push_back(token); }
 
 void TokenBuffer::printTokens() const {
+    std::cout << "Tokens (" << tokens.size() << "):" << std::endl;
     for (auto token : tokens) {
-        token.print();
+        std::cout << "\t" << token.toString() << std::endl;
     }
 }
 

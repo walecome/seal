@@ -5,6 +5,7 @@
 #include <string>
 
 #include "Lexer.hh"
+#include "Parser.hh"
 #include "TokenBuffer.hh"
 #include "argparse.h"
 
@@ -42,9 +43,9 @@ void eatAllTokens(TokenBuffer &tokenBuffer) {
 }
 
 int main(int argc, char **argv) {
-    ArgumentParser parser = parseArgs(argc, argv);
+    ArgumentParser argumentParser = parseArgs(argc, argv);
 
-    std::string source_file { parser.get<std::string>("source") };
+    std::string source_file { argumentParser.get<std::string>("source") };
 
     std::ifstream t(source_file);
     std::string code_text((std::istreambuf_iterator<char>(t)),
@@ -52,14 +53,20 @@ int main(int argc, char **argv) {
 
     Lexer lexer { code_text };
 
-    long duration = measureTime([&]() { lexer.readAll(); });
+    long lexerDuration = measureTime([&]() { lexer.readAll(); });
 
     lexer.getTokens().printTokens();
 
-    std::cout << "Lexed " << lexer.numberOfTokens() << " tokens in " << duration
-              << " milliseconds" << std::endl;
+    std::cout << "Lexed " << lexer.numberOfTokens() << " tokens in "
+              << lexerDuration << " milliseconds" << std::endl;
 
-    eatAllTokens(lexer.getTokens());
+    Parser parser {};
+
+    long parserDuration =
+        measureTime([&]() { parser.parse(lexer.getTokens()); });
+
+    std::cout << "Parsing took " << parserDuration << " milliseconds"
+              << std::endl;
 
     return 0;
 }

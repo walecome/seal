@@ -1,3 +1,2 @@
-func myfunc(var1: int) -> int {
-   print("asd");
-}
+func myfunc(var1: int) -> void {}
+func myfunc2(asdvar: void) -> int {}
