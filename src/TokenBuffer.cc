@@ -21,3 +21,7 @@ bool TokenBuffer::eat(const TokenType tokenType) {
 bool TokenBuffer::empty() const { return index >= tokens.size(); }
 
 Token TokenBuffer::pop() { return tokens.at(index++); }
+
+bool TokenBuffer::accept(TokenType tokenType) const {
+    return top().type == tokenType;
+}

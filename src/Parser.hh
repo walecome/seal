@@ -8,9 +8,7 @@
 template <typename T>
 using ptr = std::unique_ptr<T>;
 
-struct ParseNode {
-    ParseNode() = default;
-};
+struct ParseNode {};
 
 class Parser {
    public:
@@ -19,7 +17,7 @@ class Parser {
     ParseNode *parseFunction(TokenBuffer &tokens);
     ParseNode *parseFunctionDecl(TokenBuffer &tokens);
 
-    void parseBlock(TokenBuffer &tokens);
+    ParseNode *parseBlock(TokenBuffer &tokens);
 
     void expect(TokenBuffer &tokens, TokenType tokenType);
 };

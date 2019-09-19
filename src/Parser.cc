@@ -1,14 +1,15 @@
 #include "Parser.hh"
 
 void Parser::parse(TokenBuffer &tokens) {
-    while (parseFunction(tokens)) {
-        ;
+    while (!tokens.empty() && parseFunction(tokens)) {
+        std::cout << "Parsing function" << std::endl;
     };
 }
 
 ParseNode *Parser::parseFunction(TokenBuffer &tokens) {
-    return parseFunctionDecl(tokens);
-    // parseBlock(tokens);
+    ParseNode *functionDeclNode = parseFunctionDecl(tokens);
+    ParseNode *blockNode = parseBlock(tokens);
+    return functionDeclNode;
 }
 
 ParseNode *Parser::parseFunctionDecl(TokenBuffer &tokens) {
@@ -27,16 +28,26 @@ ParseNode *Parser::parseFunctionDecl(TokenBuffer &tokens) {
     expect(tokens, ARROW);
     expect(tokens, TYPE);
 
+    std::cout << "Parsed function declaration" << std::endl;
     return new ParseNode {};
 }
 
-void Parser::parseBlock(TokenBuffer &tokens) {
-    expect(tokens, LBRACE);
+ParseNode *Parser::parseBlock(TokenBuffer &tokens) {
+    if (!tokens.eat(LBRACE)) {
+        return nullptr;
+    }
+
+    if (tokens.accept(LBRACE)) parseBlock(tokens);
 
     expect(tokens, RBRACE);
+
+    std::cout << "Parsed block" << std::endl;
+    return new ParseNode {};
 }
 
 // TODO: Should tokenbuffer expect instead?
 void Parser::expect(TokenBuffer &tokens, TokenType tokenType) {
-    if (!tokens.eat(tokenType)) throw std::runtime_error { "Invalid syntax" };
+    std::ostringstream os {};
+    os << "Invalid syntax, expected " << tokenNames[tokenType] << std::endl;
+    if (!tokens.eat(tokenType)) throw std::runtime_error { os.str() };
 }

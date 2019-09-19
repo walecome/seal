@@ -16,7 +16,11 @@ class TokenBuffer {
 
     bool eat(const TokenType tokenType);
 
+    Token top() const { return tokens[index]; };
+
     bool empty() const;
+
+    bool accept(TokenType tokenType) const;
 
    private:
     unsigned index { 0 };
