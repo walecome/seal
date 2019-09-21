@@ -6,13 +6,13 @@ void Parser::parse(TokenBuffer &tokens) {
     };
 }
 
-ParseNode *Parser::parseFunction(TokenBuffer &tokens) {
-    ParseNode *functionDeclNode = parseFunctionDecl(tokens);
-    ParseNode *blockNode = parseBlock(tokens);
-    return functionDeclNode;
+Function *Parser::parseFunction(TokenBuffer &tokens) {
+    FunctionDecl *functionDeclNode = parseFunctionDecl(tokens);
+    Block *blockNode = parseBlock(tokens);
+    return new Function {};
 }
 
-ParseNode *Parser::parseFunctionDecl(TokenBuffer &tokens) {
+FunctionDecl *Parser::parseFunctionDecl(TokenBuffer &tokens) {
     if (!tokens.eat(FUNC_IDENT)) {
         return nullptr;
     }
@@ -29,10 +29,10 @@ ParseNode *Parser::parseFunctionDecl(TokenBuffer &tokens) {
     expect(tokens, TYPE);
 
     std::cout << "Parsed function declaration" << std::endl;
-    return new ParseNode {};
+    return new FunctionDecl {};
 }
 
-ParseNode *Parser::parseBlock(TokenBuffer &tokens) {
+Block *Parser::parseBlock(TokenBuffer &tokens) {
     if (!tokens.eat(LBRACE)) {
         return nullptr;
     }
@@ -42,7 +42,7 @@ ParseNode *Parser::parseBlock(TokenBuffer &tokens) {
     expect(tokens, RBRACE);
 
     std::cout << "Parsed block" << std::endl;
-    return new ParseNode {};
+    return new Block {};
 }
 
 // TODO: Should tokenbuffer expect instead?
