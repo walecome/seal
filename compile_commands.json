@@ -7,6 +7,12 @@
 
 {
   "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -Wsuggest-attribute=const -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/main.cc.o -c /home/alexander/projects/compiler/src/main.cc",
+  "file": "/home/alexander/projects/compiler/src/main.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -Wsuggest-attribute=const -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Parser.cc.o -c /home/alexander/projects/compiler/src/Parser.cc",
   "file": "/home/alexander/projects/compiler/src/Parser.cc"
 },
@@ -21,11 +27,5 @@
   "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -Wsuggest-attribute=const -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/TokenBuffer.cc.o -c /home/alexander/projects/compiler/src/TokenBuffer.cc",
   "file": "/home/alexander/projects/compiler/src/TokenBuffer.cc"
-},
-
-{
-  "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -Wsuggest-attribute=const -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/main.cc.o -c /home/alexander/projects/compiler/src/main.cc",
-  "file": "/home/alexander/projects/compiler/src/main.cc"
 }
 ]

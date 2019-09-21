@@ -3,8 +3,26 @@ cmake_minimum_required(VERSION 3.10)
 project(compiler CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(GLOB PROJECT_HEADERS src/*.hh)
-file(GLOB PROJECT_SOURCES src/*.cc)
+set(PROJECT_SOURCES
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/Lexer.cc
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/Parser.cc
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/Token.cc
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/TokenBuffer.cc
+)
+
+set(PROJECT_HEADERS
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/Lexer.hh
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/Parser.hh
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/Token.hh
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/TokenBuffer.hh
+
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Block.hh
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Function.hh
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/FunctionDecl.hh
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Node.hh
+)
+
 
 source_group("Headers" FILES ${PROJECT_HEADERS})
 source_group("Sources" FILES ${PROJECT_SOURCES})
