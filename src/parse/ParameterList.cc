@@ -1,11 +1,5 @@
 #include "ParameterList.hh"
 
-ParameterList::~ParameterList() {
-    for (Parameter* parameter : parameters) {
-        delete parameter;
-    }
-}
-
-void ParameterList::addParamter(Parameter* parameter) {
-    parameters.push_back(parameter);
+void ParameterList::addParamter(ptr_t<Parameter>& parameter) {
+    parameters.push_back(std::move(parameter));
 }

@@ -6,9 +6,7 @@
 #include <vector>
 
 struct ParameterList : public Node {
-    virtual ~ParameterList() override;
+    void addParamter(ptr_t<Parameter> &parameter);
 
-    void addParamter(Parameter *parameter);
-
-    std::vector<Parameter *> parameters {};
+    std::vector<ptr_t<Parameter>> parameters {};
 };

@@ -1,50 +1,45 @@
 #include "Parser.hh"
 
-Parser::~Parser() {
-    for (auto x : parseNodes) {
-        delete x;
-    }
-}
-
 void Parser::parse(TokenBuffer &tokens) {
     while (!tokens.empty()) {
         std::cout << "Parsing function" << std::endl;
-        Function *function = parseFunction(tokens);
+        ptr_t<Function> function = parseFunction(tokens);
 
         if (!function) break;
 
-        parseNodes.push_back(function);
+        parseNodes.push_back(std::move(function));
     };
 }
 
-Function *Parser::parseFunction(TokenBuffer &tokens) {
-    FunctionDecl *functionDeclNode = parseFunctionDecl(tokens);
-    Block *blockNode = parseBlock(tokens);
-    return new Function { functionDeclNode, blockNode };
+ptr_t<Function> Parser::parseFunction(TokenBuffer &tokens) {
+    ptr_t<FunctionDecl> functionDeclNode = parseFunctionDecl(tokens);
+    ptr_t<Block> blockNode = parseBlock(tokens);
+
+    return std::make_unique<Function>(functionDeclNode, blockNode);
 }
 
-FunctionDecl *Parser::parseFunctionDecl(TokenBuffer &tokens) {
+ptr_t<FunctionDecl> Parser::parseFunctionDecl(TokenBuffer &tokens) {
     if (!tokens.eat(FUNC_IDENT)) {
         return nullptr;
     }
 
     expect(tokens, IDENTIFIER);
 
-    ParameterList *parameters = parseParameterList(tokens);
+    ptr_t<ParameterList> parameters = parseParameterList(tokens);
 
     expect(tokens, ARROW);
     expect(tokens, TYPE);
 
     std::cout << "Parsed function declaration" << std::endl;
-    return new FunctionDecl { parameters };
+    return std::make_unique<FunctionDecl>(parameters);
 }
 
-ParameterList *Parser::parseParameterList(TokenBuffer &tokens) {
+ptr_t<ParameterList> Parser::parseParameterList(TokenBuffer &tokens) {
     expect(tokens, LPARENS);
     if (tokens.eat(RPARENS)) return nullptr;
-    ParameterList *parameters { new ParameterList {} };
+    ptr_t<ParameterList> parameters = std::make_unique<ParameterList>();
 
-    while (Parameter *parameter = parseParameter(tokens)) {
+    while (ptr_t<Parameter> parameter = parseParameter(tokens)) {
         parameters->addParamter(parameter);
         // @TODO: This is kinda ugly, we need to eat the comma to process the
         //        next token.
@@ -56,7 +51,7 @@ ParameterList *Parser::parseParameterList(TokenBuffer &tokens) {
     return parameters;
 }
 
-Parameter *Parser::parseParameter(TokenBuffer &tokens) {
+ptr_t<Parameter> Parser::parseParameter(TokenBuffer &tokens) {
     Token identifier = tokens.top();
     if (identifier.type != IDENTIFIER) return nullptr;
     tokens.eat(IDENTIFIER);
@@ -66,10 +61,11 @@ Parameter *Parser::parseParameter(TokenBuffer &tokens) {
     Token type = tokens.top();
     expect(tokens, TYPE);
 
-    return new Parameter { identifier.value, TypeUtil::fromString(type.value) };
+    return std::make_unique<Parameter>(identifier.value,
+                                       TypeUtil::fromString(type.value));
 }
 
-Block *Parser::parseBlock(TokenBuffer &tokens) {
+ptr_t<Block> Parser::parseBlock(TokenBuffer &tokens) {
     if (!tokens.eat(LBRACE)) {
         return nullptr;
     }
@@ -77,7 +73,7 @@ Block *Parser::parseBlock(TokenBuffer &tokens) {
     expect(tokens, RBRACE);
 
     std::cout << "Parsed block" << std::endl;
-    return new Block {};
+    return std::make_unique<Block>();
 }
 
 // TODO: Should tokenbuffer expect instead?

@@ -5,13 +5,12 @@
 #include "Node.hh"
 
 struct Function : public Node {
-    Function(FunctionDecl* functionDecl, Block* block)
-        : functionDecl { functionDecl }, block { block } {}
-
-    virtual ~Function() override;
+    Function(ptr_t<FunctionDecl> &functionDecl, ptr_t<Block> &block)
+        : functionDecl { std::move(functionDecl) },
+          block { std::move(block) } {}
 
     virtual std::string name() const override { return "Function"; }
 
-    FunctionDecl* functionDecl { nullptr };
-    Block* block { nullptr };
+    ptr_t<FunctionDecl> functionDecl { nullptr };
+    ptr_t<Block> block { nullptr };
 };
