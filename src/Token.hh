@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "parse/Type.hh"
+
 #define REFLECT_TOKEN(token) \
     { (token), #token }
 
@@ -87,8 +89,6 @@ static std::unordered_map<std::string, TokenType> stringTokenMap {
 
 static std::unordered_map<std::string, TokenType> keywordMap { { "func",
                                                                  FUNC_IDENT } };
-
-static std::unordered_set<std::string> types { "int", "void" };
 
 static std::unordered_map<TokenType, std::string> tokenNames {
     REFLECT_TOKEN(AMP_AMP),      REFLECT_TOKEN(AMP),

@@ -9,6 +9,12 @@ set(PROJECT_SOURCES
    ${CMAKE_CURRENT_SOURCE_DIR}/src/Parser.cc
    ${CMAKE_CURRENT_SOURCE_DIR}/src/Token.cc
    ${CMAKE_CURRENT_SOURCE_DIR}/src/TokenBuffer.cc
+
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Function.cc
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/FunctionDecl.cc
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Parameter.cc
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/ParameterList.cc
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Type.cc
 )
 
 set(PROJECT_HEADERS
@@ -21,6 +27,11 @@ set(PROJECT_HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Function.hh
    ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/FunctionDecl.hh
    ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Node.hh
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Parameter.hh
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/ParameterList.hh
+
+   # @TODO: Probably move this somewhere else
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Type.hh
 )
 
 
@@ -30,7 +41,7 @@ source_group("Sources" FILES ${PROJECT_SOURCES})
 include_directories(lib/argparse)
 
 
-set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -Wsuggest-attribute=const -fdiagnostics-color=always")
+set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always")
 
 ## Force colored output (mostly needed for Ninja build)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")

@@ -17,7 +17,9 @@ std::string Token::toString() const {
     return os.str();
 }
 
-bool isType(const std::string &s) { return types.find(s) != std::end(types); }
+bool isType(const std::string &s) {
+    return TypeUtil::stringToType.find(s) != std::end(TypeUtil::stringToType);
+}
 
 void tryReplaceKeywordOrType(Token &token) {
     auto it = keywordMap.find(token.value);

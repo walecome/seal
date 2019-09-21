@@ -1,2 +1,2 @@
-func myfunc(var1: int) -> void {{}}
-func myfunc2(asdvar: void) -> int {}
+func myfunc(var1: int) -> void {}
+func myfunc2(asdvar: void, lolol: string) -> int {}
