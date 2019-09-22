@@ -1,61 +1,73 @@
 [
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Lexer.cc.o -c /home/alexander/projects/compiler/src/Lexer.cc",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Lexer.cc.o -c /home/alexander/projects/compiler/src/Lexer.cc",
   "file": "/home/alexander/projects/compiler/src/Lexer.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/main.cc.o -c /home/alexander/projects/compiler/src/main.cc",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/main.cc.o -c /home/alexander/projects/compiler/src/main.cc",
   "file": "/home/alexander/projects/compiler/src/main.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Parser.cc.o -c /home/alexander/projects/compiler/src/Parser.cc",
-  "file": "/home/alexander/projects/compiler/src/Parser.cc"
-},
-
-{
-  "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Token.cc.o -c /home/alexander/projects/compiler/src/Token.cc",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Token.cc.o -c /home/alexander/projects/compiler/src/Token.cc",
   "file": "/home/alexander/projects/compiler/src/Token.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/TokenBuffer.cc.o -c /home/alexander/projects/compiler/src/TokenBuffer.cc",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/TokenBuffer.cc.o -c /home/alexander/projects/compiler/src/TokenBuffer.cc",
   "file": "/home/alexander/projects/compiler/src/TokenBuffer.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/Function.cc.o -c /home/alexander/projects/compiler/src/parse/Function.cc",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/Parser.cc.o -c /home/alexander/projects/compiler/src/parse/Parser.cc",
+  "file": "/home/alexander/projects/compiler/src/parse/Parser.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/Function.cc.o -c /home/alexander/projects/compiler/src/parse/Function.cc",
   "file": "/home/alexander/projects/compiler/src/parse/Function.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/FunctionDecl.cc.o -c /home/alexander/projects/compiler/src/parse/FunctionDecl.cc",
-  "file": "/home/alexander/projects/compiler/src/parse/FunctionDecl.cc"
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/Block.cc.o -c /home/alexander/projects/compiler/src/parse/Block.cc",
+  "file": "/home/alexander/projects/compiler/src/parse/Block.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/Parameter.cc.o -c /home/alexander/projects/compiler/src/parse/Parameter.cc",
-  "file": "/home/alexander/projects/compiler/src/parse/Parameter.cc"
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/Function.cc.o -c /home/alexander/projects/compiler/src/ast/Function.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/Function.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/ParameterList.cc.o -c /home/alexander/projects/compiler/src/parse/ParameterList.cc",
-  "file": "/home/alexander/projects/compiler/src/parse/ParameterList.cc"
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/FunctionDecl.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionDecl.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/FunctionDecl.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/Type.cc.o -c /home/alexander/projects/compiler/src/parse/Type.cc",
-  "file": "/home/alexander/projects/compiler/src/parse/Type.cc"
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/Parameter.cc.o -c /home/alexander/projects/compiler/src/ast/Parameter.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/Parameter.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/ParameterList.cc.o -c /home/alexander/projects/compiler/src/ast/ParameterList.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/ParameterList.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/Type.cc.o -c /home/alexander/projects/compiler/src/ast/Type.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/Type.cc"
 }
 ]

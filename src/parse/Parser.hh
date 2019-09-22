@@ -2,17 +2,20 @@
 
 #include <iostream>
 #include <memory>
+#include <stack>
 #include <stdexcept>
 #include <vector>
 
 #include "TokenBuffer.hh"
-#include "parse/Block.hh"
-#include "parse/Function.hh"
-#include "parse/FunctionDecl.hh"
-#include "parse/Node.hh"
-#include "parse/Parameter.hh"
-#include "parse/ParameterList.hh"
-#include "parse/Type.hh"
+
+#include "ast/Block.hh"
+#include "ast/Expression.hh"
+#include "ast/Function.hh"
+#include "ast/FunctionDecl.hh"
+#include "ast/Node.hh"
+#include "ast/Parameter.hh"
+#include "ast/ParameterList.hh"
+#include "ast/Type.hh"
 
 class Parser {
    public:
@@ -26,7 +29,7 @@ class Parser {
 
     ptr_t<Block> parseBlock(TokenBuffer &tokens);
 
-    void expect(TokenBuffer &tokens, TokenType tokenType);
+    ptr_t<Expression> parseExpression(TokenBuffer &tokens);
 
     std::vector<ptr_t<Node>> parseNodes {};
 };

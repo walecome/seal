@@ -4,41 +4,30 @@ project(compiler CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(PROJECT_SOURCES
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/Lexer.cc
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/Parser.cc
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/Token.cc
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/TokenBuffer.cc
+   src/Lexer.cc
+   src/main.cc
+   src/Token.cc
+   src/TokenBuffer.cc
+   
+   src/parse/Parser.cc
+   src/parse/Function.cc
+   src/parse/Block.cc
+ 
+   src/ast/Function.cc
+   src/ast/FunctionDecl.cc
+   src/ast/Parameter.cc
+   src/ast/ParameterList.cc
+   src/ast/Type.cc
 
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Function.cc
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/FunctionDecl.cc
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Parameter.cc
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/ParameterList.cc
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Type.cc
 )
-
-set(PROJECT_HEADERS
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/Lexer.hh
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/Parser.hh
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/Token.hh
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/TokenBuffer.hh
-
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Block.hh
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Function.hh
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/FunctionDecl.hh
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Node.hh
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Parameter.hh
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/ParameterList.hh
-
-   # @TODO: Probably move this somewhere else
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/parse/Type.hh
-)
-
-
-source_group("Headers" FILES ${PROJECT_HEADERS})
-source_group("Sources" FILES ${PROJECT_SOURCES})
 
 include_directories(lib/argparse)
+
+include_directories(src)
+include_directories(src/ast)
+include_directories(src/parse)
+
+
 
 
 set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always")
@@ -50,7 +39,8 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
 endif ()
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 

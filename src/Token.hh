@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "parse/Type.hh"
+#include "ast/Type.hh"
 
 #define REFLECT_TOKEN(token) \
     { (token), #token }
@@ -17,12 +17,16 @@ enum TokenType {
     RPARENS,
     HASH,
     ARROW,
+
     LT,
     GT,
     LTEQ,
     GTEQ,
+    ASSIGN,
     EQ,
+    NOT_EQ,
     SLASH,
+
     LBRACKET,
     RBRACKET,
     LBRACE,
@@ -69,22 +73,18 @@ enum TokenType {
 };
 
 static std::unordered_map<std::string, TokenType> stringTokenMap {
-    { "(", LPARENS },      { ")", RPARENS },
-    { "#", HASH },         { "->", ARROW },
-    { "<", LT },           { ">", GT },
-    { "<=", LTEQ },        { ">=", GTEQ },
-    { "/", SLASH },        { "[", LBRACKET },
-    { "]", RBRACKET },     { "{", LBRACE },
-    { "}", RBRACE },       { "-", MINUS },
-    { "+", PLUS },         { "*", STAR },
-    { "%", MODULO },       { "&", AMP },
-    { "|", PIPE },         { ".", DOT },
-    { ",", COMMA },        { ":", COLON },
-    { ";", SEMICOLON },    { "=", EQ },
-    { "'", SINGLE_QUOTE }, { "\"", DOUBLE_QUOTE },
-    { "!", EXCL },         { "&&", AMP_AMP },
-    { "||", PIPE_PIPE },   { "~", TILDE },
-    { "?", QUESTION },     { "^", POWER },
+    { "(", LPARENS },       { ")", RPARENS }, { "#", HASH },
+    { "->", ARROW },        { "<", LT },      { ">", GT },
+    { "<=", LTEQ },         { ">=", GTEQ },   { "!=", NOT_EQ },
+    { "=", ASSIGN },        { "/", SLASH },   { "[", LBRACKET },
+    { "]", RBRACKET },      { "{", LBRACE },  { "}", RBRACE },
+    { "-", MINUS },         { "+", PLUS },    { "*", STAR },
+    { "%", MODULO },        { "&", AMP },     { "|", PIPE },
+    { ".", DOT },           { ",", COMMA },   { ":", COLON },
+    { ";", SEMICOLON },     { "==", EQ },     { "'", SINGLE_QUOTE },
+    { "\"", DOUBLE_QUOTE }, { "!", EXCL },    { "&&", AMP_AMP },
+    { "||", PIPE_PIPE },    { "~", TILDE },   { "?", QUESTION },
+    { "^", POWER },
 };
 
 static std::unordered_map<std::string, TokenType> keywordMap { { "func",

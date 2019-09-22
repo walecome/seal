@@ -22,6 +22,8 @@ class TokenBuffer {
 
     bool accept(TokenType tokenType) const;
 
+    void expect(TokenType tokenType);
+
    private:
     unsigned index { 0 };
 

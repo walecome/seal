@@ -25,3 +25,13 @@ Token TokenBuffer::pop() { return tokens.at(index++); }
 bool TokenBuffer::accept(TokenType tokenType) const {
     return top().type == tokenType;
 }
+
+void TokenBuffer::expect(TokenType tokenType) {
+    std::ostringstream os {};
+    os << "Invalid syntax, expected " << tokenNames[tokenType];
+    if (top().type != tokenType) {
+        os << " got " << tokenNames[top().type];
+        throw std::runtime_error { os.str() };
+    }
+    eat(tokenType);
+}
