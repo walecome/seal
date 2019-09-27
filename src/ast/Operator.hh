@@ -52,6 +52,15 @@ struct Operator : public Node {
     bool isRightAssociative() const;
     bool isLeftAssociative() const;
 
+    virtual std::string name() const override { return "Operator"; }
+
+    virtual std::string dump() const override {
+        std::ostringstream oss {};
+        // @TODO: Fix operatorSymbol to string
+        oss << "[" << name() << ", " << (int)operatorSymbol << "]";
+        return oss.str();
+    }
+
     bool precedes(const Operator &other) const;
 
     OperatorSym operatorSymbol;

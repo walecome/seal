@@ -10,4 +10,6 @@ struct Node {
     virtual ~Node() = default;
 
     virtual std::string name() const { return "Node"; }
+
+    virtual std::string dump() const { return "Node"; }
 };

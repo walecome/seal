@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
     Parser parser {};
 
-    parser.shuntingYard(lexer.getTokens());
+    parser.parseExpression(lexer.getTokens());
 
     return 1;
 

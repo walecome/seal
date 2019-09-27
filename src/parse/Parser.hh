@@ -36,7 +36,7 @@ class Parser {
     ptr_t<Expression> parseExpression(TokenBuffer &tokens);
     ptr_t<ArgumentList> parseArgumentList(TokenBuffer &tokens);
 
-    std::vector<Token> shuntingYard(TokenBuffer &tokens);
+    TokenBuffer shuntingYard(TokenBuffer &tokens);
     ptr_t<Expression> rpnToExpressions(TokenBuffer &tokens);
 
     std::vector<ptr_t<Node>> parseNodes {};

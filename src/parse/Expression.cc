@@ -1,11 +1,15 @@
 #include "Parser.hh"
 
-std::vector<Token> Parser::shuntingYard(TokenBuffer& tokens) {
+TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
     std::stack<Token> operators {};
     std::vector<Token> output {};
 
-    while (tokens.top().type != SEMICOLON || tokens.top().type != COMMA) {
+    while (!tokens.empty()) {
+        if (tokens.top().type == SEMICOLON || tokens.top().type == COMMA) break;
+
         Token current { tokens.pop() };
+
+        std::cout << current.toString() << std::endl;
 
         if (current.type == NUMBER) {
             output.push_back(current);
@@ -61,7 +65,7 @@ std::vector<Token> Parser::shuntingYard(TokenBuffer& tokens) {
         std::cout << x.toString() << std::endl;
     }
 
-    return output;
+    return TokenBuffer { output };
 }
 
 ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
@@ -101,8 +105,14 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
             Error::rpn(current);
         }
     }
+    return std::move(expressions.top());
 }
 
 ptr_t<Expression> Parser::parseExpression(TokenBuffer& tokens) {
-    std::vector<Token> rpnTokens { shuntingYard(tokens) };
+    TokenBuffer rpnTokens = shuntingYard(tokens);
+    ptr_t<Expression> expression = rpnToExpressions(rpnTokens);
+
+    std::cout << expression->dump() << std::endl;
+
+    return expression;
 }
