@@ -43,6 +43,12 @@
 
 {
   "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/Expression.cc.o -c /home/alexander/projects/compiler/src/parse/Expression.cc",
+  "file": "/home/alexander/projects/compiler/src/parse/Expression.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/Function.cc.o -c /home/alexander/projects/compiler/src/ast/Function.cc",
   "file": "/home/alexander/projects/compiler/src/ast/Function.cc"
 },
@@ -51,6 +57,12 @@
   "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/FunctionDecl.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionDecl.cc",
   "file": "/home/alexander/projects/compiler/src/ast/FunctionDecl.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/Operator.cc.o -c /home/alexander/projects/compiler/src/ast/Operator.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/Operator.cc"
 },
 
 {

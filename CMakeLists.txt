@@ -12,9 +12,11 @@ set(PROJECT_SOURCES
    src/parse/Parser.cc
    src/parse/Function.cc
    src/parse/Block.cc
+   src/parse/Expression.cc
  
    src/ast/Function.cc
    src/ast/FunctionDecl.cc
+   src/ast/Operator.cc
    src/ast/Parameter.cc
    src/ast/ParameterList.cc
    src/ast/Type.cc

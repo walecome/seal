@@ -68,8 +68,10 @@ enum TokenType {
     FUNC_IDENT,
 
     // Type
-    TYPE
+    TYPE,
 
+    // Semantic
+    FUNC_CALL
 };
 
 static std::unordered_map<std::string, TokenType> stringTokenMap {
@@ -110,6 +112,7 @@ static std::unordered_map<TokenType, std::string> tokenNames {
     REFLECT_TOKEN(SLASH),        REFLECT_TOKEN(STAR),
     REFLECT_TOKEN(STRING),       REFLECT_TOKEN(TILDE),
     REFLECT_TOKEN(TYPE),         REFLECT_TOKEN(UNEXPECTED),
+    REFLECT_TOKEN(FUNC_CALL)
 };
 
 struct Token {

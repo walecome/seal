@@ -3,14 +3,57 @@
 
 #include <unordered_map>
 
-static std::unordered_map<Token, int> operatorPrecedence = {
-    { ASSIGN, 1 }, { EQ, 5 },    { NOT_EQ, 5 }, { LTEQ, 5 },
-    { GTEQ, 5 },   { LT, 5 },    { GT, 5 },     { PLUS, 10 },
-    { MINUS, 10 }, { STAR, 20 }, { SLASH, 20 }
+enum class OperatorSym {
+    MULT,
+    DIV,
+
+    PLUS,
+    MINUS,
+    MODULO,
+
+    EQ,
+    NOT_EQ,
+    LTEQ,
+    GTEQ,
+    LT,
+    GT,
+
+    ASSIGN
+
+};
+
+static std::unordered_map<OperatorSym, int> operatorPrecedence = {
+    { OperatorSym::ASSIGN, 1 }, { OperatorSym::EQ, 5 },
+    { OperatorSym::NOT_EQ, 5 }, { OperatorSym::LTEQ, 5 },
+    { OperatorSym::GTEQ, 5 },   { OperatorSym::LT, 5 },
+    { OperatorSym::GT, 5 },     { OperatorSym::PLUS, 10 },
+    { OperatorSym::MINUS, 10 }, { OperatorSym::MULT, 20 },
+    { OperatorSym::DIV, 20 }
+};
+
+static std::unordered_map<std::string, OperatorSym> stringToOpSym {
+    { "*", OperatorSym::MULT },    { "/", OperatorSym::DIV },
+    { "+", OperatorSym::PLUS },    { "-", OperatorSym::MINUS },
+    { "%", OperatorSym::MODULO },  { "==", OperatorSym::EQ },
+    { "!=", OperatorSym::NOT_EQ }, { "<=", OperatorSym::LTEQ },
+    { ">=", OperatorSym::GTEQ },   { "<", OperatorSym::LT },
+    { ">", OperatorSym::GT },      { "=", OperatorSym::ASSIGN },
 };
 
 struct Operator : public Node {
+    Operator(const Token &token)
+        : operatorSymbol { stringToOpSym[token.value] },
+          precedence { operatorPrecedence[operatorSymbol] } {}
+
     static bool isOperator(const Token &token) {
-        operatorPrecedence.find(token) != std::end(operatorPrecedence);
-    };
+        return stringToOpSym.find(token.value) != std::end(stringToOpSym);
+    }
+
+    bool isRightAssociative() const;
+    bool isLeftAssociative() const;
+
+    bool precedes(const Operator &other) const;
+
+    OperatorSym operatorSymbol;
+    int precedence;
 };

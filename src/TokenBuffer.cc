@@ -27,9 +27,9 @@ bool TokenBuffer::accept(TokenType tokenType) const {
 }
 
 void TokenBuffer::expect(TokenType tokenType) {
-    std::ostringstream os {};
-    os << "Invalid syntax, expected " << tokenNames[tokenType];
     if (top().type != tokenType) {
+        std::ostringstream os {};
+        os << "Invalid syntax, expected " << tokenNames[tokenType];
         os << " got " << tokenNames[top().type];
         throw std::runtime_error { os.str() };
     }

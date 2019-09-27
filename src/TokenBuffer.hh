@@ -6,6 +6,9 @@
 
 class TokenBuffer {
    public:
+    TokenBuffer() = default;
+    TokenBuffer(std::vector<Token> fromTokens) : tokens { fromTokens } {}
+
     void addToken(const Token token);
 
     void printTokens() const;
