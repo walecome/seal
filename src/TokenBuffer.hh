@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "Error.hh"
 #include "Token.hh"
 
 class TokenBuffer {

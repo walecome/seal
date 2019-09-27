@@ -6,16 +6,20 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Error.hh"
 #include "TokenBuffer.hh"
-
+#include "ast/ArgumentList.hh"
+#include "ast/BinaryExpression.hh"
 #include "ast/Block.hh"
 #include "ast/Expression.hh"
 #include "ast/Function.hh"
 #include "ast/FunctionDecl.hh"
+#include "ast/IntegerLiteral.hh"
 #include "ast/Node.hh"
 #include "ast/Parameter.hh"
 #include "ast/ParameterList.hh"
 #include "ast/Type.hh"
+#include "ast/VariableExpression.hh"
 
 class Parser {
    public:
@@ -30,6 +34,7 @@ class Parser {
     ptr_t<Block> parseBlock(TokenBuffer &tokens);
 
     ptr_t<Expression> parseExpression(TokenBuffer &tokens);
+    ptr_t<ArgumentList> parseArgumentList(TokenBuffer &tokens);
 
     std::vector<Token> shuntingYard(TokenBuffer &tokens);
     ptr_t<Expression> rpnToExpressions(TokenBuffer &tokens);

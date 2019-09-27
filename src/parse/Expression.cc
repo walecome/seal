@@ -4,7 +4,7 @@ std::vector<Token> Parser::shuntingYard(TokenBuffer& tokens) {
     std::stack<Token> operators {};
     std::vector<Token> output {};
 
-    while (tokens.top().type != SEMICOLON) {
+    while (tokens.top().type != SEMICOLON || tokens.top().type != COMMA) {
         Token current { tokens.pop() };
 
         if (current.type == NUMBER) {
@@ -65,18 +65,40 @@ std::vector<Token> Parser::shuntingYard(TokenBuffer& tokens) {
 }
 
 ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
+    std::stack<ptr_t<Expression>> expressions {};
+
     while (!tokens.empty()) {
         Token current = tokens.pop();
 
         if (current.type == NUMBER) {
+            int number = std::stoi(current.value);
+            expressions.push(std::make_unique<IntegerLiteral>(number));
+
         } else if (current.type == FUNC_CALL) {
+            ptr_t<ArgumentList> argumentList =
+                Parser::parseArgumentList(tokens);
+
+        } else if (current.type == IDENTIFIER) {  // Variable
+            expressions.push(
+                std::make_unique<VariableExpression>(current.value));
         } else if (Operator::isOperator(current)) {
+            if (expressions.size() < 2) {
+                throw std::runtime_error("Two operands needed");
+            }
+
+            ptr_t<Expression> right = std::move(expressions.top());
+            expressions.pop();
+
+            ptr_t<Expression> left = std::move(expressions.top());
+            expressions.pop();
+
+            ptr_t<Operator> op { std::make_unique<Operator>(current) };
+
+            expressions.push(
+                std::make_unique<BinaryExpression>(right, left, op));
+
         } else {
-            std::ostringstream os {};
-            os << "Invalid token when converting RPN to expression, expected "
-               << tokenNames[current.type];
-            os << " got " << tokenNames[current.type];
-            throw std::runtime_error { os.str() };
+            Error::rpn(current);
         }
     }
 }

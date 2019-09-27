@@ -8,11 +8,13 @@ set(PROJECT_SOURCES
    src/main.cc
    src/Token.cc
    src/TokenBuffer.cc
-   
+   src/Error.cc
+
    src/parse/Parser.cc
    src/parse/Function.cc
    src/parse/Block.cc
    src/parse/Expression.cc
+   src/parse/ArgumentList.cc
  
    src/ast/Function.cc
    src/ast/FunctionDecl.cc
@@ -20,6 +22,8 @@ set(PROJECT_SOURCES
    src/ast/Parameter.cc
    src/ast/ParameterList.cc
    src/ast/Type.cc
+   src/ast/ArgumentList.cc
+
 
 )
 
