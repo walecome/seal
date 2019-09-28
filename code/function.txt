@@ -1,3 +1,6 @@
 func myfunc(var1: int) -> void {
+    1 - 2;
     asd : int = (3 + 5) * 2;
+    var2 : int = asd * (abc(1) + 5);
+    abc(abc(1) * (asd - var2));
 }

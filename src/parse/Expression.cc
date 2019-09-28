@@ -9,22 +9,29 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
     while (!tokens.empty()) {
         if (tokens.eat(SEMICOLON)) break;
         if (tokens.eat(COMMA)) break;
-        if (tokens.top().type == RPARENS && parDepth == 0) break;
+        if (tokens.top().type == RPARENS && parDepth == 0) {
+            break;
+        }
         Token current { tokens.pop() };
 
         if (current.type == NUMBER) {
             output.push_back(current);
         } else if (current.type == IDENTIFIER) {
-            // @ TODO: Push function to operator stack...
             if (tokens.top().type == LPARENS) {  // Call to function
+
                 current.type = FUNC_CALL;
-                output.push_back(current);
-                while (tokens.top().type != RPARENS) {
+                output.push_back(current);  // Function call ident
+
+                int currentParDepth = parDepth;
+
+                do {
+                    if (tokens.top().type == LPARENS) ++currentParDepth;
+                    if (tokens.top().type == RPARENS) --currentParDepth;
                     output.push_back(tokens.pop());
-                }
-                output.push_back(tokens.pop());  // RPARENS
-            } else {                             // Variable
-                operators.push(current);
+                } while (currentParDepth > parDepth);
+
+            } else {  // Variable
+                output.push_back(current);
             }
         } else if (Operator::isOperator(current)) {
             Operator currentOperator { current };
@@ -83,7 +90,6 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
         } else if (current.type == FUNC_CALL) {
             ptr_t<ArgumentList> argumentList =
                 Parser::parseArgumentList(tokens);
-
             expressions.push(
                 std::make_unique<FunctionCall>(current.value, argumentList));
 
@@ -110,6 +116,7 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
             Error::rpn(current);
         }
     }
+
     return std::move(expressions.top());
 }
 

@@ -15,7 +15,7 @@ struct BinaryExpression : public Expression {
         std::ostringstream oss {};
 
         oss << name() << " (";
-        oss << right->dump() << ", " << op->dump() << ", " << left->dump()
+        oss << left->dump() << ", " << op->dump() << ", " << right->dump()
             << ")";
 
         return oss.str();

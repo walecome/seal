@@ -64,7 +64,6 @@ struct Operator : public Node {
 
     virtual std::string dump() const override {
         std::ostringstream oss {};
-        // @TODO: Fix operatorSymbol to string
         oss << "[" << name() << ", " << fromSym(operatorSymbol) << "]";
         return oss.str();
     }
