@@ -40,6 +40,14 @@ static std::unordered_map<std::string, OperatorSym> stringToOpSym {
     { ">", OperatorSym::GT },      { "=", OperatorSym::ASSIGN },
 };
 
+static std::string fromSym(OperatorSym opSym) {
+    for (auto x : stringToOpSym) {
+        if (x.second == opSym) return x.first;
+    }
+
+    throw 1;
+}
+
 struct Operator : public Node {
     Operator(const Token &token)
         : operatorSymbol { stringToOpSym[token.value] },
@@ -57,7 +65,7 @@ struct Operator : public Node {
     virtual std::string dump() const override {
         std::ostringstream oss {};
         // @TODO: Fix operatorSymbol to string
-        oss << "[" << name() << ", " << (int)operatorSymbol << "]";
+        oss << "[" << name() << ", " << fromSym(operatorSymbol) << "]";
         return oss.str();
     }
 

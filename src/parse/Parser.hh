@@ -13,6 +13,7 @@
 #include "ast/Block.hh"
 #include "ast/Expression.hh"
 #include "ast/Function.hh"
+#include "ast/FunctionCall.hh"
 #include "ast/FunctionDecl.hh"
 #include "ast/IntegerLiteral.hh"
 #include "ast/Node.hh"

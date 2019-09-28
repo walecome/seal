@@ -15,6 +15,9 @@
 enum TokenType {
     LPARENS,
     RPARENS,
+    LARGPARENS,
+    RARGPARENS,
+
     HASH,
     ARROW,
 

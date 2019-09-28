@@ -4,12 +4,13 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
     std::stack<Token> operators {};
     std::vector<Token> output {};
 
+    int parDepth = 0;
+
     while (!tokens.empty()) {
-        if (tokens.top().type == SEMICOLON || tokens.top().type == COMMA) break;
-
+        if (tokens.top().type == SEMICOLON) break;
+        if (tokens.top().type == COMMA) break;
+        if (tokens.top().type == RPARENS && parDepth == 0) break;
         Token current { tokens.pop() };
-
-        std::cout << current.toString() << std::endl;
 
         if (current.type == NUMBER) {
             output.push_back(current);
@@ -17,11 +18,12 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
             // @ TODO: Push function to operator stack...
             if (tokens.top().type == LPARENS) {  // Call to function
                 current.type = FUNC_CALL;
+                output.push_back(current);
                 while (tokens.top().type != RPARENS) {
-                    operators.push(tokens.pop());
+                    output.push_back(tokens.pop());
                 }
-                operators.push(tokens.pop());
-            } else {  // Variable
+                output.push_back(tokens.pop());  // RPARENS
+            } else {                             // Variable
                 operators.push(current);
             }
         } else if (Operator::isOperator(current)) {
@@ -46,8 +48,10 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
             operators.push(current);
 
         } else if (current.type == LPARENS) {
+            ++parDepth;
             operators.push(current);
         } else if (current.type == RPARENS) {
+            --parDepth;
             while (operators.top().type != LPARENS) {
                 output.push_back(operators.top());
                 operators.pop();
@@ -82,6 +86,9 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
             ptr_t<ArgumentList> argumentList =
                 Parser::parseArgumentList(tokens);
 
+            expressions.push(
+                std::make_unique<FunctionCall>(current.value, argumentList));
+
         } else if (current.type == IDENTIFIER) {  // Variable
             expressions.push(
                 std::make_unique<VariableExpression>(current.value));
@@ -111,7 +118,6 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
 ptr_t<Expression> Parser::parseExpression(TokenBuffer& tokens) {
     TokenBuffer rpnTokens = shuntingYard(tokens);
     ptr_t<Expression> expression = rpnToExpressions(rpnTokens);
-
     std::cout << expression->dump() << std::endl;
 
     return expression;

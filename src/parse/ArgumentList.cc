@@ -11,5 +11,7 @@ ptr_t<ArgumentList> Parser::parseArgumentList(TokenBuffer &tokens) {
         argumentList->addArgument(argumentExpression);
     } while (tokens.eat(COMMA));
 
+    tokens.expect(RPARENS);
+
     return argumentList;
 }
