@@ -56,6 +56,8 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
                 output.push_back(operators.top());
                 operators.pop();
             }
+
+            operators.pop();  // Pop parens
             // @TODO: Handle mismatched parentheses
         }
     }
