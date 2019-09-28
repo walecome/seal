@@ -9,7 +9,8 @@ ptr_t<Block> Parser::parseBlock(TokenBuffer &tokens) {
 
     while (!tokens.eat(RBRACE)) {
         ptr_t<Statement> statement = parseStatement(tokens);
-        std::cout << "Parsed statement: " << statement->dump() << std::endl;
+        if (verbose)
+            std::cout << "Parsed statement: " << statement->dump() << std::endl;
         block->addStatement(statement);
     }
 

@@ -12,6 +12,7 @@
 ArgumentParser parseArgs(int argc, char **argv) {
     ArgumentParser parser("CLI argument parser");
     parser.add_argument("--source", "The filename of the source file", true);
+    parser.add_argument("--verbose", "Use verbose compiling", false);
     try {
         parser.parse(argc, argv);
     } catch (const ArgumentParser::ArgumentNotFound &ex) {
@@ -51,16 +52,18 @@ int main(int argc, char **argv) {
     std::string code_text((std::istreambuf_iterator<char>(t)),
                           std::istreambuf_iterator<char>());
 
-    Lexer lexer { code_text };
+    bool verbose { argumentParser.get<bool>("verbose") };
+
+    Lexer lexer { code_text, verbose };
 
     long lexerDuration = measureTime([&]() { lexer.readAll(); });
 
-    lexer.getTokens().printTokens();
+    if (verbose) lexer.getTokens().printTokens();
 
     std::cout << "Lexed " << lexer.numberOfTokens() << " tokens in "
               << lexerDuration << " milliseconds" << std::endl;
 
-    Parser parser {};
+    Parser parser { verbose };
 
     long parserDuration =
         measureTime([&]() { parser.parse(lexer.getTokens()); });

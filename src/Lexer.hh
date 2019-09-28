@@ -10,7 +10,8 @@
 
 class Lexer {
    public:
-    Lexer(std::string source) : source { source } {}
+    Lexer(std::string source, bool verbose)
+        : source { source }, verbose { verbose } {}
 
     void readAll();
     Token readOne();
@@ -34,6 +35,7 @@ class Lexer {
     std::pair<TokenType, std::string> findLongestMatchingToken();
 
     const std::string source;
+    bool verbose;
     unsigned current_index { 0 };
     TokenBuffer tokens {};
 };

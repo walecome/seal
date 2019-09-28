@@ -9,7 +9,7 @@ struct StringLiteral : public Literal {
 
     virtual std::string dump() const override {
         std::ostringstream oss {};
-        oss << "[" << name() << ", " << value << "]";
+        oss << "{" << name() << ", " << value << "}";
         return oss.str();
     }
 

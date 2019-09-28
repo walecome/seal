@@ -30,6 +30,8 @@
 
 class Parser {
    public:
+    Parser(bool verbose) : verbose { verbose } {}
+
     void parse(TokenBuffer &tokens);
 
     ptr_t<ArgumentList> parseArgumentList(TokenBuffer &tokens);
@@ -46,6 +48,8 @@ class Parser {
     ptr_t<While> parseWhile(TokenBuffer &tokens);
     ptr_t<ReturnStatement> parseReturnStatement(TokenBuffer &tokens);
     TokenBuffer shuntingYard(TokenBuffer &tokens);
+
+    bool verbose;
 
     std::vector<ptr_t<Node>> parseNodes {};
 };
