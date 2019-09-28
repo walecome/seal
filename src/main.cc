@@ -62,10 +62,6 @@ int main(int argc, char **argv) {
 
     Parser parser {};
 
-    parser.parseExpression(lexer.getTokens());
-
-    return 1;
-
     long parserDuration =
         measureTime([&]() { parser.parse(lexer.getTokens()); });
 

@@ -9,9 +9,7 @@ ptr_t<ArgumentList> Parser::parseArgumentList(TokenBuffer &tokens) {
     do {
         ptr_t<Expression> argumentExpression = Parser::parseExpression(tokens);
         argumentList->addArgument(argumentExpression);
-    } while (tokens.eat(COMMA));
-
-    tokens.expect(RPARENS);
+    } while (!tokens.eat(RPARENS));
 
     return argumentList;
 }

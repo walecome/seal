@@ -5,8 +5,13 @@ ptr_t<Block> Parser::parseBlock(TokenBuffer &tokens) {
         return nullptr;
     }
 
-    tokens.expect(RBRACE);
+    int a = 0;
+    while (!tokens.eat(RBRACE)) {
+        std::cout << a++ << std::endl;
+        std::cout << tokens.top().toString() << std::endl;
 
-    std::cout << "Parsed block" << std::endl;
+        parseExpression(tokens);
+    }
+
     return std::make_unique<Block>();
 }

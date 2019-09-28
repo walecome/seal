@@ -19,7 +19,6 @@ ptr_t<FunctionDecl> Parser::parseFunctionDecl(TokenBuffer &tokens) {
     tokens.expect(ARROW);
     tokens.expect(TYPE);
 
-    std::cout << "Parsed function declaration" << std::endl;
     return std::make_unique<FunctionDecl>(parameters);
 }
 
@@ -30,9 +29,7 @@ ptr_t<ParameterList> Parser::parseParameterList(TokenBuffer &tokens) {
 
     while (ptr_t<Parameter> parameter = parseParameter(tokens)) {
         parameters->addParamter(parameter);
-        // @TODO: This is kinda ugly, we need to eat the comma to process the
-        //        next token.
-        tokens.eat(COMMA);
+        if (!tokens.eat(COMMA)) break;
     }
 
     tokens.expect(RPARENS);

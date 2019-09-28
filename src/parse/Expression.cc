@@ -7,8 +7,8 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
     int parDepth = 0;
 
     while (!tokens.empty()) {
-        if (tokens.top().type == SEMICOLON) break;
-        if (tokens.top().type == COMMA) break;
+        if (tokens.eat(SEMICOLON)) break;
+        if (tokens.eat(COMMA)) break;
         if (tokens.top().type == RPARENS && parDepth == 0) break;
         Token current { tokens.pop() };
 
@@ -65,10 +65,6 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
         operators.pop();
     }
 
-    for (auto&& x : output) {
-        std::cout << x.toString() << std::endl;
-    }
-
     return TokenBuffer { output };
 }
 
@@ -118,7 +114,7 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
 ptr_t<Expression> Parser::parseExpression(TokenBuffer& tokens) {
     TokenBuffer rpnTokens = shuntingYard(tokens);
     ptr_t<Expression> expression = rpnToExpressions(rpnTokens);
-    std::cout << expression->dump() << std::endl;
+    std::cout << "Parsed expression: " << expression->dump() << std::endl;
 
     return expression;
 }
