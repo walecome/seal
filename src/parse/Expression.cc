@@ -114,7 +114,5 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
 ptr_t<Expression> Parser::parseExpression(TokenBuffer& tokens) {
     TokenBuffer rpnTokens = shuntingYard(tokens);
     ptr_t<Expression> expression = rpnToExpressions(rpnTokens);
-    std::cout << "Parsed expression: " << expression->dump() << std::endl;
-
     return expression;
 }

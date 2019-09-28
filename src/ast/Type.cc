@@ -1,3 +1,11 @@
 #include "Type.hh"
 
-Type TypeUtil::fromString(const std::string &s) { return stringToType[s]; }
+Primitive TypeUtil::fromString(const std::string &s) {
+    auto it = stringToType.find(s);
+
+    if (it == std::end(stringToType)) {
+        throw 1;
+    }
+
+    return it->second;
+}

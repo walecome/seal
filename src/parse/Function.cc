@@ -47,6 +47,5 @@ ptr_t<Parameter> Parser::parseParameter(TokenBuffer &tokens) {
     Token type = tokens.top();
     tokens.expect(TYPE);
 
-    return std::make_unique<Parameter>(identifier.value,
-                                       TypeUtil::fromString(type.value));
+    return std::make_unique<Parameter>(identifier.value, type.value);
 }

@@ -115,7 +115,7 @@ static std::unordered_map<TokenType, std::string> tokenNames {
     REFLECT_TOKEN(SLASH),        REFLECT_TOKEN(STAR),
     REFLECT_TOKEN(STRING),       REFLECT_TOKEN(TILDE),
     REFLECT_TOKEN(TYPE),         REFLECT_TOKEN(UNEXPECTED),
-    REFLECT_TOKEN(FUNC_CALL)
+    REFLECT_TOKEN(FUNC_CALL),    REFLECT_TOKEN(ASSIGN)
 };
 
 struct Token {

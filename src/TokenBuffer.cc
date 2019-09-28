@@ -32,3 +32,8 @@ void TokenBuffer::expect(TokenType tokenType) {
     }
     eat(tokenType);
 }
+
+bool TokenBuffer::canPop(TokenType type, int offset) {
+    if (index + offset >= tokens.size()) return false;
+    return tokens.at(index + offset).type == type;
+}

@@ -15,7 +15,10 @@ set(PROJECT_SOURCES
    src/parse/Block.cc
    src/parse/Expression.cc
    src/parse/ArgumentList.cc
+   src/parse/Statement.cc
+   src/parse/VariableDecl.cc
  
+
    src/ast/Function.cc
    src/ast/FunctionDecl.cc
    src/ast/Operator.cc

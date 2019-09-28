@@ -28,6 +28,8 @@ class TokenBuffer {
 
     void expect(TokenType tokenType);
 
+    bool canPop(TokenType type, int offset = 0);
+
    private:
     unsigned index { 0 };
 

@@ -19,7 +19,9 @@
 #include "ast/Node.hh"
 #include "ast/Parameter.hh"
 #include "ast/ParameterList.hh"
+#include "ast/Statement.hh"
 #include "ast/Type.hh"
+#include "ast/VariableDecl.hh"
 #include "ast/VariableExpression.hh"
 
 class Parser {
@@ -39,6 +41,9 @@ class Parser {
 
     TokenBuffer shuntingYard(TokenBuffer &tokens);
     ptr_t<Expression> rpnToExpressions(TokenBuffer &tokens);
+
+    ptr_t<VariableDecl> parseVariableDecl(TokenBuffer &tokens);
+    ptr_t<Statement> parseStatement(TokenBuffer &tokens);
 
     std::vector<ptr_t<Node>> parseNodes {};
 };
