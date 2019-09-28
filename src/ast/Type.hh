@@ -23,14 +23,14 @@ struct Type {
 
     std::string dump() const {
         std::ostringstream oss {};
-        oss << "[Type, ";
+        oss << "{Type, ";
         for (auto &x : TypeUtil::stringToType) {
             if (x.second == primitive) {
                 oss << x.first;
                 break;
             }
         }
-        oss << "]";
+        oss << "}";
         return oss.str();
     }
 

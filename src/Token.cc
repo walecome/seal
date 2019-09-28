@@ -12,7 +12,12 @@ TokenType stringToToken(const std::string &s) {
 
 std::string Token::toString() const {
     std::ostringstream os {};
-    os << "{ " << tokenNames.find(type)->second << ", " << value << " }";
+
+    auto it = tokenNames.find(type);
+    if (it == std::end(tokenNames))
+        throw std::runtime_error("Unable to find token type in token names");
+
+    os << "{ " << it->second << ", " << value << " }";
 
     return os.str();
 }

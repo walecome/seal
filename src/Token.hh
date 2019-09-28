@@ -69,6 +69,11 @@ enum TokenType {
 
     // Keywords
     FUNC_IDENT,
+    RETURN,
+    IF,
+    ELSE,
+    ELSE_IF,
+    WHILE,
 
     // Type
     TYPE,
@@ -92,8 +97,10 @@ static std::unordered_map<std::string, TokenType> stringTokenMap {
     { "^", POWER },
 };
 
-static std::unordered_map<std::string, TokenType> keywordMap { { "func",
-                                                                 FUNC_IDENT } };
+static std::unordered_map<std::string, TokenType> keywordMap {
+    { "func", FUNC_IDENT }, { "if", IF },       { "else", ELSE },
+    { "elsif", ELSE_IF },   { "while", WHILE }, { "return", RETURN },
+};
 
 static std::unordered_map<TokenType, std::string> tokenNames {
     REFLECT_TOKEN(AMP_AMP),      REFLECT_TOKEN(AMP),
@@ -115,7 +122,11 @@ static std::unordered_map<TokenType, std::string> tokenNames {
     REFLECT_TOKEN(SLASH),        REFLECT_TOKEN(STAR),
     REFLECT_TOKEN(STRING),       REFLECT_TOKEN(TILDE),
     REFLECT_TOKEN(TYPE),         REFLECT_TOKEN(UNEXPECTED),
-    REFLECT_TOKEN(FUNC_CALL),    REFLECT_TOKEN(ASSIGN)
+    REFLECT_TOKEN(FUNC_CALL),    REFLECT_TOKEN(ASSIGN),
+    REFLECT_TOKEN(RETURN),       REFLECT_TOKEN(IF),
+    REFLECT_TOKEN(ELSE),         REFLECT_TOKEN(ELSE_IF),
+    REFLECT_TOKEN(WHILE),
+
 };
 
 struct Token {

@@ -10,7 +10,7 @@ struct VariableExpression : public Expression {
 
     virtual std::string dump() const override {
         std::ostringstream oss {};
-        oss << "[" << name() << ", " << identifier << "]";
+        oss << "{" << name() << ", " << identifier << "}";
         return oss.str();
     }
 

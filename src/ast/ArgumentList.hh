@@ -11,7 +11,7 @@ struct ArgumentList : public Node {
     virtual std::string dump() const override {
         std::ostringstream oss {};
 
-        oss << name() << " (";
+        oss << name() << " [";
 
         if (!arguments.empty()) {
             for (unsigned i = 0; i < arguments.size() - 1; ++i) {
@@ -20,7 +20,7 @@ struct ArgumentList : public Node {
 
             oss << arguments[arguments.size() - 1]->dump();
         }
-        oss << ")";
+        oss << "]";
 
         return oss.str();
     }

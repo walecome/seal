@@ -4,30 +4,30 @@ project(compiler CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(PROJECT_SOURCES
-   src/Lexer.cc
-   src/main.cc
-   src/Token.cc
-   src/TokenBuffer.cc
-   src/Error.cc
+    src/main.cc
 
-   src/parse/Parser.cc
-   src/parse/Function.cc
-   src/parse/Block.cc
-   src/parse/Expression.cc
-   src/parse/ArgumentList.cc
-   src/parse/Statement.cc
-   src/parse/VariableDecl.cc
- 
+    src/Error.cc
+    src/Lexer.cc
+    src/Token.cc
+    src/TokenBuffer.cc
 
-   src/ast/Function.cc
-   src/ast/FunctionDecl.cc
-   src/ast/Operator.cc
-   src/ast/Parameter.cc
-   src/ast/ParameterList.cc
-   src/ast/Type.cc
-   src/ast/ArgumentList.cc
+    src/parse/ArgumentList.cc
+    src/parse/Block.cc
+    src/parse/Expression.cc
+    src/parse/Function.cc
+    src/parse/IfStatement.cc
+    src/parse/Parser.cc
+    src/parse/Statement.cc
+    src/parse/VariableDecl.cc
 
-
+    src/ast/ArgumentList.cc
+    src/ast/Block.cc
+    src/ast/Function.cc
+    src/ast/FunctionDecl.cc
+    src/ast/Operator.cc
+    src/ast/Parameter.cc
+    src/ast/ParameterList.cc
+    src/ast/Type.cc
 )
 
 include_directories(lib/argparse)

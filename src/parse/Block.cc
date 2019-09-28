@@ -5,10 +5,13 @@ ptr_t<Block> Parser::parseBlock(TokenBuffer &tokens) {
         return nullptr;
     }
 
+    ptr_t<Block> block = std::make_unique<Block>();
+
     while (!tokens.eat(RBRACE)) {
         ptr_t<Statement> statement = parseStatement(tokens);
         std::cout << "Parsed statement: " << statement->dump() << std::endl;
+        block->addStatement(statement);
     }
 
-    return std::make_unique<Block>();
+    return block;
 }
