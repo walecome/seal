@@ -14,7 +14,7 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
         }
         Token current { tokens.pop() };
 
-        if (current.type == NUMBER) {
+        if (current.type == NUMBER || current.type == STRING) {
             output.push_back(current);
         } else if (current.type == IDENTIFIER) {
             if (tokens.top().type == LPARENS) {  // Call to function
@@ -86,7 +86,8 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
         if (current.type == NUMBER) {
             int number = std::stoi(current.value);
             expressions.push(std::make_unique<IntegerLiteral>(number));
-
+        } else if (current.type == STRING) {
+            expressions.push(std::make_unique<StringLiteral>(current.value));
         } else if (current.type == FUNC_CALL) {
             ptr_t<ArgumentList> argumentList =
                 Parser::parseArgumentList(tokens);
@@ -115,6 +116,10 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
         } else {
             Error::rpn(current);
         }
+    }
+
+    if (expressions.size() != 1) {
+        Error::syntax("Invalid expression", tokens);
     }
 
     return std::move(expressions.top());

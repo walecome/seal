@@ -16,7 +16,7 @@ static std::unordered_map<std::string, Primitive> stringToType {
 };
 
 Primitive fromString(const std::string &s);
-};  // namespace TypeUtil
+}  // namespace TypeUtil
 
 struct Type {
     Type(const std::string &s) : primitive { TypeUtil::fromString(s) } {}

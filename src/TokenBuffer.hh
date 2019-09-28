@@ -1,8 +1,9 @@
 #pragma once
 
+#include <sstream>
 #include <vector>
 
-#include "Error.hh"
+// #include "Error.hh"
 #include "Token.hh"
 
 class TokenBuffer {
@@ -13,6 +14,7 @@ class TokenBuffer {
     void addToken(const Token token);
 
     void printTokens() const;
+    std::string dump() const;
 
     size_t size() const { return tokens.size(); }
 

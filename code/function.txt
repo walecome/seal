@@ -10,4 +10,14 @@ func myfunc(var1: int) -> void {
     } else {
         x = 5;
     }
+
+    functioncall(withvar);
+    functioncallwithint(1);
+    functioncallwithstring("my string!");
+
+    while (asd > var2) {
+        print("something fun");
+    }
+
+    return 5;
 }

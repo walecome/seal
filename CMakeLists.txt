@@ -19,6 +19,9 @@ set(PROJECT_SOURCES
     src/parse/Parser.cc
     src/parse/Statement.cc
     src/parse/VariableDecl.cc
+    src/parse/While.cc
+    src/parse/ReturnStatement.cc
+
 
     src/ast/ArgumentList.cc
     src/ast/Block.cc

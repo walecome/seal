@@ -20,10 +20,13 @@
 #include "ast/Node.hh"
 #include "ast/Parameter.hh"
 #include "ast/ParameterList.hh"
+#include "ast/ReturnStatement.hh"
 #include "ast/Statement.hh"
+#include "ast/StringLiteral.hh"
 #include "ast/Type.hh"
 #include "ast/VariableDecl.hh"
 #include "ast/VariableExpression.hh"
+#include "ast/While.hh"
 
 class Parser {
    public:
@@ -40,6 +43,8 @@ class Parser {
     ptr_t<ParameterList> parseParameterList(TokenBuffer &tokens);
     ptr_t<Statement> parseStatement(TokenBuffer &tokens);
     ptr_t<VariableDecl> parseVariableDecl(TokenBuffer &tokens);
+    ptr_t<While> parseWhile(TokenBuffer &tokens);
+    ptr_t<ReturnStatement> parseReturnStatement(TokenBuffer &tokens);
     TokenBuffer shuntingYard(TokenBuffer &tokens);
 
     std::vector<ptr_t<Node>> parseNodes {};

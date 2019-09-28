@@ -1,12 +1,18 @@
 #include "TokenBuffer.hh"
+#include "Error.hh"
 
 void TokenBuffer::addToken(const Token token) { tokens.push_back(token); }
 
-void TokenBuffer::printTokens() const {
-    std::cout << "Tokens (" << tokens.size() << "):" << std::endl;
+void TokenBuffer::printTokens() const { std::cout << dump() << std::endl; }
+
+std::string TokenBuffer::dump() const {
+    std::ostringstream oss {};
+    oss << "Tokens (" << tokens.size() << "):" << std::endl;
     for (auto token : tokens) {
-        std::cout << "\t" << token.toString() << std::endl;
+        oss << "\t" << token.toString() << std::endl;
     }
+
+    return oss.str();
 }
 
 bool TokenBuffer::eat(const TokenType tokenType) {

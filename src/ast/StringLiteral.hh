@@ -2,10 +2,10 @@
 
 #include "Literal.hh"
 
-struct IntegerLiteral : public Literal {
-    IntegerLiteral(int value) : value { value } {}
+struct StringLiteral : public Literal {
+    StringLiteral(const std::string &value) : value { value } {}
 
-    virtual std::string name() const override { return "IntegerLiteral"; }
+    virtual std::string name() const override { return "StringLiteral"; }
 
     virtual std::string dump() const override {
         std::ostringstream oss {};
@@ -13,5 +13,5 @@ struct IntegerLiteral : public Literal {
         return oss.str();
     }
 
-    int value;
+    const std::string value;
 };
