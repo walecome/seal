@@ -7,9 +7,8 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
     int parDepth = 0;
 
     while (!tokens.empty()) {
-        // @TODO: Change from eat() to top().type
-        if (tokens.eat(SEMICOLON)) break;
-        if (tokens.eat(COMMA)) break;
+        if (tokens.top().type == SEMICOLON) break;
+        if (tokens.top().type == COMMA) break;
         if (tokens.top().type == RBRACKET) break;
         if (tokens.top().type == RPARENS && parDepth == 0) break;
 

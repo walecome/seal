@@ -16,5 +16,7 @@ ptr_t<VariableDecl> Parser::parseVariableDecl(TokenBuffer &tokens) {
 
     ptr_t<Expression> value = parseExpression(tokens);
 
+    tokens.expect(SEMICOLON);
+
     return std::make_unique<VariableDecl>(identifier.value, type.value, value);
 }

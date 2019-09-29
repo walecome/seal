@@ -9,5 +9,6 @@ ptr_t<Statement> Parser::parseStatement(TokenBuffer &tokens) {
     if ((statement = parseIfStatement(tokens))) return statement;
 
     statement = parseExpression(tokens);
+    tokens.expect(SEMICOLON);
     return statement;
 }

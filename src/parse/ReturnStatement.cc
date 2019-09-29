@@ -4,6 +4,6 @@ ptr_t<ReturnStatement> Parser::parseReturnStatement(TokenBuffer &tokens) {
     if (!tokens.eat(RETURN)) return nullptr;
 
     ptr_t<Expression> returnValue = parseExpression(tokens);
-
+    tokens.expect(SEMICOLON);
     return std::make_unique<ReturnStatement>(returnValue);
 }
