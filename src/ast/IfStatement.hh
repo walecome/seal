@@ -25,7 +25,6 @@ struct IfStatement : public Statement {
         oss << ")";
         return oss.str();
     }
-
     ptr_t<Expression> condition;
     ptr_t<Block> ifBody;
     ptr_t<Block> elseBody;

@@ -17,7 +17,8 @@ std::string Token::toString() const {
     if (it == std::end(tokenNames))
         throw std::runtime_error("Unable to find token type in token names");
 
-    os << "{ " << it->second << ", " << value << " }";
+    os << "{ " << it->second << ", " << value << ", " << row << ", " << col
+       << "}";
 
     return os.str();
 }

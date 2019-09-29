@@ -12,7 +12,7 @@ void Lexer::readAll() {
 }
 
 Token Lexer::readOne() {
-    Token token {};
+    Token token { row, col };
 
     const char c = source[current_index];
 
@@ -26,12 +26,21 @@ Token Lexer::readOne() {
         readSymbol(token);
     }
 
+    col += token.value.length();
+
     return token;
 }
 
 void Lexer::readWhitespace() {
     char c = source[current_index];
     while (isspace(c)) {
+        if (c == '\n') {
+            ++row;
+            col = 0;
+        } else {
+            ++col;
+        }
+
         c = source[++current_index];
     }
 }

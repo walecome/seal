@@ -38,4 +38,6 @@ class Lexer {
     bool verbose;
     unsigned current_index { 0 };
     TokenBuffer tokens {};
+    unsigned row { 0 };
+    unsigned col { 0 };
 };

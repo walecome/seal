@@ -130,12 +130,15 @@ static std::unordered_map<TokenType, std::string> tokenNames {
 };
 
 struct Token {
-    Token() = default;
+    Token(unsigned row, unsigned col) : row { row }, col { col } {}
     TokenType type;
 
     std::string value {};
 
     std::string toString() const;
+
+    unsigned row;
+    unsigned col;
 };
 
 TokenType stringToToken(const std::string &s);
