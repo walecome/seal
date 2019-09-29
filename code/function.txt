@@ -14,6 +14,7 @@ func myfunc(var1: int) -> void {
     functioncall(withvar);
     functioncallwithint(1);
     functioncallwithstring("my string!");
+    functioncallwitharray([1, 2, 3]);
 
     while (asd > var2) {
         print("something fun");

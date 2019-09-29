@@ -31,6 +31,8 @@ class TokenBuffer {
 
     bool canPop(TokenType type, int offset = 0);
 
+    void backtrack(unsigned steps);
+
    private:
     unsigned index { 0 };
 

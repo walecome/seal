@@ -7,11 +7,12 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
     int parDepth = 0;
 
     while (!tokens.empty()) {
+        // @TODO: Change from eat() to top().type
         if (tokens.eat(SEMICOLON)) break;
         if (tokens.eat(COMMA)) break;
-        if (tokens.top().type == RPARENS && parDepth == 0) {
-            break;
-        }
+        if (tokens.top().type == RBRACKET) break;
+        if (tokens.top().type == RPARENS && parDepth == 0) break;
+
         Token current { tokens.pop() };
 
         if (current.type == NUMBER || current.type == STRING) {
@@ -54,6 +55,16 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
 
             operators.push(current);
 
+        } else if (current.type == LBRACKET) {
+            int bracketDepth { 1 };
+            output.push_back(current);
+
+            do {
+                if (tokens.top().type == LBRACKET) ++bracketDepth;
+                if (tokens.top().type == RBRACKET) --bracketDepth;
+                output.push_back(tokens.pop());
+            } while (bracketDepth > 0);
+
         } else if (current.type == LPARENS) {
             ++parDepth;
             operators.push(current);
@@ -66,6 +77,8 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
 
             operators.pop();  // Pop parens
             // @TODO: Handle mismatched parentheses
+        } else {
+            throw std::runtime_error("Invalid expression token");
         }
     }
 
@@ -113,6 +126,11 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
             expressions.push(
                 std::make_unique<BinaryExpression>(right, left, op));
 
+        } else if (current.type == LBRACKET) {
+            // @REFACTOR: This shouldn't be needed. This isn't in line with how
+            // other things are parsed here.
+            tokens.backtrack(1);
+            expressions.push(parseArrayLiteral(tokens));
         } else {
             Error::rpn(current);
         }

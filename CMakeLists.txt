@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
     src/parse/VariableDecl.cc
     src/parse/While.cc
     src/parse/ReturnStatement.cc
+    src/parse/ArrayLiteral.cc
 
 
     src/ast/ArgumentList.cc
@@ -31,6 +32,7 @@ set(PROJECT_SOURCES
     src/ast/Parameter.cc
     src/ast/ParameterList.cc
     src/ast/Type.cc
+    src/ast/ArrayLiteral.cc
 )
 
 include_directories(lib/argparse)

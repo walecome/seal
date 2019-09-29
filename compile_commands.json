@@ -91,6 +91,12 @@
 
 {
   "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/ArrayLiteral.cc.o -c /home/alexander/projects/compiler/src/parse/ArrayLiteral.cc",
+  "file": "/home/alexander/projects/compiler/src/parse/ArrayLiteral.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/ArgumentList.cc.o -c /home/alexander/projects/compiler/src/ast/ArgumentList.cc",
   "file": "/home/alexander/projects/compiler/src/ast/ArgumentList.cc"
 },
@@ -135,5 +141,11 @@
   "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/Type.cc.o -c /home/alexander/projects/compiler/src/ast/Type.cc",
   "file": "/home/alexander/projects/compiler/src/ast/Type.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/ArrayLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/ArrayLiteral.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/ArrayLiteral.cc"
 }
 ]

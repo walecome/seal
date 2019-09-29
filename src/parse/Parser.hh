@@ -9,6 +9,7 @@
 #include "Error.hh"
 #include "TokenBuffer.hh"
 #include "ast/ArgumentList.hh"
+#include "ast/ArrayLiteral.hh"
 #include "ast/BinaryExpression.hh"
 #include "ast/Block.hh"
 #include "ast/Expression.hh"
@@ -48,6 +49,7 @@ class Parser {
     ptr_t<While> parseWhile(TokenBuffer &tokens);
     ptr_t<ReturnStatement> parseReturnStatement(TokenBuffer &tokens);
     TokenBuffer shuntingYard(TokenBuffer &tokens);
+    ptr_t<ArrayLiteral> parseArrayLiteral(TokenBuffer &tokens);
 
     bool verbose;
 
