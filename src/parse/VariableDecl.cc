@@ -1,5 +1,6 @@
-
+#include "ast/VariableDecl.hh"
 #include "Parser.hh"
+#include "ast/Expression.hh"
 
 ptr_t<VariableDecl> Parser::parseVariableDecl(TokenBuffer &tokens) {
     if (!tokens.canPop(IDENTIFIER) || !tokens.canPop(COLON, 1)) return nullptr;

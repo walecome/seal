@@ -1,4 +1,12 @@
+#include "ast/Expression.hh"
 #include "Parser.hh"
+#include "ast/ArrayLiteral.hh"
+#include "ast/BinaryExpression.hh"
+#include "ast/FunctionCall.hh"
+#include "ast/IntegerLiteral.hh"
+#include "ast/Operator.hh"
+#include "ast/StringLiteral.hh"
+#include "ast/VariableExpression.hh"
 
 TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
     std::stack<Token> operators {};

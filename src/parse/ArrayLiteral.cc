@@ -1,4 +1,6 @@
+#include "ast/ArrayLiteral.hh"
 #include "Parser.hh"
+#include "ast/Expression.hh"
 
 ptr_t<ArrayLiteral> Parser::parseArrayLiteral(TokenBuffer &tokens) {
     if (!tokens.eat(LBRACKET)) return nullptr;

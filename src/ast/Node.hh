@@ -1,15 +1,16 @@
 #pragma once
 
-#include <memory>
 #include <string>
 
-template <typename T>
-using ptr_t = std::unique_ptr<T>;
+#include "Constants.hh"
+
+struct Scope;
 
 struct Node {
     virtual ~Node() = default;
 
-    virtual std::string name() const { return "Node"; }
+    virtual void analyze(const Scope &scope) const {}
 
+    virtual std::string name() const { return "Node"; }
     virtual std::string dump() const { return "Node"; }
 };

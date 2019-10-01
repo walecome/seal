@@ -1,3 +1,4 @@
+#include "ast/Block.hh"
 #include "Parser.hh"
 
 ptr_t<Block> Parser::parseBlock(TokenBuffer &tokens) {

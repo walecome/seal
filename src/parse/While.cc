@@ -1,4 +1,7 @@
+#include "ast/While.hh"
+#include "Block.hh"
 #include "Parser.hh"
+#include "ast/Expression.hh"
 
 ptr_t<While> Parser::parseWhile(TokenBuffer &tokens) {
     if (!tokens.eat(WHILE)) return nullptr;

@@ -11,6 +11,8 @@ struct VariableDecl : public Decl {
           type { type },
           value { std::move(value) } {}
 
+    
+
     virtual std::string name() const override { return "VariableDecl"; }
     virtual std::string dump() const override {
         std::ostringstream oss {};

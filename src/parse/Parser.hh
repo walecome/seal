@@ -6,28 +6,31 @@
 #include <stdexcept>
 #include <vector>
 
+#include "Constants.hh"
 #include "Error.hh"
 #include "TokenBuffer.hh"
-#include "ast/ArgumentList.hh"
-#include "ast/ArrayLiteral.hh"
-#include "ast/BinaryExpression.hh"
-#include "ast/Block.hh"
-#include "ast/Expression.hh"
-#include "ast/Function.hh"
-#include "ast/FunctionCall.hh"
-#include "ast/FunctionDecl.hh"
-#include "ast/IfStatement.hh"
-#include "ast/IntegerLiteral.hh"
-#include "ast/Node.hh"
-#include "ast/Parameter.hh"
-#include "ast/ParameterList.hh"
-#include "ast/ReturnStatement.hh"
-#include "ast/Statement.hh"
-#include "ast/StringLiteral.hh"
-#include "ast/Type.hh"
-#include "ast/VariableDecl.hh"
-#include "ast/VariableExpression.hh"
-#include "ast/While.hh"
+#include "ast/CompilationUnit.hh"
+
+struct ArgumentList;
+struct ArrayLiteral;
+struct BinaryExpression;
+struct Block;
+struct Expression;
+struct Function;
+struct FunctionCall;
+struct FunctionDecl;
+struct IfStatement;
+struct IntegerLiteral;
+struct Node;
+struct Parameter;
+struct ParameterList;
+struct ReturnStatement;
+struct Statement;
+struct StringLiteral;
+struct Type;
+struct VariableDecl;
+struct VariableExpression;
+struct While;
 
 class Parser {
    public:
@@ -53,5 +56,5 @@ class Parser {
 
     bool verbose;
 
-    std::vector<ptr_t<Node>> parseNodes {};
+    ptr_t<CompilationUnit> compilationUnit { nullptr };
 };

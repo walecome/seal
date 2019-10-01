@@ -12,6 +12,7 @@ func myfunc(var1: int) -> void {
         x = 5;
     }
 
+
     functioncall(withvar);
     functioncallwithint(1);
     functioncallwithstring("my string!");
@@ -20,7 +21,6 @@ func myfunc(var1: int) -> void {
     while (asd > var2) {
         print("something fun");
     }
-
 
     return fib(asd);
 }
@@ -35,3 +35,5 @@ func fib(n: int) -> int {
 
     return fib(n - 1) + fib(n - 2);
 }
+
+func empty() -> void {}

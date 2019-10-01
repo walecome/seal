@@ -1,4 +1,7 @@
+#include "ast/IfStatement.hh"
 #include "Parser.hh"
+#include "ast/Block.hh"
+#include "ast/Expression.hh"
 
 ptr_t<IfStatement> Parser::parseIfStatement(TokenBuffer &tokens) {
     if (!tokens.eat(IF)) return nullptr;

@@ -1,4 +1,6 @@
+#include "ast/ReturnStatement.hh"
 #include "Parser.hh"
+#include "ast/Expression.hh"
 
 ptr_t<ReturnStatement> Parser::parseReturnStatement(TokenBuffer &tokens) {
     if (!tokens.eat(RETURN)) return nullptr;

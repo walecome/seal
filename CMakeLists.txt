@@ -33,6 +33,10 @@ set(PROJECT_SOURCES
     src/ast/ParameterList.cc
     src/ast/Type.cc
     src/ast/ArrayLiteral.cc
+    src/ast/CompilationUnit.cc
+
+
+    src/sematic/Scope.cc
 )
 
 include_directories(lib/argparse)
@@ -40,6 +44,7 @@ include_directories(lib/argparse)
 include_directories(src)
 include_directories(src/ast)
 include_directories(src/parse)
+include_directories(src/sematic)
 
 
 

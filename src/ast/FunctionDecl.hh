@@ -6,10 +6,12 @@
 #include "ParameterList.hh"
 
 struct FunctionDecl : public Node {
-    FunctionDecl(ptr_t<ParameterList> &parameters)
-        : parameterList { std::move(parameters) } {}
+    FunctionDecl(const std::string &identifier,
+                 ptr_t<ParameterList> &parameters)
+        : identifier { identifier }, parameterList { std::move(parameters) } {}
 
     virtual std::string name() const override { return "FunctionDecl"; }
 
+    const std::string identifier;
     ptr_t<ParameterList> parameterList { nullptr };
 };

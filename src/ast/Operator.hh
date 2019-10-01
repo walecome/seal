@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Node.hh"
 #include "Token.hh"
 

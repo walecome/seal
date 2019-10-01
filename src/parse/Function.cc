@@ -1,17 +1,25 @@
+#include "ast/Function.hh"
 #include "Parser.hh"
+#include "ast/FunctionDecl.hh"
+#include "ast/Parameter.hh"
+#include "ast/ParameterList.hh"
 
 ptr_t<Function> Parser::parseFunction(TokenBuffer &tokens) {
     ptr_t<FunctionDecl> functionDeclNode = parseFunctionDecl(tokens);
+    if (!functionDeclNode) return nullptr;
+
     ptr_t<Block> blockNode = parseBlock(tokens);
+    if (!blockNode) return nullptr;
 
     return std::make_unique<Function>(functionDeclNode, blockNode);
 }
 
 ptr_t<FunctionDecl> Parser::parseFunctionDecl(TokenBuffer &tokens) {
-    if (!tokens.eat(FUNC_IDENT)) {
+    if (!tokens.eat(FUNC_KEYWORD)) {
         return nullptr;
     }
 
+    Token identifier = tokens.top();
     tokens.expect(IDENTIFIER);
 
     ptr_t<ParameterList> parameters = parseParameterList(tokens);
@@ -19,7 +27,7 @@ ptr_t<FunctionDecl> Parser::parseFunctionDecl(TokenBuffer &tokens) {
     tokens.expect(ARROW);
     tokens.expect(TYPE);
 
-    return std::make_unique<FunctionDecl>(parameters);
+    return std::make_unique<FunctionDecl>(identifier.value, parameters);
 }
 
 ptr_t<ParameterList> Parser::parseParameterList(TokenBuffer &tokens) {

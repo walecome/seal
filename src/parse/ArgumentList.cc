@@ -1,3 +1,4 @@
+#include "ast/ArgumentList.hh"
 #include "Parser.hh"
 
 ptr_t<ArgumentList> Parser::parseArgumentList(TokenBuffer &tokens) {
