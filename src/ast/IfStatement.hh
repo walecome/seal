@@ -13,6 +13,8 @@ struct IfStatement : public Statement {
 
     virtual std::string name() const override { return "IfStatement"; }
 
+    virtual void analyze(Scope *scope) const override;
+
     virtual std::string dump(unsigned indent) const override;
     ptr_t<Expression> condition;
     ptr_t<Block> ifBody;

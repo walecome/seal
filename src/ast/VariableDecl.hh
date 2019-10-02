@@ -11,8 +11,13 @@ struct VariableDecl : public Decl {
           type { type },
           value { std::move(value) } {}
 
+    VariableDecl(const std::string &identifier, const std::string &type)
+        : identifier { identifier }, type { type }, value { nullptr } {}
+
     virtual std::string name() const override { return "VariableDecl"; }
     virtual std::string dump(unsigned indent) const override;
+
+    virtual void analyze(Scope *scope) const override;
 
     const std::string identifier;
     const Type type;

@@ -1,5 +1,14 @@
 #include "FunctionCall.hh"
 
+void FunctionCall::analyze(Scope *scope) const {
+    if (!scope->hasFunction(identifier)) {
+        // @TODO: Implement semantic error instead
+        throw std::runtime_error("Call to undeclared function " + identifier);
+    }
+
+    argumentList->analyze(scope);
+}
+
 std::string FunctionCall::dump(unsigned indent) const {
     std::ostringstream oss {};
 

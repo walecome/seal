@@ -1,5 +1,11 @@
 #include "BinaryExpression.hh"
 
+void BinaryExpression::analyze(Scope *scope) const {
+    left->analyze(scope);
+    op->analyze(scope);
+    right->analyze(scope);
+}
+
 std::string BinaryExpression::dump(unsigned indent) const {
     std::ostringstream oss {};
 

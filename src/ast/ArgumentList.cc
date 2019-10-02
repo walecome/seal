@@ -4,6 +4,12 @@ void ArgumentList::addArgument(ptr_t<Expression> &expression) {
     arguments.push_back(std::move(expression));
 }
 
+void ArgumentList::analyze(Scope *scope) const {
+    for (auto &argument : arguments) {
+        argument->analyze(scope);
+    }
+}
+
 std::string ArgumentList::dump(unsigned indent) const {
     std::ostringstream oss {};
 

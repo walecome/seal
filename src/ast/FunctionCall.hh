@@ -12,6 +12,8 @@ struct FunctionCall : public Expression {
     virtual std::string name() const override { return "FunctionCall"; }
     virtual std::string dump(unsigned indent) const override;
 
+    virtual void analyze(Scope *scope) const override;
+
     const std::string identifier;
     ptr_t<ArgumentList> argumentList;
 };

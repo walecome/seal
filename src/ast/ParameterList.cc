@@ -1,6 +1,6 @@
 #include "ParameterList.hh"
 
-void ParameterList::addParamter(ptr_t<Parameter>& parameter) {
+void ParameterList::addParameter(ptr_t<VariableDecl>& parameter) {
     parameters.push_back(std::move(parameter));
 }
 

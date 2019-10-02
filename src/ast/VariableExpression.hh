@@ -7,8 +7,9 @@ struct VariableExpression : public Expression {
         : identifier { identifier } {}
 
     virtual std::string name() const override { return "VariableExpression"; }
-
     virtual std::string dump(unsigned indent) const override;
+
+    virtual void analyze(Scope *scope) const override;
 
     const std::string identifier;
 };

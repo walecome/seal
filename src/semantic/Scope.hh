@@ -4,8 +4,9 @@
 #include <unordered_set>
 
 #include "Constants.hh"
-#include "ast/FunctionDecl.hh"
-#include "ast/VariableDecl.hh"
+
+struct FunctionDecl;
+struct VariableDecl;
 
 struct Scope {
     Scope(Scope *parent = nullptr) : parent { parent } {}

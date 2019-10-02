@@ -1,5 +1,11 @@
 #include "IfStatement.hh"
 
+void IfStatement::analyze(Scope* scope) const {
+    condition->analyze(scope);
+    ifBody->analyze(scope);
+    if (elseBody) elseBody->analyze(scope);
+}
+
 std::string IfStatement::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << Util::indent(indent) << name() << " (" << std::endl;

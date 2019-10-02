@@ -1,4 +1,6 @@
 #include "Scope.hh"
+#include "ast/FunctionDecl.hh"
+#include "ast/VariableDecl.hh"
 
 void Scope::addFunction(const FunctionDecl *const functionDeclaration) {
     if (hasFunction(functionDeclaration->identifier)) {

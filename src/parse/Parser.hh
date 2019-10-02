@@ -22,7 +22,6 @@ struct FunctionDecl;
 struct IfStatement;
 struct IntegerLiteral;
 struct Node;
-struct Parameter;
 struct ParameterList;
 struct ReturnStatement;
 struct Statement;
@@ -45,7 +44,7 @@ class Parser {
     ptr_t<Function> parseFunction(TokenBuffer &tokens);
     ptr_t<FunctionDecl> parseFunctionDecl(TokenBuffer &tokens);
     ptr_t<IfStatement> parseIfStatement(TokenBuffer &tokens);
-    ptr_t<Parameter> parseParameter(TokenBuffer &tokens);
+    ptr_t<VariableDecl> parseParameter(TokenBuffer &tokens);
     ptr_t<ParameterList> parseParameterList(TokenBuffer &tokens);
     ptr_t<Statement> parseStatement(TokenBuffer &tokens);
     ptr_t<VariableDecl> parseVariableDecl(TokenBuffer &tokens);

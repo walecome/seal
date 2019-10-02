@@ -30,7 +30,6 @@ set(PROJECT_SOURCES
     src/ast/Function.cc
     src/ast/FunctionDecl.cc
     src/ast/Operator.cc
-    src/ast/Parameter.cc
     src/ast/ParameterList.cc
     src/ast/Type.cc
     src/ast/ArrayLiteral.cc
@@ -45,9 +44,7 @@ set(PROJECT_SOURCES
     src/ast/While.cc
     src/ast/ReturnStatement.cc
 
-
-
-    src/sematic/Scope.cc
+    src/semantic/Scope.cc
 )
 
 include_directories(lib/argparse)
@@ -55,7 +52,7 @@ include_directories(lib/argparse)
 include_directories(src)
 include_directories(src/ast)
 include_directories(src/parse)
-include_directories(src/sematic)
+include_directories(src/semantic)
 
 
 
