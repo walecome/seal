@@ -6,6 +6,7 @@
 
 #include "Lexer.hh"
 #include "Parser.hh"
+#include "Scope.hh"
 #include "TokenBuffer.hh"
 #include "argparse.h"
 
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
 
     bool verbose { argumentParser.get<bool>("verbose") };
 
-    Lexer lexer { code_text, verbose };
+    Lexer lexer { code_text };
 
     long lexerDuration = measureTime([&]() { lexer.readAll(); });
 
@@ -63,7 +64,7 @@ int main(int argc, char **argv) {
     std::cout << "Lexed " << lexer.numberOfTokens() << " tokens in "
               << lexerDuration << " milliseconds" << std::endl;
 
-    Parser parser { verbose };
+    Parser parser {};
 
     long parserDuration =
         measureTime([&]() { parser.parse(lexer.getTokens()); });
@@ -71,7 +72,12 @@ int main(int argc, char **argv) {
     std::cout << "Parsing took " << parserDuration << " milliseconds"
               << std::endl;
 
-    std::cout << parser.compilationUnit->dump() << std::endl;
+    if (verbose) std::cout << parser.compilationUnit->dump() << std::endl;
+
+    Scope programScope {};
+    parser.compilationUnit->functionPass(programScope);
+    std::cout << "Function pass got " << programScope.functionCount()
+              << " functions" << std::endl;
 
     return 0;
 }

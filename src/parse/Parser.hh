@@ -34,7 +34,7 @@ struct While;
 
 class Parser {
    public:
-    Parser(bool verbose) : verbose { verbose } {}
+    Parser() = default;
 
     void parse(TokenBuffer &tokens);
 
@@ -53,8 +53,6 @@ class Parser {
     ptr_t<ReturnStatement> parseReturnStatement(TokenBuffer &tokens);
     TokenBuffer shuntingYard(TokenBuffer &tokens);
     ptr_t<ArrayLiteral> parseArrayLiteral(TokenBuffer &tokens);
-
-    bool verbose;
 
     ptr_t<CompilationUnit> compilationUnit { nullptr };
 };

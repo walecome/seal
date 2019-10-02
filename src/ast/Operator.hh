@@ -42,14 +42,6 @@ static std::unordered_map<std::string, OperatorSym> stringToOpSym {
     { ">", OperatorSym::GT },      { "=", OperatorSym::ASSIGN },
 };
 
-static std::string fromSym(OperatorSym opSym) {
-    for (auto x : stringToOpSym) {
-        if (x.second == opSym) return x.first;
-    }
-
-    throw 1;
-}
-
 struct Operator : public Node {
     Operator(const Token &token)
         : operatorSymbol { stringToOpSym[token.value] },

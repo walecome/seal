@@ -23,3 +23,5 @@ bool Scope::hasFunction(const std::string &ident) const {
 bool Scope::hasVariable(const std::string &ident) const {
     return variables.find(ident) != std::end(variables);
 }
+
+unsigned Scope::functionCount() const { return functions.size(); }

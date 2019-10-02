@@ -1,5 +1,13 @@
 #include "Operator.hh"
 
+static std::string fromSym(OperatorSym opSym) {
+    for (auto x : stringToOpSym) {
+        if (x.second == opSym) return x.first;
+    }
+
+    throw 1;
+}
+
 bool Operator::precedes(const Operator &other) const {
     return operatorPrecedence[operatorSymbol] >
            operatorPrecedence[other.operatorSymbol];

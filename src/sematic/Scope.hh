@@ -16,6 +16,8 @@ struct Scope {
     bool hasFunction(const std::string &ident) const;
     bool hasVariable(const std::string &ident) const;
 
+    unsigned functionCount() const;
+
     std::unordered_set<std::string> variables {};
     std::unordered_set<std::string> functions {};
 
