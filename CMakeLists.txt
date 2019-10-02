@@ -10,6 +10,7 @@ set(PROJECT_SOURCES
     src/Lexer.cc
     src/Token.cc
     src/TokenBuffer.cc
+    src/Util.cc
 
     src/parse/ArgumentList.cc
     src/parse/Block.cc
@@ -34,6 +35,16 @@ set(PROJECT_SOURCES
     src/ast/Type.cc
     src/ast/ArrayLiteral.cc
     src/ast/CompilationUnit.cc
+    src/ast/IntegerLiteral.cc
+    src/ast/StringLiteral.cc
+    src/ast/FunctionCall.cc
+    src/ast/VariableExpression.cc
+    src/ast/BinaryExpression.cc
+    src/ast/IfStatement.cc
+    src/ast/VariableDecl.cc
+    src/ast/While.cc
+    src/ast/ReturnStatement.cc
+
 
 
     src/sematic/Scope.cc

@@ -3,5 +3,7 @@
 #include "Node.hh"
 struct Statement : public Node {
     virtual std::string name() const override { return "Statement"; }
-    virtual std::string dump() const override { return name(); }
+    virtual std::string dump(unsigned indent) const override {
+        throw std::runtime_error("Pure statement node not allowed");
+    };
 };

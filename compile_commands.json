@@ -31,6 +31,12 @@
 
 {
   "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/Util.cc.o -c /home/alexander/projects/compiler/src/Util.cc",
+  "file": "/home/alexander/projects/compiler/src/Util.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/parse/ArgumentList.cc.o -c /home/alexander/projects/compiler/src/parse/ArgumentList.cc",
   "file": "/home/alexander/projects/compiler/src/parse/ArgumentList.cc"
 },
@@ -153,6 +159,60 @@
   "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/CompilationUnit.cc.o -c /home/alexander/projects/compiler/src/ast/CompilationUnit.cc",
   "file": "/home/alexander/projects/compiler/src/ast/CompilationUnit.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/IntegerLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/IntegerLiteral.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/IntegerLiteral.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/StringLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/StringLiteral.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/StringLiteral.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/FunctionCall.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionCall.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/FunctionCall.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/VariableExpression.cc.o -c /home/alexander/projects/compiler/src/ast/VariableExpression.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/VariableExpression.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/BinaryExpression.cc.o -c /home/alexander/projects/compiler/src/ast/BinaryExpression.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/BinaryExpression.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/IfStatement.cc.o -c /home/alexander/projects/compiler/src/ast/IfStatement.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/IfStatement.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/VariableDecl.cc.o -c /home/alexander/projects/compiler/src/ast/VariableDecl.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/VariableDecl.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/While.cc.o -c /home/alexander/projects/compiler/src/ast/While.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/While.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/sematic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fcolor-diagnostics -g   -std=gnu++1z -o CMakeFiles/compiler.dir/src/ast/ReturnStatement.cc.o -c /home/alexander/projects/compiler/src/ast/ReturnStatement.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/ReturnStatement.cc"
 },
 
 {

@@ -13,18 +13,7 @@ struct IfStatement : public Statement {
 
     virtual std::string name() const override { return "IfStatement"; }
 
-    virtual std::string dump() const override {
-        std::ostringstream oss {};
-        oss << name() << " (";
-        oss << condition->dump() << ", " << ifBody->dump() << ", ";
-        if (elseBody) {
-            oss << elseBody->dump();
-        } else {
-            oss << "NULL ELSEBODY";
-        }
-        oss << ")";
-        return oss.str();
-    }
+    virtual std::string dump(unsigned indent) const override;
     ptr_t<Expression> condition;
     ptr_t<Block> ifBody;
     ptr_t<Block> elseBody;

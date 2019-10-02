@@ -64,11 +64,7 @@ struct Operator : public Node {
 
     virtual std::string name() const override { return "Operator"; }
 
-    virtual std::string dump() const override {
-        std::ostringstream oss {};
-        oss << "{" << name() << ", " << fromSym(operatorSymbol) << "}";
-        return oss.str();
-    }
+    virtual std::string dump(unsigned indent) const override;
 
     bool precedes(const Operator &other) const;
 

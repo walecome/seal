@@ -9,12 +9,6 @@ struct ReturnStatement : public Statement {
 
     virtual std::string name() const override { return "ReturnStatement"; }
 
-    virtual std::string dump() const override {
-        std::ostringstream oss {};
-        oss << name() << " (";
-        oss << returnValue->dump() << ")";
-        return oss.str();
-    }
-
+    virtual std::string dump(unsigned indent) const override;
     ptr_t<Expression> returnValue;
 };

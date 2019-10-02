@@ -10,20 +10,7 @@ struct Block : public Statement {
 
     void addStatement(ptr_t<Statement> &statement);
 
-    virtual std::string dump() const override {
-        std::ostringstream oss {};
-        oss << name() << " [";
-
-        if (!statements.empty()) {
-            for (unsigned i = 0; i < statements.size() - 1; ++i) {
-                oss << statements[i]->dump() << ",";
-            }
-
-            oss << statements[statements.size() - 1]->dump();
-        }
-        oss << "]";
-        return oss.str();
-    }
+    virtual std::string dump(unsigned indent) const override;
 
     std::vector<ptr_t<Statement>> statements {};
 };

@@ -12,6 +12,8 @@ struct FunctionDecl : public Node {
 
     virtual std::string name() const override { return "FunctionDecl"; }
 
+    virtual std::string dump(unsigned indent) const override;
+
     const std::string identifier;
-    ptr_t<ParameterList> parameterList { nullptr };
+    ptr_t<ParameterList> parameterList;
 };

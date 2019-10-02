@@ -10,14 +10,7 @@ struct FunctionCall : public Expression {
         : identifier { identfier }, argumentList { std::move(argumentList) } {}
 
     virtual std::string name() const override { return "FunctionCall"; }
-    virtual std::string dump() const override {
-        std::ostringstream oss {};
-
-        oss << name() << " (";
-        oss << identifier << ", " << argumentList->dump() << ")";
-
-        return oss.str();
-    }
+    virtual std::string dump(unsigned indent) const override;
 
     const std::string identifier;
     ptr_t<ArgumentList> argumentList;

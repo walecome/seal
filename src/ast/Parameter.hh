@@ -8,7 +8,7 @@ struct Parameter : public Node {
         : identifier { identifier }, type { type } {}
 
     virtual std::string name() const override { return "Parameter"; }
-
+    virtual std::string dump(unsigned indent) const override;
     const std::string identifier;
     const Type type;
 };

@@ -11,16 +11,8 @@ struct VariableDecl : public Decl {
           type { type },
           value { std::move(value) } {}
 
-    
-
     virtual std::string name() const override { return "VariableDecl"; }
-    virtual std::string dump() const override {
-        std::ostringstream oss {};
-        oss << name() << "(";
-        oss << identifier << ", " << type.dump() << ", " << value->dump()
-            << ")";
-        return oss.str();
-    }
+    virtual std::string dump(unsigned indent) const override;
 
     const std::string identifier;
     const Type type;

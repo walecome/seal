@@ -8,11 +8,7 @@ struct VariableExpression : public Expression {
 
     virtual std::string name() const override { return "VariableExpression"; }
 
-    virtual std::string dump() const override {
-        std::ostringstream oss {};
-        oss << "{" << name() << ", " << identifier << "}";
-        return oss.str();
-    }
+    virtual std::string dump(unsigned indent) const override;
 
     const std::string identifier;
 };

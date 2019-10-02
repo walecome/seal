@@ -71,5 +71,7 @@ int main(int argc, char **argv) {
     std::cout << "Parsing took " << parserDuration << " milliseconds"
               << std::endl;
 
+    std::cout << parser.compilationUnit->dump() << std::endl;
+
     return 0;
 }

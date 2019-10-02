@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "Util.hh"
+
 enum class Primitive { STRING, INT, FLOAT, VOID };
 
 namespace TypeUtil {
@@ -21,18 +23,7 @@ Primitive fromString(const std::string &s);
 struct Type {
     Type(const std::string &s) : primitive { TypeUtil::fromString(s) } {}
 
-    std::string dump() const {
-        std::ostringstream oss {};
-        oss << "{Type, ";
-        for (auto &x : TypeUtil::stringToType) {
-            if (x.second == primitive) {
-                oss << x.first;
-                break;
-            }
-        }
-        oss << "}";
-        return oss.str();
-    }
+    std::string dump(unsigned indent) const;
 
     Primitive primitive;
 };

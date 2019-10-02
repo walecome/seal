@@ -7,11 +7,7 @@ struct StringLiteral : public Literal {
 
     virtual std::string name() const override { return "StringLiteral"; }
 
-    virtual std::string dump() const override {
-        std::ostringstream oss {};
-        oss << "{" << name() << ", " << value << "}";
-        return oss.str();
-    }
+    virtual std::string dump(unsigned indent) const override;
 
     const std::string value;
 };

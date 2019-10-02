@@ -10,3 +10,10 @@ bool Operator::isRightAssociative() const {
 }
 
 bool Operator::isLeftAssociative() const { return !isRightAssociative(); }
+
+std::string Operator::dump(unsigned indent) const {
+    std::ostringstream oss {};
+    oss << Util::indent(indent) << "{" << name() << ", "
+        << fromSym(operatorSymbol) << "}";
+    return oss.str();
+}
