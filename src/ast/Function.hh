@@ -12,6 +12,8 @@ struct Function : public Node {
     virtual std::string name() const override { return "Function"; }
     virtual std::string dump(unsigned indent) const override;
 
+    virtual void analyze(Scope *scope) const override;
+
     ptr_t<FunctionDecl> functionDecl;
     ptr_t<Block> block;
 };

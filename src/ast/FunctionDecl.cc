@@ -1,5 +1,12 @@
 #include "FunctionDecl.hh"
 
+void FunctionDecl::analyze(Scope *scope) const {
+    // @TODO: We don't check the function identifier since this is done in the
+    //        initial sematic pass. But this creates an issue with not
+    //        function inside other functions.
+    parameterList->analyze(scope);
+}
+
 std::string FunctionDecl::dump(unsigned indent) const {
     std::ostringstream oss {};
 

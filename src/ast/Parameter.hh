@@ -9,6 +9,9 @@ struct Parameter : public Node {
 
     virtual std::string name() const override { return "Parameter"; }
     virtual std::string dump(unsigned indent) const override;
+
+    virtual void analyze(Scope *scope) const override;
+
     const std::string identifier;
     const Type type;
 };

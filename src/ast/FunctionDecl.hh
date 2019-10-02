@@ -11,8 +11,9 @@ struct FunctionDecl : public Node {
         : identifier { identifier }, parameterList { std::move(parameters) } {}
 
     virtual std::string name() const override { return "FunctionDecl"; }
-
     virtual std::string dump(unsigned indent) const override;
+
+    virtual void analyze(Scope *scope) const override;
 
     const std::string identifier;
     ptr_t<ParameterList> parameterList;

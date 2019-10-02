@@ -4,6 +4,12 @@ void ParameterList::addParamter(ptr_t<Parameter>& parameter) {
     parameters.push_back(std::move(parameter));
 }
 
+void ParameterList::analyze(Scope* scope) const {
+    for (auto& parameter : parameters) {
+        parameter->analyze(scope);
+    }
+}
+
 std::string ParameterList::dump(unsigned indent) const {
     std::ostringstream oss {};
 

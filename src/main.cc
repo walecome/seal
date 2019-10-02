@@ -4,6 +4,7 @@
 #include <streambuf>
 #include <string>
 
+#include "Constants.hh"
 #include "Lexer.hh"
 #include "Parser.hh"
 #include "Scope.hh"
@@ -74,9 +75,10 @@ int main(int argc, char **argv) {
 
     if (verbose) std::cout << parser.compilationUnit->dump() << std::endl;
 
-    Scope programScope {};
-    parser.compilationUnit->functionPass(programScope);
-    std::cout << "Function pass got " << programScope.functionCount()
+    sptr_t<Scope> programScope = std::make_shared<Scope>();
+
+    parser.compilationUnit->functionPass(programScope.get());
+    std::cout << "Function pass got " << programScope->functionCount()
               << " functions" << std::endl;
 
     return 0;

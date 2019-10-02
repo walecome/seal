@@ -3,15 +3,14 @@
 #include <string>
 
 #include "Constants.hh"
+#include "Scope.hh"
 #include "Util.hh"
-
-struct Scope;
 
 struct Node {
     virtual ~Node() = default;
 
-    virtual void analyze(Scope &scope) const {}
+    virtual void analyze(Scope *) const {}
 
     virtual std::string name() const { return "Node"; }
-    virtual std::string dump(unsigned indent) const { return "Node"; }
+    virtual std::string dump(unsigned) const { return "Node"; }
 };

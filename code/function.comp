@@ -18,9 +18,14 @@ func myfunc(var1: int) -> void {
     functioncallwithstring("my string!");
     functioncallwitharray([1, 2, 3]);
 
+    if (asd == var) {
+        print("some print!");
+    }
+
     while (asd > var2) {
         print("something fun");
     }
+
 
     return fib(asd);
 }
