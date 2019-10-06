@@ -3,7 +3,7 @@
 #include <iostream>
 #include <iterator>
 #include <sstream>
-#include <string>
+#include <string_view>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -82,7 +82,7 @@ enum TokenType {
     FUNC_CALL
 };
 
-static std::unordered_map<std::string, TokenType> stringTokenMap {
+static std::unordered_map<std::string_view, TokenType> stringTokenMap {
     { "(", LPARENS },       { ")", RPARENS }, { "#", HASH },
     { "->", ARROW },        { "<", LT },      { ">", GT },
     { "<=", LTEQ },         { ">=", GTEQ },   { "!=", NOT_EQ },
@@ -97,12 +97,12 @@ static std::unordered_map<std::string, TokenType> stringTokenMap {
     { "^", POWER },
 };
 
-static std::unordered_map<std::string, TokenType> keywordMap {
+static std::unordered_map<std::string_view, TokenType> keywordMap {
     { "func", FUNC_KEYWORD }, { "if", IF },       { "else", ELSE },
     { "elsif", ELSE_IF },     { "while", WHILE }, { "return", RETURN },
 };
 
-static std::unordered_map<TokenType, std::string> tokenNames {
+static std::unordered_map<TokenType, std::string_view> tokenNames {
     REFLECT_TOKEN(AMP_AMP),      REFLECT_TOKEN(AMP),
     REFLECT_TOKEN(ARROW),        REFLECT_TOKEN(COLON),
     REFLECT_TOKEN(COMMA),        REFLECT_TOKEN(DOT),
@@ -133,7 +133,7 @@ struct Token {
     Token(unsigned row, unsigned col) : row { row }, col { col } {}
     TokenType type;
 
-    std::string value {};
+    std::string_view value {};
 
     std::string toString() const;
 
@@ -141,8 +141,7 @@ struct Token {
     unsigned col;
 };
 
-TokenType stringToToken(const std::string &s);
-
-bool isType(const std::string &s);
+TokenType stringToToken(const std::string_view s);
+bool isType(const std::string_view s);
 
 void tryReplaceKeywordOrType(Token &token);

@@ -5,7 +5,7 @@
 void Scope::addFunction(const FunctionDecl *const functionDeclaration) {
     if (hasFunction(functionDeclaration->identifier)) {
         throw std::runtime_error("Redeclaration of function " +
-                                 functionDeclaration->identifier);
+                                 std::string(functionDeclaration->identifier));
     }
     functions.insert(functionDeclaration->identifier);
 }
@@ -13,17 +13,17 @@ void Scope::addFunction(const FunctionDecl *const functionDeclaration) {
 void Scope::addVariable(const VariableDecl *const variableDeclaration) {
     if (hasVariable(variableDeclaration->identifier)) {
         throw std::runtime_error("Redeclaration of variable " +
-                                 variableDeclaration->identifier);
+                                 std::string(variableDeclaration->identifier));
     }
     variables.insert(variableDeclaration->identifier);
 }
 
-bool Scope::hasFunction(const std::string &ident) const {
-    return functions.find(ident) != std::end(functions);
+bool Scope::hasFunction(const std::string_view identifier) const {
+    return functions.find(identifier) != std::end(functions);
 }
 
-bool Scope::hasVariable(const std::string &ident) const {
-    return variables.find(ident) != std::end(variables);
+bool Scope::hasVariable(const std::string_view identifier) const {
+    return variables.find(identifier) != std::end(variables);
 }
 
 unsigned Scope::functionCount() const { return functions.size(); }

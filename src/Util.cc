@@ -11,3 +11,9 @@ std::string Util::indent(unsigned steps) {
 
     return oss.str();
 }
+
+std::shared_ptr<std::string> Util::readSource(const std::string &filename) {
+    std::ifstream t(filename);
+    return std::make_shared<std::string>((std::istreambuf_iterator<char>(t)),
+                                         std::istreambuf_iterator<char>());
+}

@@ -3,7 +3,8 @@
 void FunctionCall::analyze(Scope *scope) const {
     if (!scope->hasFunction(identifier)) {
         // @TODO: Implement semantic error instead
-        throw std::runtime_error("Call to undeclared function " + identifier);
+        throw std::runtime_error("Call to undeclared function " +
+                                 std::string(identifier));
     }
 
     argumentList->analyze(scope);

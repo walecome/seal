@@ -104,7 +104,7 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
         Token current = tokens.pop();
 
         if (current.type == NUMBER) {
-            int number = std::stoi(current.value);
+            int number = std::stoi(std::string(current.value));
             expressions.push(std::make_unique<IntegerLiteral>(number));
         } else if (current.type == STRING) {
             expressions.push(std::make_unique<StringLiteral>(current.value));

@@ -1,6 +1,6 @@
 #include "Token.hh"
 
-TokenType stringToToken(const std::string &s) {
+TokenType stringToToken(const std::string_view s) {
     auto it = stringTokenMap.find(s);
 
     if (it == std::end(stringTokenMap)) {
@@ -23,7 +23,7 @@ std::string Token::toString() const {
     return os.str();
 }
 
-bool isType(const std::string &s) {
+bool isType(const std::string_view s) {
     return TypeUtil::stringToType.find(s) != std::end(TypeUtil::stringToType);
 }
 

@@ -33,7 +33,7 @@ static std::unordered_map<OperatorSym, int> operatorPrecedence = {
     { OperatorSym::DIV, 20 }
 };
 
-static std::unordered_map<std::string, OperatorSym> stringToOpSym {
+static std::unordered_map<std::string_view, OperatorSym> stringToOpSym {
     { "*", OperatorSym::MULT },    { "/", OperatorSym::DIV },
     { "+", OperatorSym::PLUS },    { "-", OperatorSym::MINUS },
     { "%", OperatorSym::MODULO },  { "==", OperatorSym::EQ },

@@ -1,6 +1,6 @@
 #include "Type.hh"
 
-Primitive TypeUtil::fromString(const std::string &s) {
+Primitive TypeUtil::fromString(const std::string_view s) {
     auto it = stringToType.find(s);
 
     if (it == std::end(stringToType)) {
@@ -10,7 +10,7 @@ Primitive TypeUtil::fromString(const std::string &s) {
     return it->second;
 }
 
-std::string Type::dump(unsigned indent) const {
+std::string Type::dump(unsigned) const {
     std::ostringstream oss {};
     oss << "{Type, ";
     for (auto &x : TypeUtil::stringToType) {

@@ -90,24 +90,25 @@ void Lexer::readString(Token &token, char string_opener) {
 
 void Lexer::readSymbol(Token &token) {
     TokenType type;
-    std::string value;
+    std::string_view value;
     std::tie(type, value) = findLongestMatchingToken();
 
     token.type = type;
     token.value = value;
 }
 
-inline std::pair<TokenType, std::string> Lexer::findLongestMatchingToken() {
+inline std::pair<TokenType, std::string_view>
+Lexer::findLongestMatchingToken() {
     unsigned start_index = current_index;
 
     TokenType longest_symbol { UNEXPECTED };
-    std::string longest = "";
+    std::string_view longest { "" };
 
     while (1) {
         ++current_index;
         if (current_index > source.size()) break;
 
-        std::string current_string = cut(start_index, current_index);
+        std::string_view current_string = cut(start_index, current_index);
 
         TokenType found_symbol = stringToToken(current_string);
         if (found_symbol == UNEXPECTED) {
@@ -126,11 +127,11 @@ inline std::pair<TokenType, std::string> Lexer::findLongestMatchingToken() {
     return { longest_symbol, longest };
 }
 
-std::string Lexer::cut(unsigned start, unsigned end) const {
+std::string_view Lexer::cut(unsigned start, unsigned end) const {
     return source.substr(start, end - start);
 }
 
-void Lexer::reportError(const std::string &value) const {
-    std::cout << "Unable to parse token: " << value << std::endl;
+void Lexer::reportError(const std::string_view value) const {
+    std::cout << "Unable to lex token: " << value << std::endl;
     exit(EXIT_FAILURE);
 }

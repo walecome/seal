@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -10,7 +10,7 @@
 
 class Lexer {
    public:
-    Lexer(std::string source) : source { source } {}
+    Lexer(std::string_view source) : source { source } {}
 
     void readAll();
     Token readOne();
@@ -27,13 +27,13 @@ class Lexer {
     void readString(Token &token, char string_opener);
     void readSymbol(Token &token);
 
-    void reportError(const std::string &value) const;
+    void reportError(const std::string_view value) const;
 
-    std::string cut(unsigned start, unsigned steps) const;
+    std::string_view cut(unsigned start, unsigned steps) const;
 
-    std::pair<TokenType, std::string> findLongestMatchingToken();
+    std::pair<TokenType, std::string_view> findLongestMatchingToken();
 
-    const std::string source;
+    const std::string_view source;
     unsigned current_index { 0 };
     TokenBuffer tokens {};
     unsigned row { 0 };

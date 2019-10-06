@@ -3,7 +3,7 @@
 #include "Expression.hh"
 
 struct VariableExpression : public Expression {
-    VariableExpression(const std::string identifier)
+    VariableExpression(const std::string_view identifier)
         : identifier { identifier } {}
 
     virtual std::string name() const override { return "VariableExpression"; }
@@ -11,5 +11,5 @@ struct VariableExpression : public Expression {
 
     virtual void analyze(Scope *scope) const override;
 
-    const std::string identifier;
+    const std::string_view identifier;
 };

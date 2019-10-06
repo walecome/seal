@@ -6,7 +6,7 @@
 #include "ParameterList.hh"
 
 struct FunctionDecl : public Node {
-    FunctionDecl(const std::string &identifier,
+    FunctionDecl(const std::string_view identifier,
                  ptr_t<ParameterList> &parameters)
         : identifier { identifier }, parameterList { std::move(parameters) } {}
 
@@ -15,6 +15,6 @@ struct FunctionDecl : public Node {
 
     virtual void analyze(Scope *scope) const override;
 
-    const std::string identifier;
+    const std::string_view identifier;
     ptr_t<ParameterList> parameterList;
 };

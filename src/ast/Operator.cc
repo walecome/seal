@@ -1,6 +1,6 @@
 #include "Operator.hh"
 
-static std::string fromSym(OperatorSym opSym) {
+static std::string_view fromSym(OperatorSym opSym) {
     for (auto x : stringToOpSym) {
         if (x.second == opSym) return x.first;
     }

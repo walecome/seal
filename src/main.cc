@@ -9,6 +9,7 @@
 #include "Parser.hh"
 #include "Scope.hh"
 #include "TokenBuffer.hh"
+#include "Util.hh"
 #include "argparse.h"
 
 ArgumentParser parseArgs(int argc, char **argv) {
@@ -29,20 +30,13 @@ ArgumentParser parseArgs(int argc, char **argv) {
 
 template <typename Function>
 long measureTime(Function f) {
-    auto t1 = std::chrono::high_resolution_clock::now();
+    using namespace std::chrono;
+    auto t1 = high_resolution_clock::now();
     f();
-    auto t2 = std::chrono::high_resolution_clock::now();
-    auto duration =
-        std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+    auto t2 = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(t2 - t1).count();
 
     return duration;
-}
-
-void eatAllTokens(TokenBuffer &tokenBuffer) {
-    while (!tokenBuffer.empty()) {
-        std::cout << "Ate token with value: " << tokenBuffer.pop().value
-                  << std::endl;
-    }
 }
 
 int main(int argc, char **argv) {
@@ -50,13 +44,10 @@ int main(int argc, char **argv) {
 
     std::string source_file { argumentParser.get<std::string>("source") };
 
-    std::ifstream t(source_file);
-    std::string code_text((std::istreambuf_iterator<char>(t)),
-                          std::istreambuf_iterator<char>());
-
     bool verbose { argumentParser.get<bool>("verbose") };
 
-    Lexer lexer { code_text };
+    sptr_t<std::string> source = Util::readSource(source_file);
+    Lexer lexer { *source };
 
     long lexerDuration = measureTime([&]() { lexer.readAll(); });
 
