@@ -24,7 +24,7 @@ enum class OperatorSym {
 
 };
 
-static std::unordered_map<OperatorSym, int> operatorPrecedence = {
+static std::unordered_map<OperatorSym, int> operator_precedence = {
     { OperatorSym::ASSIGN, 1 }, { OperatorSym::EQ, 5 },
     { OperatorSym::NOT_EQ, 5 }, { OperatorSym::LTEQ, 5 },
     { OperatorSym::GTEQ, 5 },   { OperatorSym::LT, 5 },
@@ -33,7 +33,7 @@ static std::unordered_map<OperatorSym, int> operatorPrecedence = {
     { OperatorSym::DIV, 20 }
 };
 
-static std::unordered_map<std::string_view, OperatorSym> stringToOpSym {
+static std::unordered_map<std::string_view, OperatorSym> string_to_op_sym {
     { "*", OperatorSym::MULT },    { "/", OperatorSym::DIV },
     { "+", OperatorSym::PLUS },    { "-", OperatorSym::MINUS },
     { "%", OperatorSym::MODULO },  { "==", OperatorSym::EQ },
@@ -44,15 +44,15 @@ static std::unordered_map<std::string_view, OperatorSym> stringToOpSym {
 
 struct Operator : public Node {
     Operator(const Token &token)
-        : operatorSymbol { stringToOpSym[token.value] },
-          precedence { operatorPrecedence[operatorSymbol] } {}
+        : operator_symbol { string_to_op_sym[token.value] },
+          precedence { operator_precedence[operator_symbol] } {}
 
-    static bool isOperator(const Token &token) {
-        return stringToOpSym.find(token.value) != std::end(stringToOpSym);
+    static bool is_operator(const Token &token) {
+        return string_to_op_sym.find(token.value) != std::end(string_to_op_sym);
     }
 
-    bool isRightAssociative() const;
-    bool isLeftAssociative() const;
+    bool is_right_associative() const;
+    bool is_left_associative() const;
 
     virtual std::string name() const override { return "Operator"; }
 
@@ -60,6 +60,6 @@ struct Operator : public Node {
 
     bool precedes(const Operator &other) const;
 
-    OperatorSym operatorSymbol;
+    OperatorSym operator_symbol;
     int precedence;
 };

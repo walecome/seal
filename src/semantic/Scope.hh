@@ -11,13 +11,13 @@ struct VariableDecl;
 struct Scope {
     Scope(Scope *parent = nullptr) : parent { parent } {}
 
-    void addFunction(const FunctionDecl *const functionDeclaration);
-    void addVariable(const VariableDecl *const variableDeclaration);
+    void add_function(const FunctionDecl *const function_declaration);
+    void add_variable(const VariableDecl *const variable_declaration);
 
-    bool hasFunction(const std::string_view identifier) const;
-    bool hasVariable(const std::string_view identifier) const;
+    bool has_function(const std::string_view identifier) const;
+    bool has_variable(const std::string_view identifier) const;
 
-    unsigned functionCount() const;
+    unsigned function_count() const;
 
     std::unordered_set<std::string_view> variables {};
     std::unordered_set<std::string_view> functions {};

@@ -2,21 +2,21 @@
 
 void FunctionDecl::analyze(Scope *scope) const {
     // @TODO: We don't check the function identifier since this is done in the
-    //        initial sematic pass. But this creates an issue with not
-    //        function inside other functions.
-    parameterList->analyze(scope);
+    //        initial sematic pass. But this creates an issue with not allowing
+    //        functions inside other functions.
+    parameter_list->analyze(scope);
 }
 
 std::string FunctionDecl::dump(unsigned indent) const {
     std::ostringstream oss {};
 
-    oss << Util::indent(indent) << name() << "(" << std::endl;
-    oss << Util::indent(indent + 1) << "\"" << identifier << "\"" << std::endl;
-    if (parameterList)
-        oss << parameterList->dump(indent + 1) << std::endl;
+    oss << util::indent(indent) << name() << "(" << std::endl;
+    oss << util::indent(indent + 1) << "\"" << identifier << "\"" << std::endl;
+    if (parameter_list)
+        oss << parameter_list->dump(indent + 1) << std::endl;
     else
-        oss << Util::indent(indent + 1) << "EMPTY PARAMETERLIST" << std::endl;
-    oss << Util::indent(indent) << ")";
+        oss << util::indent(indent + 1) << "EMPTY PARAMETERLIST" << std::endl;
+    oss << util::indent(indent) << ")";
 
     return oss.str();
 }

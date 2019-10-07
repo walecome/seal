@@ -5,11 +5,11 @@
 #include "Statement.hh"
 
 struct IfStatement : public Statement {
-    IfStatement(ptr_t<Expression> &condition, ptr_t<Block> &ifBody,
-                ptr_t<Block> &elseBody)
+    IfStatement(ptr_t<Expression> &condition, ptr_t<Block> &if_body,
+                ptr_t<Block> &else_body)
         : condition { std::move(condition) },
-          ifBody { std::move(ifBody) },
-          elseBody { std::move(elseBody) } {}
+          if_body { std::move(if_body) },
+          else_body { std::move(else_body) } {}
 
     virtual std::string name() const override { return "IfStatement"; }
 
@@ -17,6 +17,6 @@ struct IfStatement : public Statement {
 
     virtual std::string dump(unsigned indent) const override;
     ptr_t<Expression> condition;
-    ptr_t<Block> ifBody;
-    ptr_t<Block> elseBody;
+    ptr_t<Block> if_body;
+    ptr_t<Block> else_body;
 };

@@ -1,7 +1,7 @@
 #include "VariableExpression.hh"
 
 void VariableExpression::analyze(Scope *scope) const {
-    if (!scope->hasVariable(identifier)) {
+    if (!scope->has_variable(identifier)) {
         // @TODO: Sematic error instead
         throw std::runtime_error("Use of undeclared variable " +
                                  std::string(identifier));
@@ -10,6 +10,6 @@ void VariableExpression::analyze(Scope *scope) const {
 
 std::string VariableExpression::dump(unsigned indent) const {
     std::ostringstream oss {};
-    oss << Util::indent(indent) << "{" << name() << ", " << identifier << "}";
+    oss << util::indent(indent) << "{" << name() << ", " << identifier << "}";
     return oss.str();
 }

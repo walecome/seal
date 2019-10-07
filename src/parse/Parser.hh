@@ -37,21 +37,21 @@ class Parser {
 
     void parse(TokenBuffer &tokens);
 
-    ptr_t<ArgumentList> parseArgumentList(TokenBuffer &tokens);
-    ptr_t<Block> parseBlock(TokenBuffer &tokens);
-    ptr_t<Expression> parseExpression(TokenBuffer &tokens);
-    ptr_t<Expression> rpnToExpressions(TokenBuffer &tokens);
-    ptr_t<Function> parseFunction(TokenBuffer &tokens);
-    ptr_t<FunctionDecl> parseFunctionDecl(TokenBuffer &tokens);
-    ptr_t<IfStatement> parseIfStatement(TokenBuffer &tokens);
-    ptr_t<VariableDecl> parseParameter(TokenBuffer &tokens);
-    ptr_t<ParameterList> parseParameterList(TokenBuffer &tokens);
-    ptr_t<Statement> parseStatement(TokenBuffer &tokens);
-    ptr_t<VariableDecl> parseVariableDecl(TokenBuffer &tokens);
-    ptr_t<While> parseWhile(TokenBuffer &tokens);
-    ptr_t<ReturnStatement> parseReturnStatement(TokenBuffer &tokens);
-    TokenBuffer shuntingYard(TokenBuffer &tokens);
-    ptr_t<ArrayLiteral> parseArrayLiteral(TokenBuffer &tokens);
+    ptr_t<ArgumentList> parse_argument_list(TokenBuffer &tokens);
+    ptr_t<Block> parse_block(TokenBuffer &tokens);
+    ptr_t<Expression> parse_expression(TokenBuffer &tokens);
+    ptr_t<Expression> rpn_to_expressions(TokenBuffer &tokens);
+    ptr_t<Function> parse_function(TokenBuffer &tokens);
+    ptr_t<FunctionDecl> parse_function_decl(TokenBuffer &tokens);
+    ptr_t<IfStatement> parse_if_statement(TokenBuffer &tokens);
+    ptr_t<VariableDecl> parse_parameter(TokenBuffer &tokens);
+    ptr_t<ParameterList> parse_parameter_list(TokenBuffer &tokens);
+    ptr_t<Statement> parse_statement(TokenBuffer &tokens);
+    ptr_t<VariableDecl> parse_variable_decl(TokenBuffer &tokens);
+    ptr_t<While> parse_while(TokenBuffer &tokens);
+    ptr_t<ReturnStatement> parse_return_statement(TokenBuffer &tokens);
+    TokenBuffer shunting_yard(TokenBuffer &tokens);
+    ptr_t<ArrayLiteral> parse_array_literal(TokenBuffer &tokens);
 
-    ptr_t<CompilationUnit> compilationUnit { nullptr };
+    ptr_t<CompilationUnit> compilation_unit { nullptr };
 };

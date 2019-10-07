@@ -4,17 +4,17 @@
 #include "ast/ParameterList.hh"
 #include "ast/VariableDecl.hh"
 
-ptr_t<Function> Parser::parseFunction(TokenBuffer &tokens) {
-    ptr_t<FunctionDecl> functionDeclNode = parseFunctionDecl(tokens);
-    if (!functionDeclNode) return nullptr;
+ptr_t<Function> Parser::parse_function(TokenBuffer &tokens) {
+    ptr_t<FunctionDecl> function_decl_node = parse_function_decl(tokens);
+    if (!function_decl_node) return nullptr;
 
-    ptr_t<Block> blockNode = parseBlock(tokens);
-    if (!blockNode) return nullptr;
+    ptr_t<Block> block_node = parse_block(tokens);
+    if (!block_node) return nullptr;
 
-    return std::make_unique<Function>(functionDeclNode, blockNode);
+    return std::make_unique<Function>(function_decl_node, block_node);
 }
 
-ptr_t<FunctionDecl> Parser::parseFunctionDecl(TokenBuffer &tokens) {
+ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
     if (!tokens.eat(FUNC_KEYWORD)) {
         return nullptr;
     }
@@ -22,7 +22,7 @@ ptr_t<FunctionDecl> Parser::parseFunctionDecl(TokenBuffer &tokens) {
     Token identifier = tokens.top();
     tokens.expect(IDENTIFIER);
 
-    ptr_t<ParameterList> parameters = parseParameterList(tokens);
+    ptr_t<ParameterList> parameters = parse_parameter_list(tokens);
 
     tokens.expect(ARROW);
     tokens.expect(TYPE);
@@ -30,13 +30,13 @@ ptr_t<FunctionDecl> Parser::parseFunctionDecl(TokenBuffer &tokens) {
     return std::make_unique<FunctionDecl>(identifier.value, parameters);
 }
 
-ptr_t<ParameterList> Parser::parseParameterList(TokenBuffer &tokens) {
+ptr_t<ParameterList> Parser::parse_parameter_list(TokenBuffer &tokens) {
     tokens.expect(LPARENS);
     if (tokens.eat(RPARENS)) return nullptr;
     ptr_t<ParameterList> parameters = std::make_unique<ParameterList>();
 
-    while (ptr_t<VariableDecl> parameter = parseParameter(tokens)) {
-        parameters->addParameter(parameter);
+    while (ptr_t<VariableDecl> parameter = parse_parameter(tokens)) {
+        parameters->add_parameter(parameter);
         if (!tokens.eat(COMMA)) break;
     }
 
@@ -45,7 +45,7 @@ ptr_t<ParameterList> Parser::parseParameterList(TokenBuffer &tokens) {
     return parameters;
 }
 
-ptr_t<VariableDecl> Parser::parseParameter(TokenBuffer &tokens) {
+ptr_t<VariableDecl> Parser::parse_parameter(TokenBuffer &tokens) {
     Token identifier = tokens.top();
     if (identifier.type != IDENTIFIER) return nullptr;
     tokens.eat(IDENTIFIER);

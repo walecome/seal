@@ -1,29 +1,29 @@
 #include "Lexer.hh"
 
-bool isString(const char c) { return c == '"' || c == '\''; }
+bool is_string(const char c) { return c == '"' || c == '\''; }
 
-void Lexer::readAll() {
-    readWhitespace();
+void Lexer::read_all() {
+    read_whitespace();
     while (current_index < source.size()) {
-        Token token = readOne();
-        tokens.addToken(token);
-        readWhitespace();
+        Token token = read_one();
+        tokens.add_token(token);
+        read_whitespace();
     }
 }
 
-Token Lexer::readOne() {
+Token Lexer::read_one() {
     Token token { row, col };
 
     const char c = source[current_index];
 
     if (std::isalpha(c)) {
-        readAlpha(token);
+        read_alpha(token);
     } else if (std::isdigit(c)) {
-        readNumber(token);
-    } else if (isString(c)) {
-        readString(token, c);
+        read_number(token);
+    } else if (is_string(c)) {
+        read_string(token, c);
     } else {
-        readSymbol(token);
+        read_symbol(token);
     }
 
     col += token.value.length();
@@ -31,7 +31,7 @@ Token Lexer::readOne() {
     return token;
 }
 
-void Lexer::readWhitespace() {
+void Lexer::read_whitespace() {
     char c = source[current_index];
     while (isspace(c)) {
         if (c == '\n') {
@@ -45,7 +45,7 @@ void Lexer::readWhitespace() {
     }
 }
 
-void Lexer::readAlpha(Token &token) {
+void Lexer::read_alpha(Token &token) {
     token.type = IDENTIFIER;
     unsigned start_index = current_index;
 
@@ -58,10 +58,10 @@ void Lexer::readAlpha(Token &token) {
 
     token.value = cut(start_index, current_index);
 
-    tryReplaceKeywordOrType(token);
+    try_replace_keyword_or_type(token);
 }
 
-void Lexer::readNumber(Token &token) {
+void Lexer::read_number(Token &token) {
     token.type = NUMBER;
     unsigned start_index = current_index;
 
@@ -73,7 +73,7 @@ void Lexer::readNumber(Token &token) {
     token.value = cut(start_index, current_index);
 }
 
-void Lexer::readString(Token &token, char string_opener) {
+void Lexer::read_string(Token &token, char string_opener) {
     token.type = STRING;
     unsigned start_index = current_index;
 
@@ -88,17 +88,17 @@ void Lexer::readString(Token &token, char string_opener) {
     token.value = cut(start_index, ++current_index);
 }
 
-void Lexer::readSymbol(Token &token) {
+void Lexer::read_symbol(Token &token) {
     TokenType type;
     std::string_view value;
-    std::tie(type, value) = findLongestMatchingToken();
+    std::tie(type, value) = find_longest_matching_token();
 
     token.type = type;
     token.value = value;
 }
 
 inline std::pair<TokenType, std::string_view>
-Lexer::findLongestMatchingToken() {
+Lexer::find_longest_matching_token() {
     unsigned start_index = current_index;
 
     TokenType longest_symbol { UNEXPECTED };
@@ -110,7 +110,7 @@ Lexer::findLongestMatchingToken() {
 
         std::string_view current_string = cut(start_index, current_index);
 
-        TokenType found_symbol = stringToToken(current_string);
+        TokenType found_symbol = string_to_token(current_string);
         if (found_symbol == UNEXPECTED) {
             break;
         }
@@ -121,7 +121,7 @@ Lexer::findLongestMatchingToken() {
     --current_index;
 
     if (longest_symbol == UNEXPECTED) {
-        reportError(cut(start_index, current_index + 1));
+        report_error(cut(start_index, current_index + 1));
     };
 
     return { longest_symbol, longest };
@@ -131,7 +131,7 @@ std::string_view Lexer::cut(unsigned start, unsigned end) const {
     return source.substr(start, end - start);
 }
 
-void Lexer::reportError(const std::string_view value) const {
+void Lexer::report_error(const std::string_view value) const {
     std::cout << "Unable to lex token: " << value << std::endl;
     exit(EXIT_FAILURE);
 }

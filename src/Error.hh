@@ -20,18 +20,16 @@ class Modifier {
     Code code;
 
    public:
-    Modifier(Code pCode) : code(pCode) {}
+    Modifier(Code p_code) : code(p_code) {}
     friend std::ostream& operator<<(std::ostream& os, const Modifier& mod) {
         return os << "\033[" << mod.code << "m";
     }
 };
 }  // namespace Color
 
-namespace Error {
+namespace error {
 void syntax(TokenType expected, Token got);
 void syntax(const std::string& s, TokenBuffer& tokens);
-
-void reportError(const std::string& error);
-
+void report_error(const std::string& error);
 void rpn(Token got);
-}  // namespace Error
+}  // namespace error

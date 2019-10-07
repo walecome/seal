@@ -6,7 +6,7 @@
 #include <vector>
 
 struct ParameterList : public Node {
-    void addParameter(ptr_t<VariableDecl> &parameter);
+    void add_parameter(ptr_t<VariableDecl> &parameter);
 
     virtual std::string name() const override { return "ParameterList"; }
     virtual std::string dump(unsigned indent) const override;

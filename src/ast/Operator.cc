@@ -1,27 +1,27 @@
 #include "Operator.hh"
 
-static std::string_view fromSym(OperatorSym opSym) {
-    for (auto x : stringToOpSym) {
-        if (x.second == opSym) return x.first;
+static std::string_view from_sym(OperatorSym op_sym) {
+    for (auto x : string_to_op_sym) {
+        if (x.second == op_sym) return x.first;
     }
 
     throw 1;
 }
 
 bool Operator::precedes(const Operator &other) const {
-    return operatorPrecedence[operatorSymbol] >
-           operatorPrecedence[other.operatorSymbol];
+    return operator_precedence[operator_symbol] >
+           operator_precedence[other.operator_symbol];
 }
 
-bool Operator::isRightAssociative() const {
-    return operatorSymbol == OperatorSym::ASSIGN;
+bool Operator::is_right_associative() const {
+    return operator_symbol == OperatorSym::ASSIGN;
 }
 
-bool Operator::isLeftAssociative() const { return !isRightAssociative(); }
+bool Operator::is_left_associative() const { return !is_right_associative(); }
 
 std::string Operator::dump(unsigned indent) const {
     std::ostringstream oss {};
-    oss << Util::indent(indent) << "{" << name() << ", "
-        << fromSym(operatorSymbol) << "}";
+    oss << util::indent(indent) << "{" << name() << ", "
+        << from_sym(operator_symbol) << "}";
     return oss.str();
 }

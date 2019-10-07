@@ -8,7 +8,7 @@
 struct FunctionDecl : public Node {
     FunctionDecl(const std::string_view identifier,
                  ptr_t<ParameterList> &parameters)
-        : identifier { identifier }, parameterList { std::move(parameters) } {}
+        : identifier { identifier }, parameter_list { std::move(parameters) } {}
 
     virtual std::string name() const override { return "FunctionDecl"; }
     virtual std::string dump(unsigned indent) const override;
@@ -16,5 +16,5 @@ struct FunctionDecl : public Node {
     virtual void analyze(Scope *scope) const override;
 
     const std::string_view identifier;
-    ptr_t<ParameterList> parameterList;
+    ptr_t<ParameterList> parameter_list;
 };

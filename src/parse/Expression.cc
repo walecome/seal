@@ -8,17 +8,17 @@
 #include "ast/StringLiteral.hh"
 #include "ast/VariableExpression.hh"
 
-TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
+TokenBuffer Parser::shunting_yard(TokenBuffer& tokens) {
     std::stack<Token> operators {};
     std::vector<Token> output {};
 
-    int parDepth = 0;
+    int par_depth = 0;
 
     while (!tokens.empty()) {
         if (tokens.top().type == SEMICOLON) break;
         if (tokens.top().type == COMMA) break;
         if (tokens.top().type == RBRACKET) break;
-        if (tokens.top().type == RPARENS && parDepth == 0) break;
+        if (tokens.top().type == RPARENS && par_depth == 0) break;
 
         Token current { tokens.pop() };
 
@@ -30,53 +30,54 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
                 current.type = FUNC_CALL;
                 output.push_back(current);  // Function call ident
 
-                int currentParDepth = parDepth;
+                int current_par_depth = par_depth;
 
                 do {
-                    if (tokens.top().type == LPARENS) ++currentParDepth;
-                    if (tokens.top().type == RPARENS) --currentParDepth;
+                    if (tokens.top().type == LPARENS) ++current_par_depth;
+                    if (tokens.top().type == RPARENS) --current_par_depth;
                     output.push_back(tokens.pop());
-                } while (currentParDepth > parDepth);
+                } while (current_par_depth > par_depth);
 
             } else {  // Variable
                 output.push_back(current);
             }
-        } else if (Operator::isOperator(current)) {
-            Operator currentOperator { current };
+        } else if (Operator::is_operator(current)) {
+            Operator current_operator { current };
 
             while (!operators.empty() &&
-                   Operator::isOperator(operators.top())) {
-                Token operatorTop = operators.top();
-                Operator otherOperator { operatorTop };
+                   Operator::is_operator(operators.top())) {
+                Token operator_top = operators.top();
+                Operator other_operator { operator_top };
 
-                if ((currentOperator.isLeftAssociative() &&
-                     currentOperator.precedence > otherOperator.precedence) ||
-                    (currentOperator.isRightAssociative() &&
-                     currentOperator.precedence <= otherOperator.precedence)) {
+                if ((current_operator.is_left_associative() &&
+                     current_operator.precedence > other_operator.precedence) ||
+                    (current_operator.is_right_associative() &&
+                     current_operator.precedence <=
+                         other_operator.precedence)) {
                     break;
                 }
 
-                output.push_back(operatorTop);
+                output.push_back(operator_top);
                 operators.pop();
             }
 
             operators.push(current);
 
         } else if (current.type == LBRACKET) {
-            int bracketDepth { 1 };
+            int bracket_depth { 1 };
             output.push_back(current);
 
             do {
-                if (tokens.top().type == LBRACKET) ++bracketDepth;
-                if (tokens.top().type == RBRACKET) --bracketDepth;
+                if (tokens.top().type == LBRACKET) ++bracket_depth;
+                if (tokens.top().type == RBRACKET) --bracket_depth;
                 output.push_back(tokens.pop());
-            } while (bracketDepth > 0);
+            } while (bracket_depth > 0);
 
         } else if (current.type == LPARENS) {
-            ++parDepth;
+            ++par_depth;
             operators.push(current);
         } else if (current.type == RPARENS) {
-            --parDepth;
+            --par_depth;
             while (operators.top().type != LPARENS) {
                 output.push_back(operators.top());
                 operators.pop();
@@ -97,7 +98,7 @@ TokenBuffer Parser::shuntingYard(TokenBuffer& tokens) {
     return TokenBuffer { output };
 }
 
-ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
+ptr_t<Expression> Parser::rpn_to_expressions(TokenBuffer& tokens) {
     std::stack<ptr_t<Expression>> expressions {};
 
     while (!tokens.empty()) {
@@ -109,15 +110,15 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
         } else if (current.type == STRING) {
             expressions.push(std::make_unique<StringLiteral>(current.value));
         } else if (current.type == FUNC_CALL) {
-            ptr_t<ArgumentList> argumentList =
-                Parser::parseArgumentList(tokens);
+            ptr_t<ArgumentList> argument_list =
+                Parser::parse_argument_list(tokens);
             expressions.push(
-                std::make_unique<FunctionCall>(current.value, argumentList));
+                std::make_unique<FunctionCall>(current.value, argument_list));
 
         } else if (current.type == IDENTIFIER) {  // Variable
             expressions.push(
                 std::make_unique<VariableExpression>(current.value));
-        } else if (Operator::isOperator(current)) {
+        } else if (Operator::is_operator(current)) {
             if (expressions.size() < 2) {
                 throw std::runtime_error("Two operands needed");
             }
@@ -137,21 +138,21 @@ ptr_t<Expression> Parser::rpnToExpressions(TokenBuffer& tokens) {
             // @REFACTOR: This shouldn't be needed. This isn't in line with how
             // other things are parsed here.
             tokens.backtrack(1);
-            expressions.push(parseArrayLiteral(tokens));
+            expressions.push(parse_array_literal(tokens));
         } else {
-            Error::rpn(current);
+            error::rpn(current);
         }
     }
 
     if (expressions.size() != 1) {
-        Error::syntax("Invalid expression", tokens);
+        error::syntax("Invalid expression", tokens);
     }
 
     return std::move(expressions.top());
 }
 
-ptr_t<Expression> Parser::parseExpression(TokenBuffer& tokens) {
-    TokenBuffer rpnTokens = shuntingYard(tokens);
-    ptr_t<Expression> expression = rpnToExpressions(rpnTokens);
+ptr_t<Expression> Parser::parse_expression(TokenBuffer& tokens) {
+    TokenBuffer rpn_tokens = shunting_yard(tokens);
+    ptr_t<Expression> expression = rpn_to_expressions(rpn_tokens);
     return expression;
 }

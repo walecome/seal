@@ -1,21 +1,21 @@
 #include "CompilationUnit.hh"
 #include "Function.hh"
 
-void CompilationUnit::addFunction(ptr_t<Function> &function) {
+void CompilationUnit::add_function(ptr_t<Function> &function) {
     functions.push_back(std::move(function));
 }
 
-void CompilationUnit::functionPass(Scope *scope) const {
+void CompilationUnit::function_pass(Scope *scope) const {
     for (auto &function : functions) {
-        scope->addFunction(function->functionDecl.get());
+        scope->add_function(function->function_decl.get());
     }
 }
 
 void CompilationUnit::analyze(Scope *scope) const {
-    std::shared_ptr<Scope> innerScope = std::make_shared<Scope>(scope);
+    std::shared_ptr<Scope> inner_scope = std::make_shared<Scope>(scope);
 
     for (auto &function : functions) {
-        function->analyze(innerScope.get());
+        function->analyze(inner_scope.get());
     }
 }
 

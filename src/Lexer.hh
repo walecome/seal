@@ -12,26 +12,26 @@ class Lexer {
    public:
     Lexer(std::string_view source) : source { source } {}
 
-    void readAll();
-    Token readOne();
+    void read_all();
+    Token read_one();
 
-    unsigned numberOfTokens() const { return tokens.size(); }
+    unsigned number_of_tokens() const { return tokens.size(); }
 
     // Get lexer tokens as reference
-    TokenBuffer &getTokens() { return tokens; }
+    TokenBuffer &get_tokens() { return tokens; }
 
    private:
-    void readWhitespace();
-    void readAlpha(Token &token);
-    void readNumber(Token &token);
-    void readString(Token &token, char string_opener);
-    void readSymbol(Token &token);
+    void read_whitespace();
+    void read_alpha(Token &token);
+    void read_number(Token &token);
+    void read_string(Token &token, char string_opener);
+    void read_symbol(Token &token);
 
-    void reportError(const std::string_view value) const;
+    void report_error(const std::string_view value) const;
 
     std::string_view cut(unsigned start, unsigned steps) const;
 
-    std::pair<TokenType, std::string_view> findLongestMatchingToken();
+    std::pair<TokenType, std::string_view> find_longest_matching_token();
 
     const std::string_view source;
     unsigned current_index { 0 };

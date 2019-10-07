@@ -1,25 +1,25 @@
 #include "Block.hh"
 
-void Block::addStatement(ptr_t<Statement> &statement) {
+void Block::add_statement(ptr_t<Statement> &statement) {
     statements.push_back(std::move(statement));
 }
 
 void Block::analyze(Scope *scope) const {
-    sptr_t<Scope> innerScope = std::make_shared<Scope>(scope);
+    sptr_t<Scope> inner_scope = std::make_shared<Scope>(scope);
 
     for (auto &statement : statements) {
-        statement->analyze(innerScope.get());
+        statement->analyze(inner_scope.get());
     }
 }
 
 std::string Block::dump(unsigned indent) const {
     std::ostringstream oss {};
-    oss << Util::indent(indent) << name() << " [" << std::endl;
+    oss << util::indent(indent) << name() << " [" << std::endl;
 
     for (auto &x : statements) {
         oss << x->dump(indent + 1) << std::endl;
     }
 
-    oss << Util::indent(indent) << "]";
+    oss << util::indent(indent) << "]";
     return oss.str();
 }

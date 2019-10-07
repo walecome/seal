@@ -7,7 +7,7 @@
 #include <streambuf>
 #include <string_view>
 
-namespace Util {
+namespace util {
 std::string indent(unsigned steps);
-std::shared_ptr<std::string> readSource(const std::string &filenames);
-}  // namespace Util
+std::shared_ptr<std::string> read_source(const std::string &filename);
+}  // namespace util

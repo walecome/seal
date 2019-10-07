@@ -7,8 +7,9 @@
 
 struct FunctionCall : public Expression {
     FunctionCall(const std::string_view identfier,
-                 ptr_t<ArgumentList> &argumentList)
-        : identifier { identfier }, argumentList { std::move(argumentList) } {}
+                 ptr_t<ArgumentList> &argument_list)
+        : identifier { identfier },
+          argument_list { std::move(argument_list) } {}
 
     virtual std::string name() const override { return "FunctionCall"; }
     virtual std::string dump(unsigned indent) const override;
@@ -16,5 +17,5 @@ struct FunctionCall : public Expression {
     virtual void analyze(Scope *scope) const override;
 
     const std::string_view identifier;
-    ptr_t<ArgumentList> argumentList;
+    ptr_t<ArgumentList> argument_list;
 };

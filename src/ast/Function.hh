@@ -5,8 +5,8 @@
 #include "Node.hh"
 
 struct Function : public Node {
-    Function(ptr_t<FunctionDecl> &functionDecl, ptr_t<Block> &block)
-        : functionDecl { std::move(functionDecl) },
+    Function(ptr_t<FunctionDecl> &function_decl, ptr_t<Block> &block)
+        : function_decl { std::move(function_decl) },
           block { std::move(block) } {}
 
     virtual std::string name() const override { return "Function"; }
@@ -14,6 +14,6 @@ struct Function : public Node {
 
     virtual void analyze(Scope *scope) const override;
 
-    ptr_t<FunctionDecl> functionDecl;
+    ptr_t<FunctionDecl> function_decl;
     ptr_t<Block> block;
 };

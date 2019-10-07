@@ -3,7 +3,7 @@
 #include "Literal.hh"
 
 struct ArrayLiteral : public Literal {
-    void addExpression(ptr_t<Expression> &expression);
+    void add_expression(ptr_t<Expression> &expression);
 
     virtual std::string name() const override { return "ArrayLiteral"; }
     virtual std::string dump(unsigned indent) const override;

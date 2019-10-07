@@ -82,7 +82,7 @@ enum TokenType {
     FUNC_CALL
 };
 
-static std::unordered_map<std::string_view, TokenType> stringTokenMap {
+static std::unordered_map<std::string_view, TokenType> string_token_map {
     { "(", LPARENS },       { ")", RPARENS }, { "#", HASH },
     { "->", ARROW },        { "<", LT },      { ">", GT },
     { "<=", LTEQ },         { ">=", GTEQ },   { "!=", NOT_EQ },
@@ -97,12 +97,12 @@ static std::unordered_map<std::string_view, TokenType> stringTokenMap {
     { "^", POWER },
 };
 
-static std::unordered_map<std::string_view, TokenType> keywordMap {
+static std::unordered_map<std::string_view, TokenType> keyword_map {
     { "func", FUNC_KEYWORD }, { "if", IF },       { "else", ELSE },
     { "elsif", ELSE_IF },     { "while", WHILE }, { "return", RETURN },
 };
 
-static std::unordered_map<TokenType, std::string_view> tokenNames {
+static std::unordered_map<TokenType, std::string_view> token_names {
     REFLECT_TOKEN(AMP_AMP),      REFLECT_TOKEN(AMP),
     REFLECT_TOKEN(ARROW),        REFLECT_TOKEN(COLON),
     REFLECT_TOKEN(COMMA),        REFLECT_TOKEN(DOT),
@@ -135,13 +135,12 @@ struct Token {
 
     std::string_view value {};
 
-    std::string toString() const;
+    std::string to_string() const;
 
     unsigned row;
     unsigned col;
 };
 
-TokenType stringToToken(const std::string_view s);
-bool isType(const std::string_view s);
-
-void tryReplaceKeywordOrType(Token &token);
+TokenType string_to_token(const std::string_view s);
+bool is_type(const std::string_view s);
+void try_replace_keyword_or_type(Token &token);

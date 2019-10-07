@@ -7,15 +7,15 @@
 #include "ast/VariableDecl.hh"
 #include "ast/While.hh"
 
-ptr_t<Statement> Parser::parseStatement(TokenBuffer &tokens) {
+ptr_t<Statement> Parser::parse_statement(TokenBuffer &tokens) {
     ptr_t<Statement> statement;
-    if ((statement = parseVariableDecl(tokens))) return statement;
-    if ((statement = parseReturnStatement(tokens))) return statement;
-    if ((statement = parseWhile(tokens))) return statement;
-    if ((statement = parseBlock(tokens))) return statement;
-    if ((statement = parseIfStatement(tokens))) return statement;
+    if ((statement = parse_variable_decl(tokens))) return statement;
+    if ((statement = parse_return_statement(tokens))) return statement;
+    if ((statement = parse_while(tokens))) return statement;
+    if ((statement = parse_block(tokens))) return statement;
+    if ((statement = parse_if_statement(tokens))) return statement;
 
-    statement = parseExpression(tokens);
+    statement = parse_expression(tokens);
     tokens.expect(SEMICOLON);
     return statement;
 }

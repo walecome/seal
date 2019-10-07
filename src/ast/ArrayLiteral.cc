@@ -1,6 +1,6 @@
 #include "ArrayLiteral.hh"
 
-void ArrayLiteral::addExpression(ptr_t<Expression> &expression) {
+void ArrayLiteral::add_expression(ptr_t<Expression> &expression) {
     expressions.push_back(std::move(expression));
 }
 
@@ -12,13 +12,13 @@ void ArrayLiteral::analyze(Scope *scope) const {
 
 std::string ArrayLiteral::dump(unsigned indent) const {
     std::ostringstream oss {};
-    oss << Util::indent(indent) << name() << " [" << std::endl;
+    oss << util::indent(indent) << name() << " [" << std::endl;
 
     for (auto &x : expressions) {
         oss << x->dump(indent + 1) << std::endl;
     }
 
-    oss << Util::indent(indent) << "]";
+    oss << util::indent(indent) << "]";
 
     return oss.str();
 }

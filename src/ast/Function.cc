@@ -1,15 +1,15 @@
 #include "Function.hh"
 
 void Function::analyze(Scope* scope) const {
-    functionDecl->analyze(scope);
+    function_decl->analyze(scope);
     block->analyze(scope);
 }
 
 std::string Function::dump(unsigned indent) const {
     std::ostringstream oss {};
-    oss << Util::indent(indent) << name() << "(" << std::endl;
-    oss << functionDecl->dump(indent + 1) << std::endl;
+    oss << util::indent(indent) << name() << "(" << std::endl;
+    oss << function_decl->dump(indent + 1) << std::endl;
     oss << block->dump(indent + 1) << std::endl;
-    oss << Util::indent(indent) << ")";
+    oss << util::indent(indent) << ")";
     return oss.str();
 }

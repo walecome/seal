@@ -12,7 +12,7 @@
 #include "Util.hh"
 #include "argparse.h"
 
-ArgumentParser parseArgs(int argc, char **argv) {
+ArgumentParser parse_args(int argc, char **argv) {
     ArgumentParser parser("CLI argument parser");
     parser.add_argument("--source", "The filename of the source file", true);
     parser.add_argument("--verbose", "Use verbose compiling", false);
@@ -29,7 +29,7 @@ ArgumentParser parseArgs(int argc, char **argv) {
 }
 
 template <typename Function>
-long measureTime(Function f) {
+long measure_time(Function f) {
     using namespace std::chrono;
     auto t1 = high_resolution_clock::now();
     f();
@@ -40,36 +40,36 @@ long measureTime(Function f) {
 }
 
 int main(int argc, char **argv) {
-    ArgumentParser argumentParser = parseArgs(argc, argv);
+    ArgumentParser argument_parser = parse_args(argc, argv);
 
-    std::string source_file { argumentParser.get<std::string>("source") };
+    std::string source_file { argument_parser.get<std::string>("source") };
 
-    bool verbose { argumentParser.get<bool>("verbose") };
+    bool verbose { argument_parser.get<bool>("verbose") };
 
-    sptr_t<std::string> source = Util::readSource(source_file);
+    sptr_t<std::string> source = util::read_source(source_file);
     Lexer lexer { *source };
 
-    long lexerDuration = measureTime([&]() { lexer.readAll(); });
+    long lexer_duration = measure_time([&]() { lexer.read_all(); });
 
-    if (verbose) lexer.getTokens().printTokens();
+    if (verbose) lexer.get_tokens().print_tokens();
 
-    std::cout << "Lexed " << lexer.numberOfTokens() << " tokens in "
-              << lexerDuration << " milliseconds" << std::endl;
+    std::cout << "Lexed " << lexer.number_of_tokens() << " tokens in "
+              << lexer_duration << " milliseconds" << std::endl;
 
     Parser parser {};
 
-    long parserDuration =
-        measureTime([&]() { parser.parse(lexer.getTokens()); });
+    long parser_duration =
+        measure_time([&]() { parser.parse(lexer.get_tokens()); });
 
-    std::cout << "Parsing took " << parserDuration << " milliseconds"
+    std::cout << "Parsing took " << parser_duration << " milliseconds"
               << std::endl;
 
-    if (verbose) std::cout << parser.compilationUnit->dump() << std::endl;
+    if (verbose) std::cout << parser.compilation_unit->dump() << std::endl;
 
-    sptr_t<Scope> programScope = std::make_shared<Scope>();
+    sptr_t<Scope> program_scope = std::make_shared<Scope>();
 
-    parser.compilationUnit->functionPass(programScope.get());
-    std::cout << "Function pass got " << programScope->functionCount()
+    parser.compilation_unit->function_pass(program_scope.get());
+    std::cout << "Function pass got " << program_scope->function_count()
               << " functions" << std::endl;
 
     return 0;

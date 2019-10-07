@@ -8,7 +8,7 @@
 struct Block : public Statement {
     virtual std::string name() const override { return "Block"; }
 
-    void addStatement(ptr_t<Statement> &statement);
+    void add_statement(ptr_t<Statement> &statement);
 
     virtual std::string dump(unsigned indent) const override;
 
