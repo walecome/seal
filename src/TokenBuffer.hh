@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iterator>
 #include <sstream>
 #include <unordered_map>
 #include <vector>
@@ -7,6 +8,8 @@
 #include "Token.hh"
 
 class TokenBuffer {
+    using TokenIterator = std::vector<Token>::iterator;
+
    public:
     TokenBuffer() = default;
     TokenBuffer(std::vector<Token> from_tokens) : tokens { from_tokens } {}
@@ -21,6 +24,8 @@ class TokenBuffer {
     std::string dump() const;
     Token pop();
     Token top() const { return tokens[index]; };
+
+    TokenIterator top_iterator() const { tokens.begin() + index; };
 
     void add_token(const Token token);
     void backtrack(unsigned steps);
