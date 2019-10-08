@@ -1,7 +1,13 @@
 #include "TokenBuffer.hh"
 #include "Error.hh"
 
-void TokenBuffer::add_token(const Token token) { tokens.push_back(token); }
+void TokenBuffer::add_token(const Token token) {
+    if (token.row > previous_row) {
+        previous_row = token.row;
+        row_indices.insert({ token.row, tokens.size() });
+    }
+    tokens.push_back(token);
+}
 
 void TokenBuffer::print_tokens() const { std::cout << dump() << std::endl; }
 
@@ -45,3 +51,41 @@ bool TokenBuffer::can_pop(TokenType type, int offset) {
 }
 
 void TokenBuffer::backtrack(unsigned int steps) { index -= steps; }
+
+std::string TokenBuffer::reconstruct_row(unsigned row) const {
+    auto it = row_indices.find(row);
+    if (it == std::end(row_indices)) {
+        throw std::runtime_error("Unable to reconstruct row " +
+                                 std::to_string(row));
+    }
+
+    unsigned current_index = it->second;
+
+    std::ostringstream oss {};
+
+    Token previous_token = tokens.at(current_index);
+    oss << previous_token.value;
+
+    while (1) {
+        ++current_index;
+        if (current_index >= tokens.size() ||
+            tokens.at(current_index).row != row) {
+            break;
+        }
+
+        Token current_token = tokens.at(current_index);
+
+        unsigned spaces = current_token.col - previous_token.col -
+                          previous_token.value.length();
+
+        for (unsigned i = 0; i < spaces; ++i) {
+            oss << " ";
+        }
+
+        oss << current_token.value;
+
+        previous_token = current_token;
+    }
+
+    return oss.str();
+}

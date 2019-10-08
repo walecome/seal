@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 
 #include "Token.hh"
@@ -25,9 +26,13 @@ class TokenBuffer {
     void backtrack(unsigned steps);
     void expect(TokenType token_type);
     void print_tokens() const;
+    std::string reconstruct_row(unsigned row) const;
 
    private:
     unsigned index { 0 };
 
     std::vector<Token> tokens {};
+    std::unordered_map<unsigned, unsigned> row_indices { { 0, 0 } };
+
+    unsigned previous_row { 0 };
 };
