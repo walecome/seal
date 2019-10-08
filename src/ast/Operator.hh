@@ -44,7 +44,8 @@ static std::unordered_map<std::string_view, OperatorSym> string_to_op_sym {
 
 struct Operator : public Node {
     Operator(const Token &token)
-        : operator_symbol { string_to_op_sym[token.value] },
+        : token { token },
+          operator_symbol { string_to_op_sym[token.value] },
           precedence { operator_precedence[operator_symbol] } {}
 
     static bool is_operator(const Token &token) {
@@ -62,6 +63,7 @@ struct Operator : public Node {
 
     bool precedes(const Operator &other) const;
 
+    const Token token;
     OperatorSym operator_symbol;
     int precedence;
 };

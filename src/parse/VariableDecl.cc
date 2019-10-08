@@ -3,7 +3,8 @@
 #include "ast/Expression.hh"
 
 ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer &tokens) {
-    if (!tokens.can_pop(IDENTIFIER) || !tokens.can_pop(COLON, 1)) return nullptr;
+    if (!tokens.can_pop(IDENTIFIER) || !tokens.can_pop(COLON, 1))
+        return nullptr;
 
     // @REFACTOR: The API for can_pop can be improved, we shouldn't need to eat
     // the tokens after checking
@@ -19,5 +20,5 @@ ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer &tokens) {
 
     tokens.expect(SEMICOLON);
 
-    return std::make_unique<VariableDecl>(identifier.value, type.value, value);
+    return std::make_unique<VariableDecl>(identifier, type.value, value);
 }

@@ -9,15 +9,15 @@ void VariableDecl::analyze(Scope *scope) {
     // Analyzing the value expression will resolve its type
     value->analyze(scope);
 
-    if (this->type != value->type) {
-        error::mismatched_type(this->type, value->type);
+    if (type != value->type) {
+        error::mismatched_type(type, value->type, identifier);
     }
 }
 
 std::string VariableDecl::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << name() << " (" << std::endl;
-    oss << util::indent(indent + 1) << "\"" << identifier << "\" : ";
+    oss << util::indent(indent + 1) << "\"" << identifier.value << "\" : ";
     oss << type.dump(0) << std::endl;
 
     if (value) oss << value->dump(indent + 1) << std::endl;

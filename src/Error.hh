@@ -38,7 +38,9 @@ void syntax(const std::string& s, TokenBuffer& tokens);
 void report_error(const std::string& error, bool quit = true);
 void rpn(Token got);
 
-void mismatched_type(const Type& expected, const Type& found);
+void mismatched_type(const Type& expected, const Type& found,
+                     const Token& token);
 void add_semantic_error(const std::string error);
+void add_semantic_error(const std::string error_prefix, const Token& token);
 void report_semantic_errors();
 }  // namespace error

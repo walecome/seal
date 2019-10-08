@@ -4,10 +4,10 @@
 
 #include "ArgumentList.hh"
 #include "Expression.hh"
+#include "Token.hh"
 
 struct FunctionCall : public Expression {
-    FunctionCall(const std::string_view identfier,
-                 ptr_t<ArgumentList> &argument_list)
+    FunctionCall(const Token identfier, ptr_t<ArgumentList> &argument_list)
         : identifier { identfier },
           argument_list { std::move(argument_list) } {}
 
@@ -16,6 +16,6 @@ struct FunctionCall : public Expression {
 
     virtual void analyze(Scope *scope) override;
 
-    const std::string_view identifier;
+    const Token identifier;
     ptr_t<ArgumentList> argument_list;
 };

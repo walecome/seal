@@ -11,11 +11,13 @@ std::string FunctionDecl::dump(unsigned indent) const {
     std::ostringstream oss {};
 
     oss << util::indent(indent) << name() << "(" << std::endl;
-    oss << util::indent(indent + 1) << "\"" << identifier << "\"" << std::endl;
+    oss << util::indent(indent + 1) << "\"" << identifier.value << "\""
+        << std::endl;
     if (parameter_list)
         oss << parameter_list->dump(indent + 1) << std::endl;
     else
         oss << util::indent(indent + 1) << "EMPTY PARAMETERLIST" << std::endl;
+    oss << util::indent(indent + 1) << type.dump(0) << std::endl;
     oss << util::indent(indent) << ")";
 
     return oss.str();

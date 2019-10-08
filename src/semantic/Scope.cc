@@ -3,21 +3,21 @@
 #include "ast/VariableDecl.hh"
 
 void Scope::add_function(const FunctionDecl *const function_decl) {
-    if (has_function(function_decl->identifier)) {
-        error::add_semantic_error("Redeclaration of function " +
-                                  std::string(function_decl->identifier));
+    if (has_function(function_decl->identifier.value)) {
+        error::add_semantic_error("Redeclaration of function",
+                                  function_decl->identifier);
         return;
     }
-    functions.insert(function_decl->identifier);
+    functions.insert(function_decl->identifier.value);
 }
 
 void Scope::add_variable(const VariableDecl *const variable_decl) {
-    if (has_variable(variable_decl->identifier)) {
-        error::add_semantic_error("Redeclaration of variable " +
-                                  std::string(variable_decl->identifier));
+    if (has_variable(variable_decl->identifier.value)) {
+        error::add_semantic_error("Redeclaration of variable",
+                                  variable_decl->identifier);
         return;
     }
-    variables.insert(variable_decl->identifier);
+    variables.insert(variable_decl->identifier.value);
 }
 
 bool Scope::has_function(const std::string_view identifier,

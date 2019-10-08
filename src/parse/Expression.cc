@@ -105,19 +105,17 @@ ptr_t<Expression> Parser::rpn_to_expressions(TokenBuffer& tokens) {
         Token current = tokens.pop();
 
         if (current.type == NUMBER) {
-            int number = std::stoi(std::string(current.value));
-            expressions.push(std::make_unique<IntegerLiteral>(number));
+            expressions.push(std::make_unique<IntegerLiteral>(current));
         } else if (current.type == STRING) {
-            expressions.push(std::make_unique<StringLiteral>(current.value));
+            expressions.push(std::make_unique<StringLiteral>(current));
         } else if (current.type == FUNC_CALL) {
             ptr_t<ArgumentList> argument_list =
                 Parser::parse_argument_list(tokens);
             expressions.push(
-                std::make_unique<FunctionCall>(current.value, argument_list));
+                std::make_unique<FunctionCall>(current, argument_list));
 
         } else if (current.type == IDENTIFIER) {  // Variable
-            expressions.push(
-                std::make_unique<VariableExpression>(current.value));
+            expressions.push(std::make_unique<VariableExpression>(current));
         } else if (Operator::is_operator(current)) {
             if (expressions.size() < 2) {
                 throw std::runtime_error("Two operands needed");

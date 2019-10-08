@@ -1,5 +1,5 @@
 #include "BinaryExpression.hh"
-
+#include "Operator.hh"
 void BinaryExpression::analyze(Scope *scope) {
     left->analyze(scope);
     op->analyze(scope);
@@ -10,7 +10,8 @@ void BinaryExpression::analyze(Scope *scope) {
     } else {
         this->type = Type(Primitive::VOID);
         // @TODO: Determine expected type, left is more likely but not always
-        error::mismatched_type(left->type, right->type);
+        Token token { 0, 0 };
+        error::mismatched_type(left->type, right->type, op->token);
     }
 }
 

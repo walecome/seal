@@ -25,9 +25,10 @@ ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
     ptr_t<ParameterList> parameters = parse_parameter_list(tokens);
 
     tokens.expect(ARROW);
+    Token type = tokens.top();
     tokens.expect(TYPE);
 
-    return std::make_unique<FunctionDecl>(identifier.value, parameters);
+    return std::make_unique<FunctionDecl>(identifier, parameters, type.value);
 }
 
 ptr_t<ParameterList> Parser::parse_parameter_list(TokenBuffer &tokens) {
@@ -55,5 +56,5 @@ ptr_t<VariableDecl> Parser::parse_parameter(TokenBuffer &tokens) {
     Token type = tokens.top();
     tokens.expect(TYPE);
 
-    return std::make_unique<VariableDecl>(identifier.value, type.value);
+    return std::make_unique<VariableDecl>(identifier, type.value);
 }
