@@ -2,23 +2,22 @@ func myfunc(var1: int) -> void {
     1 - 2;
     asd : int = (1);
     hejsan : int = (3 + 5) * 2;
-    var2 : int = asd * (abc(1) + 5);
-    abc(abc(1) * (asd - var2));
+    var2 : int = asd * (asdfunc(1) + 5);
+    abc(asdfunc(1) * (asd - var2));
 
     x : int = 0;
 
     if (asd < var2) {
-        x = abc(asd);
+        x = asdfunc(asd);
         asd = var2;
     } else {
         x = 5;
     }
 
 
-    functioncall(withvar);
+    functioncall(var2);
     functioncallwithint(1);
     functioncallwithstring("my string!");
-    functioncallwitharray([1, 2, 3]);
 
     var : int = 15;
 
@@ -34,15 +33,17 @@ func myfunc(var1: int) -> void {
     return fib(asd);
 }
 
-func asd() -> int {
-    return 1;
+func functioncall(a : int) -> void {}
+func functioncallwithint(a : int) -> void {}
+func functioncallwithstring(a : string)  -> void {}
+func asdfunc(a : int) -> int {
+    return a + 3;
 }
-
-func abc() -> string {
+func abc(a : int) -> string {
     print("hello world");
 }
 
-func print() -> void {}
+func print(text : string) -> void {}
 
 func fib(n: int) -> int {
     if (n == 0) {

@@ -5,10 +5,8 @@ void Block::add_statement(ptr_t<Statement> &statement) {
 }
 
 void Block::analyze(Scope *scope) {
-    ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope);
-
     for (auto &statement : statements) {
-        statement->analyze(inner_scope.get());
+        statement->analyze(scope);
     }
 }
 

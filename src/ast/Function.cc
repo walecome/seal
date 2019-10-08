@@ -1,8 +1,10 @@
 #include "Function.hh"
 
 void Function::analyze(Scope* scope) {
-    function_decl->analyze(scope);
-    block->analyze(scope);
+    ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope);
+
+    function_decl->analyze(inner_scope.get());
+    block->analyze(inner_scope.get());
 }
 
 std::string Function::dump(unsigned indent) const {

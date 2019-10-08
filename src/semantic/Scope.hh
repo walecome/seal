@@ -1,7 +1,8 @@
 #pragma once
 
+#include <cassert>
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 
 #include "Constants.hh"
 #include "Error.hh"
@@ -12,18 +13,21 @@ struct VariableDecl;
 struct Scope {
     Scope(Scope *parent = nullptr) : parent { parent } {}
 
-    void add_function(const FunctionDecl *const function_declaration);
-    void add_variable(const VariableDecl *const variable_declaration);
+    void add_function(FunctionDecl *const function_declaration);
+    void add_variable(VariableDecl *const variable_declaration);
 
     bool has_function(const std::string_view identifier,
                       bool traverse_parent = false) const;
     bool has_variable(const std::string_view identifier,
                       bool traverse_parent = false) const;
 
+    FunctionDecl *get_function(const std::string_view identifier) const;
+    VariableDecl *get_variable(const std::string_view identifier) const;
+
     unsigned function_count() const;
 
-    std::unordered_set<std::string_view> variables {};
-    std::unordered_set<std::string_view> functions {};
+    std::unordered_map<std::string_view, VariableDecl *const> variables {};
+    std::unordered_map<std::string_view, FunctionDecl *const> functions {};
 
     Scope *const parent;
 };

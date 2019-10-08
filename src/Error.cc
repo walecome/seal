@@ -28,11 +28,10 @@ void error::report_error(const std::string &error, bool quit) {
     if (quit) exit(EXIT_FAILURE);
 }
 
-void error::mismatched_type(const Type &expected, const Type &found,
-                            const Token &token) {
+void error::mismatched_type(const Type &a, const Type &b, const Token &token) {
     std::ostringstream oss {};
-    oss << "Mismatched types, expected " << expected.to_string() << " found "
-        << found.to_string() << " " << token.to_string();
+    oss << "Mismatched types, got " << a.to_string() << " and " << b.to_string()
+        << " " << token.to_string();
     add_semantic_error(oss.str());
 }
 
