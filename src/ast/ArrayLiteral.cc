@@ -4,7 +4,7 @@ void ArrayLiteral::add_expression(ptr_t<Expression> &expression) {
     expressions.push_back(std::move(expression));
 }
 
-void ArrayLiteral::analyze(Scope *scope) const {
+void ArrayLiteral::analyze(Scope *scope) {
     for (auto &expression : expressions) {
         expression->analyze(scope);
     }

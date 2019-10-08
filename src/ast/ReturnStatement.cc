@@ -1,5 +1,7 @@
 #include "ReturnStatement.hh"
 
+void ReturnStatement::analyze(Scope *scope) { return_value->analyze(scope); }
+
 std::string ReturnStatement::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << name() << " (" << std::endl;

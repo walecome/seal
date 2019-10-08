@@ -1,6 +1,6 @@
 #include "Function.hh"
 
-void Function::analyze(Scope* scope) const {
+void Function::analyze(Scope* scope) {
     function_decl->analyze(scope);
     block->analyze(scope);
 }

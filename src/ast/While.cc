@@ -1,6 +1,6 @@
 #include "While.hh"
 
-void While::analyze(Scope *scope) const {
+void While::analyze(Scope *scope) {
     condition->analyze(scope);
     body->analyze(scope);
 }

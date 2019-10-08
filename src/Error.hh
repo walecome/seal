@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdexcept>
+#include <string>
+#include <vector>
 
 #include "Token.hh"
 #include "TokenBuffer.hh"
@@ -27,9 +29,16 @@ class Modifier {
 };
 }  // namespace Color
 
+struct Type;
+
 namespace error {
+static std::vector<std::string> semantic_errors {};
 void syntax(TokenType expected, Token got);
 void syntax(const std::string& s, TokenBuffer& tokens);
-void report_error(const std::string& error);
+void report_error(const std::string& error, bool quit = true);
 void rpn(Token got);
+
+void mismatched_type(const Type& expected, const Type& found);
+void add_semantic_error(const std::string error);
+void report_semantic_errors();
 }  // namespace error

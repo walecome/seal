@@ -13,6 +13,6 @@ struct CompilationUnit : public Node {
     std::string dump() const;
     virtual std::string dump(unsigned indent) const override;
 
-    void function_pass(Scope* scope) const;
-    virtual void analyze(Scope* scope) const override;
+    void function_pass(Scope* scope);
+    virtual void analyze(Scope* scope) override;
 };

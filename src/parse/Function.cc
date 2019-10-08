@@ -32,8 +32,8 @@ ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
 
 ptr_t<ParameterList> Parser::parse_parameter_list(TokenBuffer &tokens) {
     tokens.expect(LPARENS);
-    if (tokens.eat(RPARENS)) return nullptr;
     ptr_t<ParameterList> parameters = std::make_unique<ParameterList>();
+    if (tokens.eat(RPARENS)) return parameters;
 
     while (ptr_t<VariableDecl> parameter = parse_parameter(tokens)) {
         parameters->add_parameter(parameter);

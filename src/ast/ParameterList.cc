@@ -4,7 +4,7 @@ void ParameterList::add_parameter(ptr_t<VariableDecl>& parameter) {
     parameters.push_back(std::move(parameter));
 }
 
-void ParameterList::analyze(Scope* scope) const {
+void ParameterList::analyze(Scope* scope) {
     for (auto& parameter : parameters) {
         parameter->analyze(scope);
     }

@@ -12,7 +12,7 @@ struct Block : public Statement {
 
     virtual std::string dump(unsigned indent) const override;
 
-    virtual void analyze(Scope *scope) const override;
+    virtual void analyze(Scope *scope) override;
 
     std::vector<ptr_t<Statement>> statements {};
 };

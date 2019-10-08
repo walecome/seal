@@ -1,7 +1,7 @@
 func myfunc(var1: int) -> void {
     1 - 2;
     asd(1);
-    asd : int = (3 + 5) * 2;
+    hejsan : int = (3 + 5) * 2;
     var2 : int = asd * (abc(1) + 5);
     abc(abc(1) * (asd - var2));
 
@@ -29,6 +29,16 @@ func myfunc(var1: int) -> void {
 
     return fib(asd);
 }
+
+func asd() -> int {
+    return 1;
+}
+
+func abc() -> void {
+    print("hello world");
+}
+
+func print() -> void {}
 
 func fib(n: int) -> int {
     if (n == 0) {

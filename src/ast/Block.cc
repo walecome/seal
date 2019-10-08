@@ -4,8 +4,8 @@ void Block::add_statement(ptr_t<Statement> &statement) {
     statements.push_back(std::move(statement));
 }
 
-void Block::analyze(Scope *scope) const {
-    sptr_t<Scope> inner_scope = std::make_shared<Scope>(scope);
+void Block::analyze(Scope *scope) {
+    ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope);
 
     for (auto &statement : statements) {
         statement->analyze(inner_scope.get());

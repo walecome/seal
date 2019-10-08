@@ -1,4 +1,5 @@
 #include "Error.hh"
+#include "ast/Type.hh"
 
 void error::syntax(TokenType expected, Token got) {
     std::ostringstream oss {};
@@ -20,9 +21,28 @@ void error::rpn(Token got) {
     report_error(oss.str());
 }
 
-void error::report_error(const std::string &error) {
+void error::report_error(const std::string &error, bool quit) {
     std::cout << Color::Modifier(Color::FG_RED) << "ERROR: " << error
               << Color::Modifier(Color::FG_DEFAULT) << std::endl;
 
+    if (quit) exit(EXIT_FAILURE);
+}
+
+void error::mismatched_type(const Type &expected, const Type &found) {
+    std::ostringstream oss {};
+    oss << "Mismatched types, expected " << expected.to_string() << " found "
+        << found.to_string() << std::endl;
+    add_semantic_error(oss.str());
+}
+
+void error::add_semantic_error(const std::string error) {
+    semantic_errors.push_back(error);
+}
+
+void error::report_semantic_errors() {
+    if (semantic_errors.empty()) return;
+    for (auto &error : semantic_errors) {
+        report_error(error, false);
+    }
     exit(EXIT_FAILURE);
 }

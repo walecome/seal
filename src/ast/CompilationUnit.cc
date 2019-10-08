@@ -5,13 +5,13 @@ void CompilationUnit::add_function(ptr_t<Function> &function) {
     functions.push_back(std::move(function));
 }
 
-void CompilationUnit::function_pass(Scope *scope) const {
+void CompilationUnit::function_pass(Scope *scope) {
     for (auto &function : functions) {
         scope->add_function(function->function_decl.get());
     }
 }
 
-void CompilationUnit::analyze(Scope *scope) const {
+void CompilationUnit::analyze(Scope *scope) {
     std::shared_ptr<Scope> inner_scope = std::make_shared<Scope>(scope);
 
     for (auto &function : functions) {

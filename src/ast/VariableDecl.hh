@@ -17,7 +17,7 @@ struct VariableDecl : public Decl {
     virtual std::string name() const override { return "VariableDecl"; }
     virtual std::string dump(unsigned indent) const override;
 
-    virtual void analyze(Scope *scope) const override;
+    virtual void analyze(Scope *scope) override;
 
     const std::string_view identifier;
     const Type type;

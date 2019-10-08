@@ -54,6 +54,8 @@ struct Operator : public Node {
     bool is_right_associative() const;
     bool is_left_associative() const;
 
+    virtual void analyze(Scope *) override {}
+
     virtual std::string name() const override { return "Operator"; }
 
     virtual std::string dump(unsigned indent) const override;

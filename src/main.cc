@@ -66,11 +66,14 @@ int main(int argc, char **argv) {
 
     if (verbose) std::cout << parser.compilation_unit->dump() << std::endl;
 
-    sptr_t<Scope> program_scope = std::make_shared<Scope>();
+    ptr_t<Scope> program_scope = std::make_unique<Scope>();
 
     parser.compilation_unit->function_pass(program_scope.get());
     std::cout << "Function pass got " << program_scope->function_count()
               << " functions" << std::endl;
+
+    parser.compilation_unit->analyze(program_scope.get());
+    error::report_semantic_errors();
 
     return 0;
 }

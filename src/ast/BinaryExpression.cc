@@ -1,9 +1,17 @@
 #include "BinaryExpression.hh"
 
-void BinaryExpression::analyze(Scope *scope) const {
+void BinaryExpression::analyze(Scope *scope) {
     left->analyze(scope);
     op->analyze(scope);
     right->analyze(scope);
+
+    if (left->type == right->type) {
+        this->type = left->type;
+    } else {
+        this->type = Type(Primitive::VOID);
+        // @TODO: Determine expected type, left is more likely but not always
+        error::mismatched_type(left->type, right->type);
+    }
 }
 
 std::string BinaryExpression::dump(unsigned indent) const {

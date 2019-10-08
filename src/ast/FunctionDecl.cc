@@ -1,6 +1,6 @@
 #include "FunctionDecl.hh"
 
-void FunctionDecl::analyze(Scope *scope) const {
+void FunctionDecl::analyze(Scope *scope) {
     // @TODO: We don't check the function identifier since this is done in the
     //        initial sematic pass. But this creates an issue with not allowing
     //        functions inside other functions.

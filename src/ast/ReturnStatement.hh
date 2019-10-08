@@ -8,7 +8,9 @@ struct ReturnStatement : public Statement {
         : return_value { std::move(return_value) } {}
 
     virtual std::string name() const override { return "ReturnStatement"; }
-
     virtual std::string dump(unsigned indent) const override;
+
+    virtual void analyze(Scope *scope) override;
+
     ptr_t<Expression> return_value;
 };

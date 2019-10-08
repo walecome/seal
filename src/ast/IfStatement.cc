@@ -1,6 +1,6 @@
 #include "IfStatement.hh"
 
-void IfStatement::analyze(Scope* scope) const {
+void IfStatement::analyze(Scope* scope) {
     condition->analyze(scope);
     if_body->analyze(scope);
     if (else_body) else_body->analyze(scope);

@@ -1,10 +1,10 @@
 #include "FunctionCall.hh"
 
-void FunctionCall::analyze(Scope *scope) const {
-    if (!scope->has_function(identifier)) {
+void FunctionCall::analyze(Scope *scope) {
+    if (!scope->has_function(identifier, true)) {
         // @TODO: Implement semantic error instead
-        throw std::runtime_error("Call to undeclared function " +
-                                 std::string(identifier));
+        error::add_semantic_error("Call to undeclared function " +
+                                  std::string(identifier));
     }
 
     argument_list->analyze(scope);

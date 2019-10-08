@@ -1,10 +1,10 @@
 #include "VariableExpression.hh"
 
-void VariableExpression::analyze(Scope *scope) const {
+void VariableExpression::analyze(Scope *scope) {
     if (!scope->has_variable(identifier)) {
         // @TODO: Sematic error instead
-        throw std::runtime_error("Use of undeclared variable " +
-                                 std::string(identifier));
+        error::add_semantic_error("Use of undeclared variable " +
+                                  std::string(identifier));
     }
 }
 

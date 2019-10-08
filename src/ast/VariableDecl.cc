@@ -1,7 +1,17 @@
 #include "VariableDecl.hh"
 
-void VariableDecl::analyze(Scope *scope) const {
-    // @TODO: Type check
+void VariableDecl::analyze(Scope *scope) {
+    scope->add_variable(this);
+
+    // Parameters don't have values
+    if (!value) return;
+
+    // Analyzing the value expression will resolve its type
+    value->analyze(scope);
+
+    if (this->type != value->type) {
+        error::mismatched_type(this->type, value->type);
+    }
 }
 
 std::string VariableDecl::dump(unsigned indent) const {

@@ -9,7 +9,7 @@ struct VariableExpression : public Expression {
     virtual std::string name() const override { return "VariableExpression"; }
     virtual std::string dump(unsigned indent) const override;
 
-    virtual void analyze(Scope *scope) const override;
+    virtual void analyze(Scope *scope) override;
 
     const std::string_view identifier;
 };

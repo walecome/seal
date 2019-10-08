@@ -4,7 +4,7 @@ void ArgumentList::add_argument(ptr_t<Expression> &expression) {
     arguments.push_back(std::move(expression));
 }
 
-void ArgumentList::analyze(Scope *scope) const {
+void ArgumentList::analyze(Scope *scope) {
     for (auto &argument : arguments) {
         argument->analyze(scope);
     }
