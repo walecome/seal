@@ -115,6 +115,7 @@ ptr_t<Expression> Parser::rpn_to_expressions(TokenBuffer& tokens) {
                 std::make_unique<FunctionCall>(current, argument_list));
 
         } else if (current.type == IDENTIFIER) {  // Variable
+            // @TODO: We need to add a source_ref to var_expr
             expressions.push(std::make_unique<VariableExpression>(current));
         } else if (Operator::is_operator(current)) {
             if (expressions.size() < 2) {
@@ -150,11 +151,13 @@ ptr_t<Expression> Parser::rpn_to_expressions(TokenBuffer& tokens) {
 }
 
 ptr_t<Expression> Parser::parse_expression(TokenBuffer& tokens) {
-    auto begin = tokens.top_iterator();
+    auto begin = TokenBuffer::get_program_buffer()->top_iterator();
     TokenBuffer rpn_tokens = shunting_yard(tokens);
-    auto end = tokens.top_iterator();
+    auto end = TokenBuffer::get_program_buffer()->top_iterator();
     ptr_t<Expression> expression = rpn_to_expressions(rpn_tokens);
     expression->source_ref.begin = begin;
-    expression->source_ref.end = std::next(end);
+    expression->source_ref.end = end;
+    expression->source_ref.size = TokenBuffer::get_program_buffer()->size();
+    std::cout << expression->dump(0) << std::endl;
     return expression;
 }

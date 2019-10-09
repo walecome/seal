@@ -5,7 +5,7 @@
 void Scope::add_function(FunctionDecl *const function_decl) {
     if (has_function(function_decl->identifier.value)) {
         error::add_semantic_error("Redeclaration of function",
-                                  function_decl->identifier);
+                                  function_decl->source_ref);
         return;
     }
     functions.insert({ function_decl->identifier.value, function_decl });
@@ -14,7 +14,7 @@ void Scope::add_function(FunctionDecl *const function_decl) {
 void Scope::add_variable(VariableDecl *const variable_decl) {
     if (has_variable(variable_decl->identifier.value)) {
         error::add_semantic_error("Redeclaration of variable",
-                                  variable_decl->identifier);
+                                  variable_decl->source_ref);
         return;
     }
     variables.insert({ variable_decl->identifier.value, variable_decl });

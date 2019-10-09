@@ -3,7 +3,7 @@
 
 void FunctionCall::analyze(Scope *scope) {
     if (!scope->has_function(identifier.value, true)) {
-        error::add_semantic_error("Call to undeclared function", identifier);
+        error::add_semantic_error("Call to undeclared function", source_ref);
         type = Type { Primitive::VOID };
         return;
     }
@@ -16,7 +16,7 @@ void FunctionCall::analyze(Scope *scope) {
         argument_list->arguments.size()) {
         error::add_semantic_error(
             "Function call argument list length does not match declaration",
-            identifier);
+            source_ref);
         return;
     }
 

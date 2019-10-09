@@ -8,4 +8,6 @@
 struct SourceRef {
     TokenBuffer::Iterator begin;
     TokenBuffer::Iterator end;
+
+    int size { -1 };
 };

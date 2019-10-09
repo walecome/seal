@@ -4,6 +4,19 @@
 #include "SourceRef.hh"
 #include "TokenBuffer.hh"
 
+// @REFACTOR: This is needed to access the correct iterators from the
+//            expression parsing. This is super ugly and should be reworked.
+//            The problem comes from us creating new TokenBuffer for each
+//            recursive expression call, which leads to the iterators pointing
+//            at stack buffer which is destroyed.
+static TokenBuffer* program_buffer = nullptr;
+
+TokenBuffer::TokenBuffer() {
+    if (!program_buffer) program_buffer = this;
+}
+
+TokenBuffer* TokenBuffer::get_program_buffer() { return program_buffer; }
+
 void TokenBuffer::add_token(const Token token) {
     if (token.row > previous_row) {
         previous_row = token.row;
@@ -104,7 +117,7 @@ std::string TokenBuffer::as_source() const {
 
     Token previous = tokens.front();
 
-    for (auto &token : tokens) {
+    for (auto& token : tokens) {
         int row_dt = token.row - previous.row;
 
         if (row_dt) {

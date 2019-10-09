@@ -18,7 +18,7 @@ ptr_t<Block> Parser::parse_block(TokenBuffer &tokens) {
     auto end = tokens.top_iterator();
 
     block->source_ref.begin = begin;
-    block->source_ref.end = std::next(end);
+    block->source_ref.end = end;
 
     return block;
 }

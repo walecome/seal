@@ -4,7 +4,7 @@
 void VariableExpression::analyze(Scope *scope) {
     if (!scope->has_variable(identifier.value, true)) {
         // @TODO: Sematic error instead
-        error::add_semantic_error("Use of undeclared variable", identifier);
+        error::add_semantic_error("Use of undeclared variable", source_ref);
         type = Type { Primitive::VOID };
     } else {
         type = scope->get_variable(identifier.value)->type;

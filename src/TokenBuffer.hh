@@ -13,7 +13,7 @@ class TokenBuffer {
    public:
     using Iterator = std::vector<Token>::iterator;
 
-    TokenBuffer() = default;
+    TokenBuffer();
     TokenBuffer(std::vector<Token> from_tokens) : tokens { from_tokens } {}
 
     bool accept(TokenType token_type) const;
@@ -36,6 +36,7 @@ class TokenBuffer {
     std::string reconstruct_row(unsigned row) const;
 
     static TokenBuffer source_tokens(SourceRef source_ref);
+    static TokenBuffer* get_program_buffer();
 
     std::string as_source() const;
 

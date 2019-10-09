@@ -14,6 +14,7 @@ func myfunc(var1: int) -> void {
         x = 5;
     }
 
+    x = y;
 
     functioncall(var2);
     functioncallwithint(1);

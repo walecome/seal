@@ -17,7 +17,7 @@ ptr_t<Function> Parser::parse_function(TokenBuffer &tokens) {
     auto function = std::make_unique<Function>(function_decl_node, block_node);
 
     function->source_ref.begin = begin;
-    function->source_ref.end = std::next(end);
+    function->source_ref.end = end;
 
     return function;
 }

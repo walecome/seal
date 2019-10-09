@@ -9,7 +9,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/compiler",
-      "args": ["--source", "code/illformed_types.comp"],
+      "args": ["--source", "code/function.comp"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

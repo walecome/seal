@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "Error.hh"
 #include "ast/Type.hh"
 
@@ -28,14 +30,22 @@ void error::report_error(const std::string &error, bool quit) {
     if (quit) exit(EXIT_FAILURE);
 }
 
+std::string line_text(SourceRef source_ref) {
+    std::ostringstream oss {};
+
+    oss << "Line " << (source_ref.begin->row + 1) << " column "
+        << (source_ref.begin->col + 1);
+
+    return oss.str();
+}
+
 void error::mismatched_type(const Type &a, const Type &b,
                             SourceRef source_ref) {
     std::ostringstream oss {};
 
     auto tokens = TokenBuffer::source_tokens(source_ref);
 
-    oss << "Line " << (source_ref.begin->row + 1) << " column "
-        << (source_ref.begin->col + 1) << ": ";
+    oss << line_text(source_ref) << ": ";
     oss << "Mismatched types, got " << a.to_string() << " and " << b.to_string()
         << std::endl;
     oss << "\t" << tokens.as_source();
@@ -50,6 +60,18 @@ void error::add_semantic_error(const std::string error_prefix,
                                const Token &token) {
     std::ostringstream oss {};
     oss << error_prefix << ": " << token.to_string();
+    add_semantic_error(oss.str());
+}
+
+void error::add_semantic_error(const std::string error_prefix,
+                               SourceRef source_ref) {
+    auto tokens = TokenBuffer::source_tokens(source_ref);
+
+    std::ostringstream oss {};
+    oss << line_text(source_ref) << ": ";
+    oss << error_prefix << std::endl;
+    oss << "\t" << tokens.as_source();
+
     add_semantic_error(oss.str());
 }
 
