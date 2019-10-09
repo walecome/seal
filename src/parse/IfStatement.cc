@@ -4,6 +4,8 @@
 #include "ast/Expression.hh"
 
 ptr_t<IfStatement> Parser::parse_if_statement(TokenBuffer &tokens) {
+    auto begin = tokens.top_iterator();
+
     if (!tokens.eat(IF)) return nullptr;
 
     tokens.expect(LPARENS);
@@ -19,5 +21,13 @@ ptr_t<IfStatement> Parser::parse_if_statement(TokenBuffer &tokens) {
         else_body = parse_block(tokens);
     }
 
-    return std::make_unique<IfStatement>(condition, if_body, else_body);
+    auto end = tokens.top_iterator();
+
+    auto if_statement =
+        std::make_unique<IfStatement>(condition, if_body, else_body);
+
+    if_statement->source_ref.begin = begin;
+    if_statement->source_ref.end = end;
+
+    return if_statement;
 }

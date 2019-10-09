@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include "SourceRef.hh"
 #include "Token.hh"
 #include "TokenBuffer.hh"
 
@@ -38,7 +39,7 @@ void syntax(const std::string& s, TokenBuffer& tokens);
 void report_error(const std::string& error, bool quit = true);
 void rpn(Token got);
 
-void mismatched_type(const Type& a, const Type& b, const Token& token);
+void mismatched_type(const Type& a, const Type& b, SourceRef source_ref);
 void add_semantic_error(const std::string error);
 void add_semantic_error(const std::string error_prefix, const Token& token);
 void report_semantic_errors();

@@ -28,7 +28,7 @@ void FunctionCall::analyze(Scope *scope) {
         const auto &param = decl->parameter_list->parameters.at(i);
 
         if (arg->type != param->type) {
-            error::mismatched_type(arg->type, param->type, identifier);
+            error::mismatched_type(arg->type, param->type, source_ref);
         }
     }
 }

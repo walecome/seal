@@ -10,7 +10,7 @@ void VariableDecl::analyze(Scope *scope) {
     value->analyze(scope);
 
     if (type != value->type) {
-        error::mismatched_type(type, value->type, identifier);
+        error::mismatched_type(type, value->type, source_ref);
     }
 }
 

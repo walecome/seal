@@ -5,6 +5,7 @@
 #include "Constants.hh"
 #include "Error.hh"
 #include "Scope.hh"
+#include "SourceRef.hh"
 #include "Util.hh"
 
 struct Node {
@@ -14,4 +15,6 @@ struct Node {
 
     virtual std::string name() const { return "Node"; }
     virtual std::string dump(unsigned) const { return "Node"; }
+
+    SourceRef source_ref {};
 };

@@ -7,10 +7,12 @@
 
 #include "Token.hh"
 
-class TokenBuffer {
-    using TokenIterator = std::vector<Token>::iterator;
+struct SourceRef;
 
+class TokenBuffer {
    public:
+    using Iterator = std::vector<Token>::iterator;
+
     TokenBuffer() = default;
     TokenBuffer(std::vector<Token> from_tokens) : tokens { from_tokens } {}
 
@@ -25,13 +27,17 @@ class TokenBuffer {
     Token pop();
     Token top() const { return tokens[index]; };
 
-    TokenIterator top_iterator() const { tokens.begin() + index; };
+    Iterator top_iterator();
 
     void add_token(const Token token);
     void backtrack(unsigned steps);
     void expect(TokenType token_type);
     void print_tokens() const;
     std::string reconstruct_row(unsigned row) const;
+
+    static TokenBuffer source_tokens(SourceRef source_ref);
+
+    std::string as_source() const;
 
    private:
     unsigned index { 0 };

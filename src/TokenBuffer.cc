@@ -1,5 +1,6 @@
 #include "TokenBuffer.hh"
 #include "Error.hh"
+#include "SourceRef.hh"
 
 void TokenBuffer::add_token(const Token token) {
     if (token.row > previous_row) {
@@ -88,4 +89,51 @@ std::string TokenBuffer::reconstruct_row(unsigned row) const {
     }
 
     return oss.str();
+}
+
+TokenBuffer::Iterator TokenBuffer::top_iterator() {
+    return tokens.begin() + index;
+}
+
+std::string TokenBuffer::as_source() const {
+    if (tokens.empty()) return "";
+
+    std::ostringstream oss {};
+
+    Token previous;
+    previous.value = "";
+
+    for (auto &token : tokens) {
+        int row_dt = token.row - previous.row;
+
+        if (row_dt) {
+            for (int i = 0; i < row_dt; ++i) {
+                oss << std::endl;
+            }
+            for (unsigned i = 0; i < token.col; ++i) {
+                oss << " ";
+            }
+        } else {
+            int spaces = token.col - previous.col - previous.value.length();
+            for (int i = 0; i < spaces; ++i) {
+                oss << " ";
+            }
+        }
+
+        oss << token.value;
+
+        previous = token;
+    }
+
+    return oss.str();
+}
+
+TokenBuffer TokenBuffer::source_tokens(SourceRef source_ref) {
+    TokenBuffer source_tokens {};
+    while (source_ref.begin != source_ref.end) {
+        source_tokens.add_token(*source_ref.begin);
+        ++source_ref.begin;
+    }
+
+    return source_tokens;
 }

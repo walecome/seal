@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <iterator>
 #include <memory>
 #include <stack>
 #include <stdexcept>

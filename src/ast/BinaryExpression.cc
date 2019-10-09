@@ -9,9 +9,7 @@ void BinaryExpression::analyze(Scope *scope) {
         this->type = left->type;
     } else {
         this->type = Type(Primitive::VOID);
-        // @TODO: Determine expected type, left is more likely but not always
-        Token token { 0, 0 };
-        error::mismatched_type(left->type, right->type, op->token);
+        error::mismatched_type(left->type, right->type, source_ref);
     }
 }
 

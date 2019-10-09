@@ -130,6 +130,7 @@ static std::unordered_map<TokenType, std::string_view> token_names {
 };
 
 struct Token {
+    Token() : row { 0 }, col { 0 } {}
     Token(unsigned row, unsigned col) : row { row }, col { col } {}
     TokenType type;
 

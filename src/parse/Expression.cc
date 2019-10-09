@@ -150,7 +150,11 @@ ptr_t<Expression> Parser::rpn_to_expressions(TokenBuffer& tokens) {
 }
 
 ptr_t<Expression> Parser::parse_expression(TokenBuffer& tokens) {
+    auto begin = tokens.top_iterator();
     TokenBuffer rpn_tokens = shunting_yard(tokens);
+    auto end = tokens.top_iterator();
     ptr_t<Expression> expression = rpn_to_expressions(rpn_tokens);
+    expression->source_ref.begin = begin;
+    expression->source_ref.end = std::next(end);
     return expression;
 }
