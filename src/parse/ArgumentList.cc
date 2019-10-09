@@ -21,7 +21,7 @@ ptr_t<ArgumentList> Parser::parse_argument_list(TokenBuffer &tokens) {
     auto end = tokens.top_iterator();
 
     argument_list->source_ref.begin = begin;
-    argument_list->source_ref.end = std::next(end);
+    argument_list->source_ref.end = end;
 
     return argument_list;
 }

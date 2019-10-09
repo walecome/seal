@@ -151,6 +151,10 @@ ptr_t<Expression> Parser::rpn_to_expressions(TokenBuffer& tokens) {
 }
 
 ptr_t<Expression> Parser::parse_expression(TokenBuffer& tokens) {
+    // @TODO/BUG: This is simply not working. A new TokenBuffer is created with
+    //            each call to shunting_yard, which will create invalid
+    //            iterators for the SourceRef struct.
+
     auto begin = TokenBuffer::get_program_buffer()->top_iterator();
     TokenBuffer rpn_tokens = shunting_yard(tokens);
     auto end = TokenBuffer::get_program_buffer()->top_iterator();

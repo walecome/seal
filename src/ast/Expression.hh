@@ -14,5 +14,5 @@ struct Expression : public Statement {
         throw std::runtime_error("Analysis of pure expression not allowed");
     };
 
-    Type type;
+    Type type {};
 };

@@ -17,6 +17,10 @@ struct Scope {
     Scope(Scope *parent = nullptr, FunctionDecl *context = nullptr)
         : parent { parent }, context { get_context(parent, context) } {}
 
+    // Silence compile warnings until we actually need them
+    Scope(const Scope &) = delete;
+    bool operator=(const Scope &) = delete;
+
     void add_function(FunctionDecl *const function_declaration);
     void add_variable(VariableDecl *const variable_declaration);
 

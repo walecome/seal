@@ -79,14 +79,20 @@ add_custom_command(
                 ${CMAKE_HOME_DIRECTORY}/compile_commands.json)
 
 
-find_program(
-    CLANG_TIDY_EXE
-    NAMES "clang-tidy"
-    DOC "Path to clang-tidy executable"
-)
-if(NOT CLANG_TIDY_EXE)
-    message(STATUS "clang-tidy not found.")
-else()
-    message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-    set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=*,-clang-analyzer-alpha.*")
-endif()
+# find_program(
+#     CLANG_TIDY_EXE
+#     NAMES "clang-tidy"
+#     DOC "Path to clang-tidy executable"
+# )
+# if(NOT CLANG_TIDY_EXE)
+#     message(STATUS "clang-tidy not found.")
+# else()
+#     message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
+#     set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=*,-clang-analyzer-alpha.*")
+# endif()
+# if(CLANG_TIDY_EXE)
+#   set_target_properties(
+#     compiler PROPERTIES
+#     CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
+#   )
+# endif()
