@@ -5,7 +5,7 @@ func myfunc(var1: int) -> void {
     var2 : int = asd * (asdfunc(1) + 5);
     abc(asdfunc(1) * (asd - var2));
 
-    x : int = 0;
+    x : mut int = 0;
 
     if (asd < var2) {
         x = asdfunc(asd);
@@ -13,8 +13,6 @@ func myfunc(var1: int) -> void {
     } else {
         x = 5;
     }
-
-    x = y;
 
     functioncall(var2);
     functioncallwithint(1);

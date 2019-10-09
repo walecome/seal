@@ -79,7 +79,8 @@ enum TokenType {
     TYPE,
 
     // Semantic
-    FUNC_CALL
+    FUNC_CALL,
+    MUTABLE
 };
 
 static std::unordered_map<std::string_view, TokenType> string_token_map {
@@ -100,6 +101,7 @@ static std::unordered_map<std::string_view, TokenType> string_token_map {
 static std::unordered_map<std::string_view, TokenType> keyword_map {
     { "func", FUNC_KEYWORD }, { "if", IF },       { "else", ELSE },
     { "elsif", ELSE_IF },     { "while", WHILE }, { "return", RETURN },
+    { "mut", MUTABLE }
 };
 
 static std::unordered_map<TokenType, std::string_view> token_names {
@@ -125,15 +127,15 @@ static std::unordered_map<TokenType, std::string_view> token_names {
     REFLECT_TOKEN(FUNC_CALL),    REFLECT_TOKEN(ASSIGN),
     REFLECT_TOKEN(RETURN),       REFLECT_TOKEN(IF),
     REFLECT_TOKEN(ELSE),         REFLECT_TOKEN(ELSE_IF),
-    REFLECT_TOKEN(WHILE),
+    REFLECT_TOKEN(WHILE),        REFLECT_TOKEN(MUTABLE),
 
 };
 
 struct Token {
     Token() : row { 0 }, col { 0 } {}
     Token(unsigned row, unsigned col) : row { row }, col { col } {}
-    TokenType type;
 
+    TokenType type {};
     std::string_view value {};
 
     std::string to_string() const;

@@ -14,6 +14,8 @@ ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer &tokens) {
     tokens.expect(IDENTIFIER);
     tokens.expect(COLON);
 
+    bool is_mutable = tokens.eat(MUTABLE);
+
     Token type = tokens.top();
     tokens.expect(TYPE);
     tokens.expect(ASSIGN);
@@ -24,8 +26,8 @@ ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer &tokens) {
 
     auto end = tokens.top_iterator();
 
-    auto var_decl =
-        std::make_unique<VariableDecl>(identifier, type.value, value);
+    auto var_decl = std::make_unique<VariableDecl>(identifier, type.value,
+                                                   value, is_mutable);
 
     var_decl->source_ref.begin = begin;
     var_decl->source_ref.end = end;
