@@ -22,7 +22,7 @@ void error::rpn(Token got) {
 }
 
 void error::report_error(const std::string &error, bool quit) {
-    std::cout << Color::Modifier(Color::FG_RED) << "ERROR: " << error
+    std::cout << Color::Modifier(Color::FG_RED) << error
               << Color::Modifier(Color::FG_DEFAULT) << std::endl;
 
     if (quit) exit(EXIT_FAILURE);
@@ -34,10 +34,11 @@ void error::mismatched_type(const Type &a, const Type &b,
 
     auto tokens = TokenBuffer::source_tokens(source_ref);
 
-    oss << "On line " << (source_ref.begin->row + 1) << " column "
-        << (source_ref.begin->col + 1) << ":" << std::endl;
+    oss << "Line " << (source_ref.begin->row + 1) << " column "
+        << (source_ref.begin->col + 1) << ": ";
     oss << "Mismatched types, got " << a.to_string() << " and " << b.to_string()
-        << "    " << tokens.as_source();
+        << std::endl;
+    oss << "\t" << tokens.as_source();
     add_semantic_error(oss.str());
 }
 

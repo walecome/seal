@@ -1,6 +1,8 @@
-#include "TokenBuffer.hh"
+#include <cmath>
+
 #include "Error.hh"
 #include "SourceRef.hh"
+#include "TokenBuffer.hh"
 
 void TokenBuffer::add_token(const Token token) {
     if (token.row > previous_row) {
@@ -100,8 +102,7 @@ std::string TokenBuffer::as_source() const {
 
     std::ostringstream oss {};
 
-    Token previous;
-    previous.value = "";
+    Token previous = tokens.front();
 
     for (auto &token : tokens) {
         int row_dt = token.row - previous.row;
@@ -114,7 +115,8 @@ std::string TokenBuffer::as_source() const {
                 oss << " ";
             }
         } else {
-            int spaces = token.col - previous.col - previous.value.length();
+            int spaces = std::max(
+                0, (int)(token.col - previous.col - previous.value.length()));
             for (int i = 0; i < spaces; ++i) {
                 oss << " ";
             }

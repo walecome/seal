@@ -28,9 +28,6 @@ func myfunc(var1: int) -> void {
     while (asd > var2) {
         print("something fun");
     }
-
-
-    return fib(asd);
 }
 
 func functioncall(a : int) -> void {}
@@ -41,6 +38,7 @@ func asdfunc(a : int) -> int {
 }
 func abc(a : int) -> string {
     print("hello world");
+    return "Hello world!";
 }
 
 func print(text : string) -> void {}

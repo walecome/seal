@@ -1,6 +1,14 @@
 #include "ReturnStatement.hh"
+#include "FunctionDecl.hh"
 
-void ReturnStatement::analyze(Scope *scope) { return_value->analyze(scope); }
+void ReturnStatement::analyze(Scope *scope) {
+    return_value->analyze(scope);
+
+    if (return_value->type != scope->context->type) {
+        error::mismatched_type(scope->context->type, return_value->type,
+                               source_ref);
+    }
+}
 
 std::string ReturnStatement::dump(unsigned indent) const {
     std::ostringstream oss {};

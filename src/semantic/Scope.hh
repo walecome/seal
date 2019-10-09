@@ -9,9 +9,13 @@
 
 struct FunctionDecl;
 struct VariableDecl;
+struct Scope;
+
+static FunctionDecl *get_context(Scope *, FunctionDecl *);
 
 struct Scope {
-    Scope(Scope *parent = nullptr) : parent { parent } {}
+    Scope(Scope *parent = nullptr, FunctionDecl *context = nullptr)
+        : parent { parent }, context { get_context(parent, context) } {}
 
     void add_function(FunctionDecl *const function_declaration);
     void add_variable(VariableDecl *const variable_declaration);
@@ -30,4 +34,12 @@ struct Scope {
     std::unordered_map<std::string_view, FunctionDecl *const> functions {};
 
     Scope *const parent;
+    FunctionDecl *const context;
 };
+
+static FunctionDecl *get_context(Scope *parent, FunctionDecl *context) {
+    if (context) return context;
+    if (parent) return parent->context;
+
+    return nullptr;
+}

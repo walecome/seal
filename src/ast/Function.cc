@@ -1,7 +1,8 @@
 #include "Function.hh"
 
 void Function::analyze(Scope* scope) {
-    ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope);
+    ptr_t<Scope> inner_scope =
+        std::make_unique<Scope>(scope, function_decl.get());
 
     function_decl->analyze(inner_scope.get());
     block->analyze(inner_scope.get());
