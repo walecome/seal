@@ -54,9 +54,6 @@ include_directories(src/ast)
 include_directories(src/parse)
 include_directories(src/semantic)
 
-
-
-
 set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always")
 
 ## Force colored output (mostly needed for Ninja build)
@@ -69,7 +66,7 @@ endif ()
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+# target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 ## Move compile_commands.json to project directory after make
 add_custom_command(

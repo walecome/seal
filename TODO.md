@@ -1,0 +1,3 @@
+- Rework expression parser
+- Implement tree walker
+- Type check mutability
