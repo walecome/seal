@@ -31,6 +31,7 @@ struct Type;
 struct VariableDecl;
 struct VariableExpression;
 struct While;
+struct UnaryExpression;
 
 class Parser {
    public:
@@ -53,6 +54,8 @@ class Parser {
     ptr_t<ReturnStatement> parse_return_statement(TokenBuffer &tokens);
     TokenBuffer shunting_yard(TokenBuffer &tokens);
     ptr_t<ArrayLiteral> parse_array_literal(TokenBuffer &tokens);
+    ptr_t<Expression> parse_primary(TokenBuffer &tokens);
+    ptr_t<UnaryExpression> parse_unary(TokenBuffer &tokens);
 
     ptr_t<CompilationUnit> compilation_unit { nullptr };
 };
