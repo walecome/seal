@@ -26,6 +26,7 @@ set(PROJECT_SOURCES
 
 
     src/ast/ArgumentList.cc
+    src/ast/AssignExpression.cc
     src/ast/Block.cc
     src/ast/Function.cc
     src/ast/FunctionDecl.cc
@@ -43,6 +44,8 @@ set(PROJECT_SOURCES
     src/ast/VariableDecl.cc
     src/ast/While.cc
     src/ast/ReturnStatement.cc
+    src/ast/UnaryExpression.cc
+
 
     src/semantic/Scope.cc
 )

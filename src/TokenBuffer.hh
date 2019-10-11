@@ -1,5 +1,6 @@
 #pragma once
 
+#include <initializer_list>
 #include <iterator>
 #include <sstream>
 #include <unordered_map>
@@ -19,6 +20,7 @@ class TokenBuffer {
     bool accept(TokenType token_type) const;
     bool can_pop(TokenType type, int offset = 0);
     bool eat(const TokenType token_type);
+    bool eat(const std::initializer_list<TokenType> eatable_tokens);
     bool empty() const;
 
     size_t size() const { return tokens.size(); }
@@ -26,6 +28,7 @@ class TokenBuffer {
     std::string dump() const;
     Token pop();
     Token top() const { return tokens[index]; };
+    Token previous() const { return tokens[index - 1]; }
 
     Iterator top_iterator();
 

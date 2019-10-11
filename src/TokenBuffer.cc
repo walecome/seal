@@ -46,6 +46,14 @@ bool TokenBuffer::eat(const TokenType token_type) {
     return false;
 }
 
+bool TokenBuffer::eat(const std::initializer_list<TokenType> eatable_tokens) {
+    for (auto& token : eatable_tokens) {
+        if (eat(token)) return true;
+    }
+
+    return false;
+}
+
 bool TokenBuffer::empty() const { return index >= tokens.size(); }
 
 Token TokenBuffer::pop() { return tokens.at(index++); }

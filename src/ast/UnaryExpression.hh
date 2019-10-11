@@ -8,7 +8,6 @@ struct UnaryExpression : public Expression {
 
     virtual std::string name() const override { return "UnaryExpression"; }
     virtual std::string dump(unsigned indent) const override;
-
     virtual void analyze(Scope *scope) override;
 
     ptr_t<Operator> op;

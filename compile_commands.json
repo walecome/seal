@@ -109,6 +109,12 @@
 
 {
   "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/AssignExpression.cc.o -c /home/alexander/projects/compiler/src/ast/AssignExpression.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/AssignExpression.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Block.cc.o -c /home/alexander/projects/compiler/src/ast/Block.cc",
   "file": "/home/alexander/projects/compiler/src/ast/Block.cc"
 },
@@ -207,6 +213,12 @@
   "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ReturnStatement.cc.o -c /home/alexander/projects/compiler/src/ast/ReturnStatement.cc",
   "file": "/home/alexander/projects/compiler/src/ast/ReturnStatement.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/UnaryExpression.cc.o -c /home/alexander/projects/compiler/src/ast/UnaryExpression.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/UnaryExpression.cc"
 },
 
 {
