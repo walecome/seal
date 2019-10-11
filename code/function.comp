@@ -1,6 +1,6 @@
 func myfunc(var1: int) -> void {
     1 - 2;
-    asd : int = (1);
+    asd : mut int = (1);
     hejsan : int = (3 + 5) * 2;
     var2 : int = asd * (asdfunc(1) + 5);
     abc(asdfunc(1) * (asd - var2));
