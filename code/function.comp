@@ -14,6 +14,8 @@ func myfunc(var1: int) -> void {
         x = 5;
     }
 
+    x = -5--------------10;
+
     functioncall(var2);
     functioncallwithint(1);
     functioncallwithstring("my string!");

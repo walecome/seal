@@ -1,5 +1,12 @@
 #include "UnaryExpression.hh"
 
+void UnaryExpression::analyze(Scope *scope) {
+    expression->analyze(scope);
+    op->analyze(scope);
+
+    this->type = expression->type;
+}
+
 std::string UnaryExpression::dump(unsigned indent) const {
     std::ostringstream oss {};
 
@@ -10,4 +17,3 @@ std::string UnaryExpression::dump(unsigned indent) const {
 
     return oss.str();
 }
-void UnaryExpression::analyze(Scope *scope) {}
