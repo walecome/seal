@@ -1,4 +1,4 @@
-func myfunc(var1: int) -> void {
+fn myfunc(var1: int) -> void {
     1 - 2;
     asd : mut int = (1);
     hejsan : int = (3 + 5) * 2;
@@ -13,6 +13,10 @@ func myfunc(var1: int) -> void {
     } else {
         x = 5;
     }
+
+    my_bool : bool = true;
+
+    if (x == 3) {print("xd");}
 
     x = -5--------------10;
 
@@ -31,18 +35,18 @@ func myfunc(var1: int) -> void {
     }
 }
 
-func functioncall(a : int) -> void {}
-func functioncallwithint(a : int) -> void {}
-func functioncallwithstring(a : string)  -> void {}
-func asdfunc(a : int) -> int {
+fn functioncall(a : int) -> void {}
+fn functioncallwithint(a : int) -> void {}
+fn functioncallwithstring(a : string)  -> void {}
+fn asdfunc(a : int) -> int {
     return a + 3;
 }
-func abc(a : int) -> string {
+fn abc(a : int) -> string {
     print("hello world");
     return "Hello world!";
 }
 
-func print(text : string) -> void {}
+fn print(text : string) -> void {}
 
 func fib(n: int) -> int {
     if (n == 0) {

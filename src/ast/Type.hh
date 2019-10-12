@@ -6,7 +6,7 @@
 
 #include "Util.hh"
 
-enum class Primitive { STRING, INT, FLOAT, VOID };
+enum class Primitive { STRING, INT, FLOAT, VOID, BOOL };
 
 struct Operator;
 struct Expression;
@@ -17,10 +17,13 @@ static std::unordered_map<std::string_view, Primitive> string_to_type {
     { "string", Primitive::STRING },
     { "int", Primitive::INT },
     { "float", Primitive::FLOAT },
-    { "void", Primitive::VOID }
+    { "void", Primitive::VOID },
+    { "bool", Primitive::BOOL }
+
 };
 
 Primitive from_string(const std::string_view s);
+
 }  // namespace TypeUtil
 
 struct Type {

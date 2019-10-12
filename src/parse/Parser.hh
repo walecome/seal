@@ -58,6 +58,7 @@ class Parser {
     ptr_t<Expression> parse_mult_div(TokenBuffer &tokens);
     ptr_t<Expression> parse_add_sub(TokenBuffer &tokens);
     ptr_t<Expression> parse_compare(TokenBuffer &tokens);
+    ptr_t<Expression> parse_equality(TokenBuffer &tokens);
     ptr_t<Expression> parse_assign(TokenBuffer &tokens);
 
     ptr_t<FunctionCall> parse_function_call(TokenBuffer &tokens);

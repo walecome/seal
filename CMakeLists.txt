@@ -35,8 +35,6 @@ set(PROJECT_SOURCES
     src/ast/Type.cc
     src/ast/ArrayLiteral.cc
     src/ast/CompilationUnit.cc
-    src/ast/IntegerLiteral.cc
-    src/ast/StringLiteral.cc
     src/ast/FunctionCall.cc
     src/ast/VariableExpression.cc
     src/ast/BinaryExpression.cc
@@ -45,7 +43,7 @@ set(PROJECT_SOURCES
     src/ast/While.cc
     src/ast/ReturnStatement.cc
     src/ast/UnaryExpression.cc
-
+    src/ast/Literal.cc
 
     src/semantic/Scope.cc
 )

@@ -3,6 +3,9 @@
 #include "ast/ArrayLiteral.hh"
 #include "ast/AssignExpression.hh"
 #include "ast/BinaryExpression.hh"
+#include "ast/BooleanLiteral.hh"
+#include "ast/CompareExpression.hh"
+#include "ast/EqualityExpression.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/IntegerLiteral.hh"
 #include "ast/Operator.hh"
@@ -22,12 +25,30 @@ ptr_t<Expression> Parser::parse_expression(TokenBuffer& tokens) {
 
 ptr_t<Expression> Parser::parse_assign(TokenBuffer& tokens) {
     auto begin = tokens.top_iterator();
-    ptr_t<Expression> first = parse_compare(tokens);
+    ptr_t<Expression> first = parse_equality(tokens);
 
     while (tokens.eat(ASSIGN)) {
         ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
-        ptr_t<Expression> second = parse_compare(tokens);
+        ptr_t<Expression> second = parse_equality(tokens);
         first = std::make_unique<AssignExpression>(first, op, second);
+    }
+
+    auto end = tokens.top_iterator();
+    first->source_ref.begin = begin;
+    first->source_ref.end = end;
+
+    return first;
+}
+
+ptr_t<Expression> Parser::parse_equality(TokenBuffer& tokens) {
+    auto begin = tokens.top_iterator();
+
+    ptr_t<Expression> first = parse_compare(tokens);
+
+    while (tokens.eat({ EQ, NOT_EQ })) {
+        ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
+        ptr_t<Expression> second = parse_compare(tokens);
+        first = std::make_unique<EqualityExpression>(first, op, second);
     }
 
     auto end = tokens.top_iterator();
@@ -41,10 +62,10 @@ ptr_t<Expression> Parser::parse_compare(TokenBuffer& tokens) {
     auto begin = tokens.top_iterator();
     ptr_t<Expression> first = parse_add_sub(tokens);
 
-    while (tokens.eat({ GT, GTEQ, LT, LTEQ, EQ, NOT_EQ })) {
+    while (tokens.eat({ GT, GTEQ, LT, LTEQ })) {
         ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
         ptr_t<Expression> second = parse_add_sub(tokens);
-        first = std::make_unique<BinaryExpression>(first, op, second);
+        first = std::make_unique<CompareExpression>(first, op, second);
     }
 
     auto end = tokens.top_iterator();
@@ -126,6 +147,8 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
     } else if (current.type == LPARENS) {
         primary = parse_expression(tokens);
         tokens.expect(RPARENS);
+    } else if (current.type == BOOL) {
+        primary = std::make_unique<BooleanLiteral>(current);
     } else if (current.type == IDENTIFIER) {
         if (!(primary = parse_function_call(tokens))) {
             primary = std::make_unique<VariableExpression>(current);

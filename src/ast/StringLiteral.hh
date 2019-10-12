@@ -4,11 +4,6 @@
 #include "Token.hh"
 
 struct StringLiteral : public Literal {
-    StringLiteral(const Token value)
-        : Literal(Primitive::STRING), value { value } {}
-
+    StringLiteral(const Token value) : Literal(Primitive::STRING, value) {}
     virtual std::string name() const override { return "StringLiteral"; }
-    virtual std::string dump(unsigned indent) const override;
-
-    const Token value;
 };

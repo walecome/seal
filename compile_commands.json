@@ -163,18 +163,6 @@
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/IntegerLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/IntegerLiteral.cc",
-  "file": "/home/alexander/projects/compiler/src/ast/IntegerLiteral.cc"
-},
-
-{
-  "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/StringLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/StringLiteral.cc",
-  "file": "/home/alexander/projects/compiler/src/ast/StringLiteral.cc"
-},
-
-{
-  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/FunctionCall.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionCall.cc",
   "file": "/home/alexander/projects/compiler/src/ast/FunctionCall.cc"
 },
@@ -219,6 +207,12 @@
   "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/UnaryExpression.cc.o -c /home/alexander/projects/compiler/src/ast/UnaryExpression.cc",
   "file": "/home/alexander/projects/compiler/src/ast/UnaryExpression.cc"
+},
+
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Literal.cc.o -c /home/alexander/projects/compiler/src/ast/Literal.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/Literal.cc"
 },
 
 {
