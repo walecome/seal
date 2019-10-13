@@ -79,6 +79,8 @@ struct Interpreter {
     expr_value_t interpret_variable_expr(VariableExpression *);
     void interpret_while(While *);
 
+    void handle_print(Expression *);
+
     Environment *current_env();
     void enter_block();
     void exit_block();

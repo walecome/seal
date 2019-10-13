@@ -1,4 +1,6 @@
 fn main() -> int {
+    print("fib");
+    print(fib(10));
     return 1;
 }
 
@@ -56,14 +58,20 @@ fn abc(a : int) -> string {
     return "Hello world!";
 }
 
-fn print(text : string) -> void {}
-
-fn fib(n: int) -> int {
+fn rec_test(n : int) -> int {
+    print(n);
     if (n == 0) {
         return 0;
     }
-    if (n == 1) {
-        return 1;
+
+    return rec_test(n - 1);
+}
+
+fn print(text : string) -> void {}
+
+fn fib(n: int) -> int {
+    if (n <= 1) {
+        return n;
     }
 
     return fib(n - 1) + fib(n - 2);

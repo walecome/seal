@@ -60,8 +60,8 @@ std::string bin_op(const std::string& left, const std::string& right,
 
 // Operators other than +, -, * and / should be matched by the other functions
 expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
-    expr_value_t right_value = interpret_expr(expr->right.get());
     expr_value_t left_value = interpret_expr(expr->left.get());
+    expr_value_t right_value = interpret_expr(expr->right.get());
 
     assert(right_value.index() == left_value.index());
 
@@ -100,16 +100,16 @@ expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
 
     switch (expr->op->operator_symbol) {
         case OperatorSym::GT:
-            return right_value > left_value;
+            return left_value > right_value;
             break;
         case OperatorSym::GTEQ:
-            return right_value >= left_value;
+            return left_value >= right_value;
             break;
         case OperatorSym::LT:
-            return right_value < left_value;
+            return left_value < right_value;
             break;
         case OperatorSym::LTEQ:
-            return right_value <= left_value;
+            return left_value <= right_value;
             break;
         default:
             assert(false);
@@ -117,19 +117,20 @@ expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
 }
 
 void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {
-    bool found = false;
+    FunctionDecl* main { nullptr };
+
     for (auto& function : unit->functions) {
         if (function->identifier.value == "main") {
-            interpret_block(function->body.get());
-            found = true;
+            main = function.get();
             break;
         }
     }
-
-    if (!found) {
-        std::cout << "Function " << std::quoted("main")
-                  << " not found in program" << std::endl;
-        exit(EXIT_FAILURE);
+    try {
+        interpret_block(main->body.get());
+    } catch (const ReturnException& ret) {
+        std::cout << "Remaining envs: " << environments.size() << std::endl;
+        std::cout << "Function main finished with status: "
+                  << std::get<int>(ret.value) << std::endl;
     }
 }
 
@@ -150,6 +151,8 @@ expr_value_t Interpreter::interpret_expr(Expression* expr) {
         return interpret_variable_expr(ptr);
     } else if (auto ptr = dynamic_cast<FunctionCall*>(expr)) {
         return interpret_function_call(ptr);
+    } else if (auto ptr = dynamic_cast<Literal*>(expr)) {
+        return interpret_literal(ptr);
     } else {
         throw std::runtime_error("Intepretation of invalid expression");
     }
@@ -168,10 +171,30 @@ expr_value_t Interpreter::interpret_equality_expr(EqualityExpression* expr) {
     assert(false);
 }
 
+void Interpreter::handle_print(Expression* expr) {
+    expr_value_t value = interpret_expr(expr);
+    if (std::holds_alternative<bool>(value)) {
+        std::cout << std::boolalpha << std::get<bool>(value) << std::endl;
+    } else if (std::holds_alternative<int>(value)) {
+        std::cout << std::get<int>(value) << std::endl;
+    } else if (std::holds_alternative<float>(value)) {
+        std::cout << std::get<float>(value) << std::endl;
+    } else if (std::holds_alternative<std::string>(value)) {
+        std::cout << std::get<std::string>(value) << std::endl;
+    } else {
+        assert(false);
+    }
+}
+
 expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
     enter_block();
-    auto func = function_scope->get_function(function_call->identifier.value);
 
+    if (function_call->identifier.value == "print") {
+        handle_print(function_call->argument_list->arguments.front().get());
+        return 0;
+    }
+
+    auto func = function_scope->get_function(function_call->identifier.value);
     auto& arguments = function_call->argument_list->arguments;
     for (unsigned i = 0; i < arguments.size(); ++i) {
         expr_value_t value = interpret_expr(arguments.at(i).get());
@@ -182,9 +205,16 @@ expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
 
     expr_value_t value;
 
+    unsigned start_size = environments.size();
+
     try {
         interpret_block(func->body.get());
-    } catch (ReturnException& ret) {
+    } catch (const ReturnException& ret) {
+        unsigned end_size = environments.size();
+        for (unsigned i = 0; i < (end_size - start_size); ++i) {
+            exit_block();
+        }
+
         value = ret.value;
     }
 
@@ -215,7 +245,7 @@ void Interpreter::interpret_if_statement(IfStatement* if_statement) {
 
     if (is_truthy(condition_value)) {
         interpret_block(if_statement->if_body.get());
-    } else {
+    } else if (if_statement->else_body) {
         interpret_block(if_statement->else_body.get());
     }
 }
@@ -254,9 +284,11 @@ void Interpreter::interpret_statement(Statement* statement) {
         interpret_if_statement(ptr);
     } else if (auto ptr = dynamic_cast<While*>(statement)) {
         interpret_while(ptr);
+    } else if (auto ptr = dynamic_cast<ReturnStatement*>(statement)) {
+        interpret_return(ptr);
+    } else {
+        assert(false);
     }
-
-    assert(false);
 }
 
 void Interpreter::interpret_type(Type*) { assert(false); }

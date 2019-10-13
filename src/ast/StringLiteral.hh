@@ -9,5 +9,6 @@ struct StringLiteral : public Literal {
     virtual std::string name() const override { return "StringLiteral"; }
     virtual std::string dump(unsigned indent) const override;
 
-    std::string_view value;
+    // @TODO: This should be string_view but creates weird bugs...
+    std::string value;
 };

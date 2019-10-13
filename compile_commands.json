@@ -1,235 +1,235 @@
 [
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/main.cc.o -c /home/alexander/projects/compiler/src/main.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/main.cc.o -c /home/alexander/projects/compiler/src/main.cc",
   "file": "/home/alexander/projects/compiler/src/main.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Error.cc.o -c /home/alexander/projects/compiler/src/Error.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Error.cc.o -c /home/alexander/projects/compiler/src/Error.cc",
   "file": "/home/alexander/projects/compiler/src/Error.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Interpreter.cc.o -c /home/alexander/projects/compiler/src/Interpreter.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Interpreter.cc.o -c /home/alexander/projects/compiler/src/Interpreter.cc",
   "file": "/home/alexander/projects/compiler/src/Interpreter.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Lexer.cc.o -c /home/alexander/projects/compiler/src/Lexer.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Lexer.cc.o -c /home/alexander/projects/compiler/src/Lexer.cc",
   "file": "/home/alexander/projects/compiler/src/Lexer.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Token.cc.o -c /home/alexander/projects/compiler/src/Token.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Token.cc.o -c /home/alexander/projects/compiler/src/Token.cc",
   "file": "/home/alexander/projects/compiler/src/Token.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/TokenBuffer.cc.o -c /home/alexander/projects/compiler/src/TokenBuffer.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/TokenBuffer.cc.o -c /home/alexander/projects/compiler/src/TokenBuffer.cc",
   "file": "/home/alexander/projects/compiler/src/TokenBuffer.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Util.cc.o -c /home/alexander/projects/compiler/src/Util.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/Util.cc.o -c /home/alexander/projects/compiler/src/Util.cc",
   "file": "/home/alexander/projects/compiler/src/Util.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/ArgumentList.cc.o -c /home/alexander/projects/compiler/src/parse/ArgumentList.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/ArgumentList.cc.o -c /home/alexander/projects/compiler/src/parse/ArgumentList.cc",
   "file": "/home/alexander/projects/compiler/src/parse/ArgumentList.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Block.cc.o -c /home/alexander/projects/compiler/src/parse/Block.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Block.cc.o -c /home/alexander/projects/compiler/src/parse/Block.cc",
   "file": "/home/alexander/projects/compiler/src/parse/Block.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Expression.cc.o -c /home/alexander/projects/compiler/src/parse/Expression.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Expression.cc.o -c /home/alexander/projects/compiler/src/parse/Expression.cc",
   "file": "/home/alexander/projects/compiler/src/parse/Expression.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Function.cc.o -c /home/alexander/projects/compiler/src/parse/Function.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Function.cc.o -c /home/alexander/projects/compiler/src/parse/Function.cc",
   "file": "/home/alexander/projects/compiler/src/parse/Function.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/IfStatement.cc.o -c /home/alexander/projects/compiler/src/parse/IfStatement.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/IfStatement.cc.o -c /home/alexander/projects/compiler/src/parse/IfStatement.cc",
   "file": "/home/alexander/projects/compiler/src/parse/IfStatement.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Parser.cc.o -c /home/alexander/projects/compiler/src/parse/Parser.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Parser.cc.o -c /home/alexander/projects/compiler/src/parse/Parser.cc",
   "file": "/home/alexander/projects/compiler/src/parse/Parser.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Statement.cc.o -c /home/alexander/projects/compiler/src/parse/Statement.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/Statement.cc.o -c /home/alexander/projects/compiler/src/parse/Statement.cc",
   "file": "/home/alexander/projects/compiler/src/parse/Statement.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/VariableDecl.cc.o -c /home/alexander/projects/compiler/src/parse/VariableDecl.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/VariableDecl.cc.o -c /home/alexander/projects/compiler/src/parse/VariableDecl.cc",
   "file": "/home/alexander/projects/compiler/src/parse/VariableDecl.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/While.cc.o -c /home/alexander/projects/compiler/src/parse/While.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/While.cc.o -c /home/alexander/projects/compiler/src/parse/While.cc",
   "file": "/home/alexander/projects/compiler/src/parse/While.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/ReturnStatement.cc.o -c /home/alexander/projects/compiler/src/parse/ReturnStatement.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/ReturnStatement.cc.o -c /home/alexander/projects/compiler/src/parse/ReturnStatement.cc",
   "file": "/home/alexander/projects/compiler/src/parse/ReturnStatement.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/ArrayLiteral.cc.o -c /home/alexander/projects/compiler/src/parse/ArrayLiteral.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/parse/ArrayLiteral.cc.o -c /home/alexander/projects/compiler/src/parse/ArrayLiteral.cc",
   "file": "/home/alexander/projects/compiler/src/parse/ArrayLiteral.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ArgumentList.cc.o -c /home/alexander/projects/compiler/src/ast/ArgumentList.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ArgumentList.cc.o -c /home/alexander/projects/compiler/src/ast/ArgumentList.cc",
   "file": "/home/alexander/projects/compiler/src/ast/ArgumentList.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/AssignExpression.cc.o -c /home/alexander/projects/compiler/src/ast/AssignExpression.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/AssignExpression.cc.o -c /home/alexander/projects/compiler/src/ast/AssignExpression.cc",
   "file": "/home/alexander/projects/compiler/src/ast/AssignExpression.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Block.cc.o -c /home/alexander/projects/compiler/src/ast/Block.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Block.cc.o -c /home/alexander/projects/compiler/src/ast/Block.cc",
   "file": "/home/alexander/projects/compiler/src/ast/Block.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/FunctionDecl.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionDecl.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/FunctionDecl.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionDecl.cc",
   "file": "/home/alexander/projects/compiler/src/ast/FunctionDecl.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Operator.cc.o -c /home/alexander/projects/compiler/src/ast/Operator.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Operator.cc.o -c /home/alexander/projects/compiler/src/ast/Operator.cc",
   "file": "/home/alexander/projects/compiler/src/ast/Operator.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ParameterList.cc.o -c /home/alexander/projects/compiler/src/ast/ParameterList.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ParameterList.cc.o -c /home/alexander/projects/compiler/src/ast/ParameterList.cc",
   "file": "/home/alexander/projects/compiler/src/ast/ParameterList.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Type.cc.o -c /home/alexander/projects/compiler/src/ast/Type.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Type.cc.o -c /home/alexander/projects/compiler/src/ast/Type.cc",
   "file": "/home/alexander/projects/compiler/src/ast/Type.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ArrayLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/ArrayLiteral.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ArrayLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/ArrayLiteral.cc",
   "file": "/home/alexander/projects/compiler/src/ast/ArrayLiteral.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/IntegerLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/IntegerLiteral.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/IntegerLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/IntegerLiteral.cc",
   "file": "/home/alexander/projects/compiler/src/ast/IntegerLiteral.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/StringLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/StringLiteral.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/StringLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/StringLiteral.cc",
   "file": "/home/alexander/projects/compiler/src/ast/StringLiteral.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/BooleanLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/BooleanLiteral.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/BooleanLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/BooleanLiteral.cc",
   "file": "/home/alexander/projects/compiler/src/ast/BooleanLiteral.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/CompilationUnit.cc.o -c /home/alexander/projects/compiler/src/ast/CompilationUnit.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/CompilationUnit.cc.o -c /home/alexander/projects/compiler/src/ast/CompilationUnit.cc",
   "file": "/home/alexander/projects/compiler/src/ast/CompilationUnit.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/FunctionCall.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionCall.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/FunctionCall.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionCall.cc",
   "file": "/home/alexander/projects/compiler/src/ast/FunctionCall.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/VariableExpression.cc.o -c /home/alexander/projects/compiler/src/ast/VariableExpression.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/VariableExpression.cc.o -c /home/alexander/projects/compiler/src/ast/VariableExpression.cc",
   "file": "/home/alexander/projects/compiler/src/ast/VariableExpression.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/BinaryExpression.cc.o -c /home/alexander/projects/compiler/src/ast/BinaryExpression.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/BinaryExpression.cc.o -c /home/alexander/projects/compiler/src/ast/BinaryExpression.cc",
   "file": "/home/alexander/projects/compiler/src/ast/BinaryExpression.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/IfStatement.cc.o -c /home/alexander/projects/compiler/src/ast/IfStatement.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/IfStatement.cc.o -c /home/alexander/projects/compiler/src/ast/IfStatement.cc",
   "file": "/home/alexander/projects/compiler/src/ast/IfStatement.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/VariableDecl.cc.o -c /home/alexander/projects/compiler/src/ast/VariableDecl.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/VariableDecl.cc.o -c /home/alexander/projects/compiler/src/ast/VariableDecl.cc",
   "file": "/home/alexander/projects/compiler/src/ast/VariableDecl.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/While.cc.o -c /home/alexander/projects/compiler/src/ast/While.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/While.cc.o -c /home/alexander/projects/compiler/src/ast/While.cc",
   "file": "/home/alexander/projects/compiler/src/ast/While.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ReturnStatement.cc.o -c /home/alexander/projects/compiler/src/ast/ReturnStatement.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/ReturnStatement.cc.o -c /home/alexander/projects/compiler/src/ast/ReturnStatement.cc",
   "file": "/home/alexander/projects/compiler/src/ast/ReturnStatement.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/UnaryExpression.cc.o -c /home/alexander/projects/compiler/src/ast/UnaryExpression.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/UnaryExpression.cc.o -c /home/alexander/projects/compiler/src/ast/UnaryExpression.cc",
   "file": "/home/alexander/projects/compiler/src/ast/UnaryExpression.cc"
 },
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/semantic/Scope.cc.o -c /home/alexander/projects/compiler/src/semantic/Scope.cc",
+  "command": "/usr/bin/c++   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -O3 -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/semantic/Scope.cc.o -c /home/alexander/projects/compiler/src/semantic/Scope.cc",
   "file": "/home/alexander/projects/compiler/src/semantic/Scope.cc"
 }
 ]
