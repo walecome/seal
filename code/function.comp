@@ -48,7 +48,7 @@ fn abc(a : int) -> string {
 
 fn print(text : string) -> void {}
 
-func fib(n: int) -> int {
+fn fib(n: int) -> int {
     if (n == 0) {
         return 0;
     }
@@ -59,4 +59,4 @@ func fib(n: int) -> int {
     return fib(n - 1) + fib(n - 2);
 }
 
-func empty() -> void {}
+fn empty() -> void {}

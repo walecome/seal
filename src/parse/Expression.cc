@@ -141,14 +141,17 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
     Token current = tokens.pop();
 
     if (current.type == NUMBER) {
-        primary = std::make_unique<IntegerLiteral>(current);
+        int value = std::stoi(std::string(current.value));
+        primary = std::make_unique<IntegerLiteral>(value);
     } else if (current.type == STRING) {
-        primary = std::make_unique<StringLiteral>(current);
+        std::string value = std::string(current.value);
+        primary = std::make_unique<StringLiteral>(value);
     } else if (current.type == LPARENS) {
         primary = parse_expression(tokens);
         tokens.expect(RPARENS);
     } else if (current.type == BOOL) {
-        primary = std::make_unique<BooleanLiteral>(current);
+        bool value = (current.value == "true");
+        primary = std::make_unique<BooleanLiteral>(value);
     } else if (current.type == IDENTIFIER) {
         if (!(primary = parse_function_call(tokens))) {
             primary = std::make_unique<VariableExpression>(current);

@@ -8,6 +8,9 @@
 #include <stack>
 
 struct Expression : public Statement {
+    Expression() = default;
+    Expression(Type type) : type { type } {}
+
     virtual std::string name() const override { return "Expression"; }
 
     virtual void analyze(Scope *) override {

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <streambuf>
 #include <string>
+#include <variant>
 
 #include "Constants.hh"
 #include "Lexer.hh"

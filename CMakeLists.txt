@@ -7,6 +7,7 @@ set(PROJECT_SOURCES
     src/main.cc
 
     src/Error.cc
+    src/Interpreter.cc
     src/Lexer.cc
     src/Token.cc
     src/TokenBuffer.cc
@@ -34,6 +35,9 @@ set(PROJECT_SOURCES
     src/ast/ParameterList.cc
     src/ast/Type.cc
     src/ast/ArrayLiteral.cc
+    src/ast/IntegerLiteral.cc
+    src/ast/StringLiteral.cc
+    src/ast/BooleanLiteral.cc
     src/ast/CompilationUnit.cc
     src/ast/FunctionCall.cc
     src/ast/VariableExpression.cc
@@ -43,7 +47,6 @@ set(PROJECT_SOURCES
     src/ast/While.cc
     src/ast/ReturnStatement.cc
     src/ast/UnaryExpression.cc
-    src/ast/Literal.cc
 
     src/semantic/Scope.cc
 )

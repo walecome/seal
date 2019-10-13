@@ -4,7 +4,10 @@
 #include "Token.hh"
 
 struct BooleanLiteral : public Literal {
-    BooleanLiteral(const Token value) : Literal(Primitive::BOOL, value) {}
+    BooleanLiteral(bool value) : Literal(Primitive::BOOL), value { value } {}
 
     virtual std::string name() const override { return "BooleanLiteral"; }
+    virtual std::string dump(unsigned indent) const override;
+
+    bool value;
 };
