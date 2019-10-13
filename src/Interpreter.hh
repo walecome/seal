@@ -43,7 +43,7 @@ struct Environment {
 };
 
 struct Interpreter {
-    Interpreter() = default;
+    Interpreter(Scope *function_scope) : function_scope { function_scope } {}
 
     void interpret_argument_list(ArgumentList *);
     void interpret_array_literal(ArrayLiteral *);
@@ -73,4 +73,5 @@ struct Interpreter {
     void exit_block();
 
     std::stack<ptr_t<Environment>> environments {};
+    Scope *function_scope;
 };

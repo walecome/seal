@@ -6,6 +6,7 @@ void Interpreter::interpret_argument_list(ArgumentList* arg_list) {
     }
 }
 
+// @TODO
 void Interpreter::interpret_array_literal(ArrayLiteral* array_literal) {
     for (auto& expr : array_literal->expressions) {
         interpret_expr(expr.get());
@@ -13,8 +14,12 @@ void Interpreter::interpret_array_literal(ArrayLiteral* array_literal) {
 }
 
 expr_value_t Interpreter::interpret_assign_expr(AssignExpression* expr) {
-    interpret_expr(expr->right.get());
-    // @TODO: Set variables
+    expr_value_t value = interpret_expr(expr->right.get());
+    auto identifier =
+        dynamic_cast<VariableExpression*>(expr->left.get())->identifier.value;
+    current_env()->set_variable(identifier, value);
+
+    return value;
 }
 
 template <typename T, typename Op>
@@ -61,6 +66,7 @@ void Interpreter::interpret_block(Block* block) {
     for (auto& statement : block->statements) {
         interpret_statement(statement.get());
     }
+    exit_block();
 }
 
 expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
@@ -85,7 +91,11 @@ expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
     }
 }
 
-void Interpreter::interpret_compilation_unit(CompilationUnit*) {}
+void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {
+    for (auto& function : unit->functions) {
+        interpret_function(function.get());
+    }
+}
 
 expr_value_t Interpreter::interpret_expr(Expression* expr) {
     if (auto ptr = dynamic_cast<AssignExpression*>(expr)) {
@@ -122,12 +132,23 @@ expr_value_t Interpreter::interpret_equality_expr(EqualityExpression* expr) {
     assert(false);
 }
 
-void Interpreter::interpret_function(Function*) {
-    // @TODO: Register function
+void Interpreter::interpret_function(Function* function) {
+    interpret_block(function->block.get());
 }
 
-expr_value_t Interpreter::interpret_function_call(FunctionCall*) {
-    // @TODO: Look up function decl and assign params in env
+expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
+    enter_block();
+    auto func = function_scope->get_function(function_call->identifier.value);
+
+    auto& arguments = function_call->argument_list->arguments;
+    for (unsigned i = 0; i < arguments.size(); ++i) {
+        expr_value_t value = interpret_expr(arguments.at(i).get());
+        std::string_view ident =
+            func->parameter_list->parameters.at(i)->identifier.value;
+        current_env()->set_variable(ident, value);
+    }
+    // expr_value_t return_value = interpret_function(func.get());
+    exit_block();
 }
 
 void Interpreter::interpret_if_statement(IfStatement*) {}
@@ -154,8 +175,6 @@ expr_value_t Interpreter::interpret_variable_expr(VariableExpression*) {}
 
 void Interpreter::interpret_while(While*) {}
 
-Environment* Interpreter::current_env() { return environments.top().get(); }
-
 void Interpreter::enter_block() {
     auto new_env = std::make_unique<Environment>();
     new_env->parent = current_env();
@@ -163,3 +182,8 @@ void Interpreter::enter_block() {
 }
 
 void Interpreter::exit_block() { environments.pop(); }
+
+void Environment::set_variable(std::string_view ident, expr_value_t data) {}
+expr_value_t Environment::get_variable(std::string_view ident) {}
+
+Environment* Interpreter::current_env() { return environments.top().get(); }
