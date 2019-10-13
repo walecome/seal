@@ -6,6 +6,7 @@
 #include <variant>
 
 #include "Constants.hh"
+#include "Interpreter.hh"
 #include "Lexer.hh"
 #include "Parser.hh"
 #include "Scope.hh"
@@ -75,6 +76,9 @@ int main(int argc, char **argv) {
 
     parser.compilation_unit->analyze(program_scope.get());
     error::report_semantic_errors();
+
+    Interpreter interpreter { program_scope.get() };
+    interpreter.interpret_compilation_unit(parser.compilation_unit.get());
 
     return 0;
 }

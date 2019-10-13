@@ -2,9 +2,12 @@
 
 #include <cassert>
 #include <functional>
+#include <iomanip>
 #include <memory>
 #include <stack>
+#include <stdexcept>
 #include <string_view>
+#include <type_traits>
 #include <unordered_map>
 #include <variant>
 
@@ -14,16 +17,19 @@
 #include "ast/AssignExpression.hh"
 #include "ast/BinaryExpression.hh"
 #include "ast/Block.hh"
+#include "ast/BooleanLiteral.hh"
 #include "ast/CompareExpression.hh"
 #include "ast/CompilationUnit.hh"
 #include "ast/EqualityExpression.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/FunctionDecl.hh"
 #include "ast/IfStatement.hh"
+#include "ast/IntegerLiteral.hh"
 #include "ast/Literal.hh"
 #include "ast/Operator.hh"
 #include "ast/ParameterList.hh"
 #include "ast/ReturnStatement.hh"
+#include "ast/StringLiteral.hh"
 #include "ast/Type.hh"
 #include "ast/UnaryExpression.hh"
 #include "ast/VariableDecl.hh"
@@ -41,8 +47,15 @@ struct Environment {
     std::unordered_map<std::string_view, expr_value_t> variable_data {};
 };
 
+struct ReturnException : public std::exception {
+    ReturnException(expr_value_t value) : value { value } {}
+    expr_value_t value;
+};
+
 struct Interpreter {
-    Interpreter(Scope *function_scope) : function_scope { function_scope } {}
+    Interpreter(Scope *function_scope) : function_scope { function_scope } {
+        environments.push(std::make_unique<Environment>());
+    }
 
     void interpret_argument_list(ArgumentList *);
     void interpret_array_literal(ArrayLiteral *);
@@ -55,7 +68,7 @@ struct Interpreter {
     expr_value_t interpret_equality_expr(EqualityExpression *);
     expr_value_t interpret_function_call(FunctionCall *);
     void interpret_if_statement(IfStatement *);
-    void interpret_literal(Literal *);
+    expr_value_t interpret_literal(Literal *);
     void interpret_operator(Operator *);
     void interpret_param_list(ParameterList *);
     void interpret_return(ReturnStatement *);
