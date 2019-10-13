@@ -6,10 +6,11 @@ void Parser::parse(TokenBuffer &tokens) {
         std::make_unique<CompilationUnit>();
 
     while (!tokens.empty()) {
-        ptr_t<Function> function = parse_function(tokens);
+        ptr_t<FunctionDecl> function_decl = parse_function_decl(tokens);
 
-        if (!function) throw std::runtime_error("Unable to parse function");
-        compilation_unit->add_function(function);
+        if (!function_decl)
+            throw std::runtime_error("Unable to parse function declaration");
+        compilation_unit->add_function(function_decl);
     };
 
     this->compilation_unit = std::move(compilation_unit);

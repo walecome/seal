@@ -1,13 +1,12 @@
 #include "CompilationUnit.hh"
-#include "Function.hh"
 
-void CompilationUnit::add_function(ptr_t<Function> &function) {
+void CompilationUnit::add_function(ptr_t<FunctionDecl> &function) {
     functions.push_back(std::move(function));
 }
 
 void CompilationUnit::function_pass(Scope *scope) {
     for (auto &function : functions) {
-        scope->add_function(function->function_decl.get());
+        scope->add_function(function.get());
     }
 }
 

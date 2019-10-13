@@ -14,6 +14,11 @@ fn myfunc(var1: int) -> void {
         x = 5;
     }
 
+    {
+        x = 3;
+        x : int = 5;
+    }
+
     my_bool : bool = true;
 
     if (x == 3) {print("xd");}

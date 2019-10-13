@@ -29,7 +29,6 @@ set(PROJECT_SOURCES
     src/ast/ArgumentList.cc
     src/ast/AssignExpression.cc
     src/ast/Block.cc
-    src/ast/Function.cc
     src/ast/FunctionDecl.cc
     src/ast/Operator.cc
     src/ast/ParameterList.cc

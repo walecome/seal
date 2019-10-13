@@ -91,11 +91,7 @@ expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
     }
 }
 
-void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {
-    for (auto& function : unit->functions) {
-        interpret_function(function.get());
-    }
-}
+void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {}
 
 expr_value_t Interpreter::interpret_expr(Expression* expr) {
     if (auto ptr = dynamic_cast<AssignExpression*>(expr)) {
@@ -130,10 +126,6 @@ expr_value_t Interpreter::interpret_equality_expr(EqualityExpression* expr) {
     }
 
     assert(false);
-}
-
-void Interpreter::interpret_function(Function* function) {
-    interpret_block(function->block.get());
 }
 
 expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {

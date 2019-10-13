@@ -127,12 +127,6 @@
 
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/Function.cc.o -c /home/alexander/projects/compiler/src/ast/Function.cc",
-  "file": "/home/alexander/projects/compiler/src/ast/Function.cc"
-},
-
-{
-  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++-6.0   -I../. -I../lib/argparse -I../src -I../src/ast -I../src/parse -I../src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always   -o CMakeFiles/compiler.dir/src/ast/FunctionDecl.cc.o -c /home/alexander/projects/compiler/src/ast/FunctionDecl.cc",
   "file": "/home/alexander/projects/compiler/src/ast/FunctionDecl.cc"
 },

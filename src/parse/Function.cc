@@ -1,26 +1,7 @@
-#include "ast/Function.hh"
 #include "Parser.hh"
 #include "ast/FunctionDecl.hh"
 #include "ast/ParameterList.hh"
 #include "ast/VariableDecl.hh"
-
-ptr_t<Function> Parser::parse_function(TokenBuffer &tokens) {
-    auto begin = tokens.top_iterator();
-
-    ptr_t<FunctionDecl> function_decl_node = parse_function_decl(tokens);
-    if (!function_decl_node) return nullptr;
-
-    ptr_t<Block> block_node = parse_block(tokens);
-    if (!block_node) return nullptr;
-
-    auto end = tokens.top_iterator();
-    auto function = std::make_unique<Function>(function_decl_node, block_node);
-
-    function->source_ref.begin = begin;
-    function->source_ref.end = end;
-
-    return function;
-}
 
 ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
     auto begin = tokens.top_iterator();
@@ -38,9 +19,12 @@ ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
     Token type = tokens.top();
     tokens.expect(TYPE);
 
+    ptr_t<Block> body = parse_block(tokens);
+    if (!body) return nullptr;
+
     auto end = tokens.top_iterator();
-    auto function_decl =
-        std::make_unique<FunctionDecl>(identifier, parameters, type.value);
+    auto function_decl = std::make_unique<FunctionDecl>(identifier, parameters,
+                                                        body, type.value);
 
     function_decl->source_ref.begin = begin;
     function_decl->source_ref.end = end;

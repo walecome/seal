@@ -17,7 +17,6 @@
 #include "ast/CompareExpression.hh"
 #include "ast/CompilationUnit.hh"
 #include "ast/EqualityExpression.hh"
-#include "ast/Function.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/FunctionDecl.hh"
 #include "ast/IfStatement.hh"
@@ -54,7 +53,6 @@ struct Interpreter {
     void interpret_compilation_unit(CompilationUnit *);
     expr_value_t interpret_expr(Expression *);
     expr_value_t interpret_equality_expr(EqualityExpression *);
-    void interpret_function(Function *);
     expr_value_t interpret_function_call(FunctionCall *);
     void interpret_if_statement(IfStatement *);
     void interpret_literal(Literal *);
