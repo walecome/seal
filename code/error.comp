@@ -1,4 +1,4 @@
-func main() -> void {
+fn main() -> void {
 
     x : int = 3;
     x = y;

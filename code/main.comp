@@ -1,0 +1,28 @@
+fn main() -> int {
+
+    x : int = 3;
+
+    {
+        x = 10;
+    }
+
+    x = x + 1;
+
+    x = asd;
+
+    a : string = "a";
+
+    print(asd); 
+
+    print(x);
+
+    assert(x == 1337, "x == 1337");
+
+    return 0;
+}
+
+fn assert(value : bool, desc : string) -> void {
+    if (value == false) {
+        print("Assertion failed for");
+    }
+}

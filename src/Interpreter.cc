@@ -18,7 +18,7 @@ expr_value_t Interpreter::interpret_assign_expr(AssignExpression* expr) {
     expr_value_t value = interpret_expr(expr->right.get());
     auto identifier =
         dynamic_cast<VariableExpression*>(expr->left.get())->identifier.value;
-    current_env()->set_variable(identifier, value);
+    current_env()->set_variable(identifier, value, false);
 
     return value;
 }
@@ -200,7 +200,7 @@ expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
         expr_value_t value = interpret_expr(arguments.at(i).get());
         std::string_view ident =
             func->parameter_list->parameters.at(i)->identifier.value;
-        current_env()->set_variable(ident, value);
+        current_env()->set_variable(ident, value, true);
     }
 
     expr_value_t value;
@@ -311,14 +311,22 @@ expr_value_t Interpreter::interpret_unary_expr(UnaryExpression* expr) {
 
 void Interpreter::interpret_variable_decl(VariableDecl* var_decl) {
     current_env()->set_variable(var_decl->identifier.value,
-                                interpret_expr(var_decl->value.get()));
+                                interpret_expr(var_decl->value.get()), true);
 }
 
 expr_value_t Interpreter::interpret_variable_expr(VariableExpression* expr) {
     return current_env()->get_variable(expr->identifier.value);
 }
 
-void Interpreter::interpret_while(While*) {}
+void Interpreter::interpret_while(While* while_statement) {
+    expr_value_t condition_value =
+        interpret_expr(while_statement->condition.get());
+
+    while (is_truthy(condition_value)) {
+        interpret_block(while_statement->body.get());
+        condition_value = interpret_expr(while_statement->condition.get());
+    }
+}
 
 void Interpreter::enter_block() {
     auto new_env = std::make_unique<Environment>();
@@ -328,11 +336,20 @@ void Interpreter::enter_block() {
 
 void Interpreter::exit_block() { environments.pop(); }
 
-void Environment::set_variable(std::string_view ident, expr_value_t data) {
-    variable_data[ident] = data;
+Environment* Interpreter::current_env() { return environments.top().get(); }
+
+void Environment::set_variable(std::string_view ident, expr_value_t data,
+                               bool force_local) {
+    if (force_local) {
+        variable_data[ident] = data;
+    } else {
+        Environment* variable_env = env_of_variable(ident);
+        if (!variable_env) variable_env = this;
+        variable_env->set_variable(ident, data, true);
+    }
 }
 
-expr_value_t Environment::get_variable(std::string_view ident) {
+expr_value_t Environment::get_variable(std::string_view ident) const {
     auto it = variable_data.find(ident);
     if (it != std::end(variable_data)) {
         return it->second;
@@ -345,4 +362,16 @@ expr_value_t Environment::get_variable(std::string_view ident) {
     assert(false);
 }
 
-Environment* Interpreter::current_env() { return environments.top().get(); }
+Environment* Environment::env_of_variable(std::string_view ident) const {
+    auto it = variable_data.find(ident);
+
+    if (it != std::end(variable_data)) {
+        return const_cast<Environment*>(this);
+    }
+
+    if (parent) {
+        return parent->env_of_variable(ident);
+    }
+
+    return nullptr;
+}

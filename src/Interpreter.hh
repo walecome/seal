@@ -41,8 +41,10 @@ using expr_value_t = std::variant<int, float, bool, std::string>;
 struct Environment {
     Environment *parent { nullptr };
 
-    void set_variable(std::string_view ident, expr_value_t data);
-    expr_value_t get_variable(std::string_view ident);
+    void set_variable(std::string_view ident, expr_value_t data,
+                      bool force_local);
+    expr_value_t get_variable(std::string_view ident) const;
+    Environment *env_of_variable(std::string_view ident) const;
 
     std::unordered_map<std::string_view, expr_value_t> variable_data {};
 };
