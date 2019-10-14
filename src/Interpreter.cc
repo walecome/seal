@@ -127,11 +127,14 @@ void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {
     }
     try {
         interpret_block(main->body.get());
+        std::cout << "Function main finished without a status" << std::endl;
     } catch (const ReturnException& ret) {
-        std::cout << "Remaining envs: " << environments.size() << std::endl;
+        exit_block();
         std::cout << "Function main finished with status: "
                   << std::get<int>(ret.value) << std::endl;
     }
+
+    assert(environments.empty());
 }
 
 expr_value_t Interpreter::interpret_expr(Expression* expr) {
@@ -188,7 +191,6 @@ void Interpreter::handle_print(Expression* expr) {
 
 expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
     enter_block();
-
     if (function_call->identifier.value == "print") {
         handle_print(function_call->argument_list->arguments.front().get());
         return 0;
@@ -336,7 +338,10 @@ void Interpreter::enter_block() {
 
 void Interpreter::exit_block() { environments.pop(); }
 
-Environment* Interpreter::current_env() { return environments.top().get(); }
+Environment* Interpreter::current_env() {
+    if (environments.empty()) return nullptr;
+    return environments.top().get();
+}
 
 void Environment::set_variable(std::string_view ident, expr_value_t data,
                                bool force_local) {

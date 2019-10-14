@@ -6,6 +6,8 @@ void BinaryExpression::analyze(Scope *scope) {
     right->analyze(scope);
 
     if (left->type == right->type) {
+        // @REFACTOR: Ugly logic
+        if (this->type.primitive != Primitive::VOID) return;
         this->type = left->type;
     } else {
         this->type = Type(Primitive::VOID);

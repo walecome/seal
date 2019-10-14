@@ -25,9 +25,9 @@ struct Scope {
     void add_variable(VariableDecl *const variable_declaration);
 
     bool has_function(const std::string_view identifier,
-                      bool traverse_parent = false) const;
+                      bool traverse_parent) const;
     bool has_variable(const std::string_view identifier,
-                      bool traverse_parent = false) const;
+                      bool traverse_parent) const;
 
     FunctionDecl *get_function(const std::string_view identifier) const;
     VariableDecl *get_variable(const std::string_view identifier) const;

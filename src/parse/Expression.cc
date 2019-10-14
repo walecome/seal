@@ -144,8 +144,11 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
         int value = std::stoi(std::string(current.value));
         primary = std::make_unique<IntegerLiteral>(value);
     } else if (current.type == STRING) {
-        std::string value = std::string(current.value);
-        primary = std::make_unique<StringLiteral>(value);
+        std::string_view quotes_removed = current.value;
+        quotes_removed.remove_prefix(1);
+        quotes_removed.remove_suffix(1);
+
+        primary = std::make_unique<StringLiteral>(std::string(quotes_removed));
     } else if (current.type == LPARENS) {
         primary = parse_expression(tokens);
         tokens.expect(RPARENS);

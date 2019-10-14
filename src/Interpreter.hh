@@ -55,9 +55,7 @@ struct ReturnException : public std::exception {
 };
 
 struct Interpreter {
-    Interpreter(Scope *function_scope) : function_scope { function_scope } {
-        environments.push(std::make_unique<Environment>());
-    }
+    Interpreter(Scope *function_scope) : function_scope { function_scope } {}
 
     void interpret_argument_list(ArgumentList *);
     void interpret_array_literal(ArrayLiteral *);
@@ -89,4 +87,7 @@ struct Interpreter {
 
     std::stack<ptr_t<Environment>> environments {};
     Scope *function_scope;
+
+    int number_enter = 0;
+    int number_exit = 0;
 };

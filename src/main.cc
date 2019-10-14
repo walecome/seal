@@ -74,8 +74,11 @@ int main(int argc, char **argv) {
     std::cout << "Function pass got " << program_scope->function_count()
               << " functions" << std::endl;
 
-    parser.compilation_unit->analyze(program_scope.get());
+    long semantic_duration = measure_time(
+        [&]() { parser.compilation_unit->analyze(program_scope.get()); });
     error::report_semantic_errors();
+    std::cout << "Semantic analysis took " << semantic_duration
+              << " milliseconds" << std::endl;
 
     Interpreter interpreter { program_scope.get() };
     interpreter.interpret_compilation_unit(parser.compilation_unit.get());
