@@ -54,6 +54,8 @@ struct ReturnException : public std::exception {
     expr_value_t value;
 };
 
+struct EnvGuard;
+
 struct Interpreter {
     Interpreter(Scope *function_scope) : function_scope { function_scope } {}
 
@@ -82,12 +84,24 @@ struct Interpreter {
     void handle_print(Expression *);
 
     Environment *current_env();
-    void enter_block();
-    void exit_block();
+    void _enter_block();
+    void _exit_block();
+
+    EnvGuard acquire_block();
 
     std::stack<ptr_t<Environment>> environments {};
     Scope *function_scope;
 
     int number_enter = 0;
     int number_exit = 0;
+};
+
+struct EnvGuard {
+    EnvGuard() = delete;
+    EnvGuard(Interpreter *interpreter) : interpreter { interpreter } {
+        interpreter->_enter_block();
+    }
+
+    ~EnvGuard() { interpreter->_exit_block(); }
+    Interpreter *interpreter;
 };

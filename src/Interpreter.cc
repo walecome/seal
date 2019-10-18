@@ -87,11 +87,10 @@ expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
 }
 
 void Interpreter::interpret_block(Block* block) {
-    enter_block();
+    auto guard = acquire_block();
     for (auto& statement : block->statements) {
         interpret_statement(statement.get());
     }
-    exit_block();
 }
 
 expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
@@ -129,7 +128,6 @@ void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {
         interpret_block(main->body.get());
         std::cout << "Function main finished without a status" << std::endl;
     } catch (const ReturnException& ret) {
-        exit_block();
         std::cout << "Function main finished with status: "
                   << std::get<int>(ret.value) << std::endl;
     }
@@ -190,7 +188,8 @@ void Interpreter::handle_print(Expression* expr) {
 }
 
 expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
-    enter_block();
+    auto guard = acquire_block();
+
     if (function_call->identifier.value == "print") {
         handle_print(function_call->argument_list->arguments.front().get());
         return 0;
@@ -207,20 +206,12 @@ expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
 
     expr_value_t value;
 
-    unsigned start_size = environments.size();
-
     try {
         interpret_block(func->body.get());
     } catch (const ReturnException& ret) {
-        unsigned end_size = environments.size();
-        for (unsigned i = 0; i < (end_size - start_size); ++i) {
-            exit_block();
-        }
-
         value = ret.value;
     }
 
-    exit_block();
     return value;
 }
 
@@ -330,18 +321,20 @@ void Interpreter::interpret_while(While* while_statement) {
     }
 }
 
-void Interpreter::enter_block() {
+void Interpreter::_enter_block() {
     auto new_env = std::make_unique<Environment>();
     new_env->parent = current_env();
     environments.push(std::move(new_env));
 }
 
-void Interpreter::exit_block() { environments.pop(); }
+void Interpreter::_exit_block() { environments.pop(); }
 
 Environment* Interpreter::current_env() {
     if (environments.empty()) return nullptr;
     return environments.top().get();
 }
+
+EnvGuard Interpreter::acquire_block() { return EnvGuard(this); }
 
 void Environment::set_variable(std::string_view ident, expr_value_t data,
                                bool force_local) {
