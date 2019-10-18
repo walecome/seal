@@ -50,6 +50,48 @@ set(PROJECT_SOURCES
     src/semantic/Scope.cc
 )
 
+set(PROJECT_HEADERS
+
+    src/ast/ArgumentList.hh        
+    src/ast/ArrayLiteral.hh        
+    src/ast/AssignExpression.hh    
+    src/ast/BinaryExpression.hh    
+    src/ast/Block.hh               
+    src/ast/BooleanLiteral.hh      
+    src/ast/CompareExpression.hh   
+    src/ast/CompilationUnit.hh     
+    src/ast/Decl.hh                
+    src/ast/EqualityExpression.hh  
+    src/ast/Expression.hh
+    src/ast/FunctionCall.hh
+    src/ast/FunctionDecl.hh
+    src/ast/IfStatement.hh
+    src/ast/IntegerLiteral.hh
+    src/ast/Literal.hh
+    src/ast/Node.hh
+    src/ast/Operator.hh
+    src/ast/ParameterList.hh
+    src/ast/ReturnStatement.hh
+    src/ast/Statement.hh
+    src/ast/StringLiteral.hh
+    src/ast/Type.hh
+    src/ast/UnaryExpression.hh
+    src/ast/VariableDecl.hh
+    src/ast/VariableExpression.hh
+    src/ast/While.hh
+    src/Constants.hh
+    src/Error.hh
+    src/Interpreter.hh
+    src/Lexer.hh
+    src/parse/Parser.hh
+    src/semantic/Scope.hh
+    src/SourceRef.hh
+    src/Token.hh
+    src/TokenBuffer.hh
+    src/Util.hh
+
+)
+
 include_directories(lib/argparse)
 
 include_directories(src)
@@ -66,7 +108,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
 endif ()
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 
 
 # target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
