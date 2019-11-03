@@ -4,6 +4,13 @@ void ArgumentList::add_argument(ptr_t<Expression> &expression) {
     arguments.push_back(std::move(expression));
 }
 
+template <typename Function>
+void ArgumentList::for_each_argument(Function callback) const {
+    for (auto &argument : arguments) {
+        callback(argument.get());
+    }
+}
+
 void ArgumentList::analyze(Scope *scope) {
     for (auto &argument : arguments) {
         argument->analyze(scope);

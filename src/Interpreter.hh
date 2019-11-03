@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <variant>
 
+#include "Constants.hh"
 #include "Scope.hh"
 #include "ast/ArgumentList.hh"
 #include "ast/ArrayLiteral.hh"
@@ -35,8 +36,7 @@
 #include "ast/VariableDecl.hh"
 #include "ast/VariableExpression.hh"
 #include "ast/While.hh"
-
-using expr_value_t = std::variant<int, float, bool, std::string>;
+#include "builtin/BuiltIn.hh"
 
 struct Environment {
     Environment *parent { nullptr };
@@ -71,8 +71,6 @@ struct Interpreter {
     expr_value_t interpret_function_call(FunctionCall *);
     void interpret_if_statement(IfStatement *);
     expr_value_t interpret_literal(Literal *);
-    void interpret_operator(Operator *);
-    void interpret_param_list(ParameterList *);
     void interpret_return(ReturnStatement *);
     void interpret_statement(Statement *);
     void interpret_type(Type *);
@@ -81,11 +79,13 @@ struct Interpreter {
     expr_value_t interpret_variable_expr(VariableExpression *);
     void interpret_while(While *);
 
+    std::vector<expr_value_t> prepare_expression_values(ArgumentList *);
+
     void handle_print(Expression *);
 
     Environment *current_env();
-    void _enter_block();
-    void _exit_block();
+    void enter_block();
+    void exit_block();
 
     EnvGuard acquire_block();
 
@@ -99,9 +99,9 @@ struct Interpreter {
 struct EnvGuard {
     EnvGuard() = delete;
     EnvGuard(Interpreter *interpreter) : interpreter { interpreter } {
-        interpreter->_enter_block();
+        interpreter->enter_block();
     }
 
-    ~EnvGuard() { interpreter->_exit_block(); }
+    ~EnvGuard() { interpreter->exit_block(); }
     Interpreter *interpreter;
 };

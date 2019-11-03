@@ -47,7 +47,7 @@ FunctionDecl *Scope::get_function(const std::string_view identifier) const {
     if (parent) return parent->get_function(identifier);
 
     // If function is not found
-    assert(false);
+    ASSERT_NOT_REACHED();
     return nullptr;
 }
 VariableDecl *Scope::get_variable(const std::string_view identifier) const {
@@ -57,6 +57,6 @@ VariableDecl *Scope::get_variable(const std::string_view identifier) const {
     if (parent) return parent->get_variable(identifier);
 
     // If function is not found
-    assert(false);
+    ASSERT_NOT_REACHED();
     return nullptr;
 }

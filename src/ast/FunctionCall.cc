@@ -1,7 +1,16 @@
 #include "FunctionCall.hh"
 #include "FunctionDecl.hh"
 
+#include "builtin/BuiltIn.hh"
+
 void FunctionCall::analyze(Scope *scope) {
+    if (BuiltIn::is_builtin(identifier.value)) {
+        if (BuiltIn::is_typechecked(identifier.value)) {
+            // @TODO: Handle typechecking for built in
+        }
+        return;
+    }
+
     if (!scope->has_function(identifier.value, true)) {
         error::add_semantic_error("Call to undeclared function", source_ref);
         type = Type { Primitive::VOID };

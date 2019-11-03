@@ -8,7 +8,7 @@ void Interpreter::interpret_argument_list(ArgumentList* arg_list) {
 
 // @TODO
 void Interpreter::interpret_array_literal(ArrayLiteral* array_literal) {
-    assert(false);
+    ASSERT_NOT_REACHED();
     for (auto& expr : array_literal->expressions) {
         interpret_expr(expr.get());
     }
@@ -25,8 +25,6 @@ expr_value_t Interpreter::interpret_assign_expr(AssignExpression* expr) {
 
 template <class T>
 T bin_op(T left, T right, OperatorSym op) {
-    static_assert(!std::is_same<T, std::string>::value,
-                  "General binary operation cannot be perfomed on strings");
     switch (op) {
         case OperatorSym::PLUS:
             return left + right;
@@ -37,10 +35,10 @@ T bin_op(T left, T right, OperatorSym op) {
         case OperatorSym::DIV:
             return left / right;
         default:
-            assert(false);
+            ASSERT_NOT_REACHED();
     }
 
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
 
 std::string bin_op(const std::string& left, const std::string& right,
@@ -52,10 +50,10 @@ std::string bin_op(const std::string& left, const std::string& right,
         case OperatorSym::MULT:
         case OperatorSym::DIV:
         default:
-            assert(false);
+            ASSERT_NOT_REACHED();
     }
 
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
 
 // Operators other than +, -, * and / should be matched by the other functions
@@ -63,7 +61,7 @@ expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
     expr_value_t left_value = interpret_expr(expr->left.get());
     expr_value_t right_value = interpret_expr(expr->right.get());
 
-    assert(right_value.index() == left_value.index());
+    ASSERT(right_value.index() == left_value.index());
 
     if (std::holds_alternative<int>(right_value)) {
         return bin_op(std::get<int>(left_value), std::get<int>(right_value),
@@ -83,7 +81,7 @@ expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
                       expr->op->operator_symbol);
     }
 
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
 
 void Interpreter::interpret_block(Block* block) {
@@ -111,7 +109,7 @@ expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
             return left_value <= right_value;
             break;
         default:
-            assert(false);
+            ASSERT_NOT_REACHED();
     }
 }
 
@@ -132,7 +130,7 @@ void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {
                   << std::get<int>(ret.value) << std::endl;
     }
 
-    assert(environments.empty());
+    ASSERT(environments.empty());
 }
 
 expr_value_t Interpreter::interpret_expr(Expression* expr) {
@@ -154,9 +152,9 @@ expr_value_t Interpreter::interpret_expr(Expression* expr) {
         return interpret_function_call(ptr);
     } else if (auto ptr = dynamic_cast<Literal*>(expr)) {
         return interpret_literal(ptr);
-    } else {
-        throw std::runtime_error("Intepretation of invalid expression");
     }
+
+    ASSERT_NOT_REACHED();
 }
 
 expr_value_t Interpreter::interpret_equality_expr(EqualityExpression* expr) {
@@ -169,29 +167,60 @@ expr_value_t Interpreter::interpret_equality_expr(EqualityExpression* expr) {
         return right_value != left_value;
     }
 
-    assert(false);
+    ASSERT_NOT_REACHED();
+}
+
+template <class T>
+void print(T t, bool is_bool = false) {
+    if (is_bool) {
+        std::cout << std::boolalpha;
+    }
+
+    std::cout << t << std::endl;
 }
 
 void Interpreter::handle_print(Expression* expr) {
     expr_value_t value = interpret_expr(expr);
-    if (std::holds_alternative<bool>(value)) {
-        std::cout << std::boolalpha << std::get<bool>(value) << std::endl;
-    } else if (std::holds_alternative<int>(value)) {
-        std::cout << std::get<int>(value) << std::endl;
-    } else if (std::holds_alternative<float>(value)) {
-        std::cout << std::get<float>(value) << std::endl;
-    } else if (std::holds_alternative<std::string>(value)) {
-        std::cout << std::get<std::string>(value) << std::endl;
-    } else {
-        assert(false);
+
+    switch (expr->type.primitive) {
+        case Primitive::FLOAT:
+            print(std::get<float>(value));
+            break;
+        case Primitive::INT:
+            print(std::get<int>(value));
+            break;
+        case Primitive::STRING:
+            print(std::get<std::string>(value));
+            break;
+        case Primitive::BOOL:
+            print(std::get<bool>(value), true);
+            break;
+        case Primitive::VOID:
+        default:
+            ASSERT_NOT_REACHED();
     }
+}
+
+std::vector<expr_value_t> Interpreter::prepare_expression_values(
+    ArgumentList* argument_list) {
+    std::vector<expr_value_t> values {};
+
+    for (auto& x : argument_list->arguments) {
+        values.push_back(interpret_expr(x.get()));
+    }
+
+    return values;
 }
 
 expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
     auto guard = acquire_block();
 
-    if (function_call->identifier.value == "print") {
-        handle_print(function_call->argument_list->arguments.front().get());
+    auto ident = function_call->identifier.value;
+
+    if (BuiltIn::is_builtin(ident)) {
+        BuiltIn::dispatch_builtin_function(
+            ident,
+            prepare_expression_values(function_call->argument_list.get()));
         return 0;
     }
 
@@ -208,6 +237,9 @@ expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
 
     try {
         interpret_block(func->body.get());
+        if (func->type.primitive != Primitive::VOID) {
+            ASSERT_NOT_REACHED();
+        }
     } catch (const ReturnException& ret) {
         value = ret.value;
     }
@@ -216,20 +248,13 @@ expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
 }
 
 bool is_truthy(expr_value_t value) {
-    if (std::holds_alternative<bool>(value)) {
-        return std::get<bool>(value);
-    }
-    if (std::holds_alternative<std::string>(value)) {
+    if (std::holds_alternative<bool>(value)) return std::get<bool>(value);
+    if (std::holds_alternative<std::string>(value))
         return std::get<std::string>(value) == "";
-    }
-    if (std::holds_alternative<int>(value)) {
-        return std::get<int>(value);
-    }
-    if (std::holds_alternative<float>(value)) {
-        return std::get<float>(value);
-    }
+    if (std::holds_alternative<int>(value)) return std::get<int>(value);
+    if (std::holds_alternative<float>(value)) return std::get<float>(value);
 
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
 
 void Interpreter::interpret_if_statement(IfStatement* if_statement) {
@@ -254,12 +279,8 @@ expr_value_t Interpreter::interpret_literal(Literal* literal) {
         return ptr->value;
     }
 
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
-
-void Interpreter::interpret_operator(Operator*) { assert(false); }
-
-void Interpreter::interpret_param_list(ParameterList*) { assert(false); }
 
 void Interpreter::interpret_return(ReturnStatement* ret) {
     // Unwind stack to caller
@@ -280,11 +301,11 @@ void Interpreter::interpret_statement(Statement* statement) {
     } else if (auto ptr = dynamic_cast<ReturnStatement*>(statement)) {
         interpret_return(ptr);
     } else {
-        assert(false);
+        ASSERT_NOT_REACHED();
     }
 }
 
-void Interpreter::interpret_type(Type*) { assert(false); }
+void Interpreter::interpret_type(Type*) { ASSERT_NOT_REACHED(); }
 
 expr_value_t Interpreter::interpret_unary_expr(UnaryExpression* expr) {
     expr_value_t value = interpret_expr(expr->expression.get());
@@ -295,11 +316,11 @@ expr_value_t Interpreter::interpret_unary_expr(UnaryExpression* expr) {
         } else if (std::holds_alternative<float>(value)) {
             return -std::get<float>(value);
         } else {
-            assert(false);
+            ASSERT_NOT_REACHED();
         }
     }
 
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
 
 void Interpreter::interpret_variable_decl(VariableDecl* var_decl) {
@@ -321,13 +342,13 @@ void Interpreter::interpret_while(While* while_statement) {
     }
 }
 
-void Interpreter::_enter_block() {
+void Interpreter::enter_block() {
     auto new_env = std::make_unique<Environment>();
     new_env->parent = current_env();
     environments.push(std::move(new_env));
 }
 
-void Interpreter::_exit_block() { environments.pop(); }
+void Interpreter::exit_block() { environments.pop(); }
 
 Environment* Interpreter::current_env() {
     if (environments.empty()) return nullptr;
@@ -357,7 +378,7 @@ expr_value_t Environment::get_variable(std::string_view ident) const {
 
     // This should not be able to happen as the typechecker should find these
     // instances and terminate.
-    assert(false);
+    ASSERT_NOT_REACHED();
 }
 
 Environment* Environment::env_of_variable(std::string_view ident) const {
