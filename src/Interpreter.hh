@@ -22,6 +22,7 @@
 #include "ast/CompareExpression.hh"
 #include "ast/CompilationUnit.hh"
 #include "ast/EqualityExpression.hh"
+#include "ast/FloatLiteral.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/FunctionDecl.hh"
 #include "ast/IfStatement.hh"
@@ -105,3 +106,5 @@ struct EnvGuard {
     ~EnvGuard() { interpreter->exit_block(); }
     Interpreter *interpreter;
 };
+
+#define ENV_GUARD() auto __env_guard = acquire_block();

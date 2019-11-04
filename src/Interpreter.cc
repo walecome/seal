@@ -85,7 +85,7 @@ expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
 }
 
 void Interpreter::interpret_block(Block* block) {
-    auto guard = acquire_block();
+    ENV_GUARD()
     for (auto& statement : block->statements) {
         interpret_statement(statement.get());
     }
@@ -213,7 +213,7 @@ std::vector<expr_value_t> Interpreter::prepare_expression_values(
 }
 
 expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
-    auto guard = acquire_block();
+    ENV_GUARD()
 
     auto ident = function_call->identifier.value;
 
@@ -276,6 +276,9 @@ expr_value_t Interpreter::interpret_literal(Literal* literal) {
         return std::string(ptr->value);
     }
     if (auto ptr = dynamic_cast<IntegerLiteral*>(literal)) {
+        return ptr->value;
+    }
+    if (auto ptr = dynamic_cast<FloatLiteral*>(literal)) {
         return ptr->value;
     }
 

@@ -6,6 +6,7 @@
 #include "ast/BooleanLiteral.hh"
 #include "ast/CompareExpression.hh"
 #include "ast/EqualityExpression.hh"
+#include "ast/FloatLiteral.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/IntegerLiteral.hh"
 #include "ast/Operator.hh"
@@ -133,6 +134,20 @@ ptr_t<Expression> Parser::parse_unary(TokenBuffer& tokens) {
     return expression;
 }
 
+ptr_t<Expression> parse_number(TokenBuffer& tokens) {
+    Token first = tokens.previous();
+
+    std::ostringstream oss {};
+    oss << first.value;
+
+    if (tokens.eat(DOT)) {
+        oss << "." << tokens.pop().value;
+        return std::make_unique<FloatLiteral>(std::stof(oss.str()));
+    }
+
+    return std::make_unique<IntegerLiteral>(std::stoi(oss.str()));
+}
+
 ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
     ptr_t<Expression> primary;
 
@@ -141,8 +156,7 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
     Token current = tokens.pop();
 
     if (current.type == NUMBER) {
-        int value = std::stoi(std::string(current.value));
-        primary = std::make_unique<IntegerLiteral>(value);
+        primary = parse_number(tokens);
     } else if (current.type == STRING) {
         std::string_view quotes_removed = current.value;
         quotes_removed.remove_prefix(1);

@@ -4,57 +4,54 @@ project(compiler CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(PROJECT_SOURCES
-    src/main.cc
+    src/ast/ArgumentList.cc
+    src/ast/ArrayLiteral.cc
+    src/ast/AssignExpression.cc
+    src/ast/BinaryExpression.cc
+    src/ast/Block.cc
+    src/ast/BooleanLiteral.cc
+    src/ast/CompilationUnit.cc
+    src/ast/FloatLiteral.cc
+    src/ast/FunctionCall.cc
+    src/ast/FunctionDecl.cc
+    src/ast/IfStatement.cc
+    src/ast/IntegerLiteral.cc
+    src/ast/Operator.cc
+    src/ast/ParameterList.cc
+    src/ast/ReturnStatement.cc
+    src/ast/StringLiteral.cc
+    src/ast/Type.cc
+    src/ast/UnaryExpression.cc
+    src/ast/VariableDecl.cc
+    src/ast/VariableExpression.cc
+    src/ast/While.cc
+
+    src/builtin/BuiltIn.cc
+    src/builtin/Print.cc
 
     src/Error.cc
     src/Interpreter.cc
     src/Lexer.cc
-    src/Token.cc
-    src/TokenBuffer.cc
-    src/Util.cc
+    src/main.cc
 
     src/parse/ArgumentList.cc
+    src/parse/ArrayLiteral.cc
     src/parse/Block.cc
     src/parse/Expression.cc
     src/parse/Function.cc
     src/parse/IfStatement.cc
     src/parse/Parser.cc
+    src/parse/ReturnStatement.cc
     src/parse/Statement.cc
     src/parse/VariableDecl.cc
     src/parse/While.cc
-    src/parse/ReturnStatement.cc
-    src/parse/ArrayLiteral.cc
-
-
-    src/ast/ArgumentList.cc
-    src/ast/AssignExpression.cc
-    src/ast/Block.cc
-    src/ast/FunctionDecl.cc
-    src/ast/Operator.cc
-    src/ast/ParameterList.cc
-    src/ast/Type.cc
-    src/ast/ArrayLiteral.cc
-    src/ast/IntegerLiteral.cc
-    src/ast/StringLiteral.cc
-    src/ast/BooleanLiteral.cc
-    src/ast/CompilationUnit.cc
-    src/ast/FunctionCall.cc
-    src/ast/VariableExpression.cc
-    src/ast/BinaryExpression.cc
-    src/ast/IfStatement.cc
-    src/ast/VariableDecl.cc
-    src/ast/While.cc
-    src/ast/ReturnStatement.cc
-    src/ast/UnaryExpression.cc
-
-    src/builtin/BuiltIn.cc
-    src/builtin/Print.cc
-
     src/semantic/Scope.cc
+    src/Token.cc
+    src/TokenBuffer.cc
+    src/Util.cc
 )
 
 set(PROJECT_HEADERS
-
     src/ast/ArgumentList.hh        
     src/ast/ArrayLiteral.hh        
     src/ast/AssignExpression.hh    
@@ -66,6 +63,7 @@ set(PROJECT_HEADERS
     src/ast/Decl.hh                
     src/ast/EqualityExpression.hh  
     src/ast/Expression.hh
+    src/ast/FloatLiteral.hh
     src/ast/FunctionCall.hh
     src/ast/FunctionDecl.hh
     src/ast/IfStatement.hh
@@ -82,7 +80,9 @@ set(PROJECT_HEADERS
     src/ast/VariableDecl.hh
     src/ast/VariableExpression.hh
     src/ast/While.hh
+    
     src/builtin/BuiltIn.hh
+    
     src/Constants.hh
     src/Error.hh
     src/Interpreter.hh
@@ -93,7 +93,6 @@ set(PROJECT_HEADERS
     src/Token.hh
     src/TokenBuffer.hh
     src/Util.hh
-
 )
 
 include_directories(lib/argparse)

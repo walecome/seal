@@ -1,30 +1,10 @@
 fn main() -> int {
 
-    print("asd\n\"");
+    x : mut float = 0.1337 * 100.0;
+
+    println(x);
 
     return 0;
-    x : mut int = 150;
-
-    FG_RED      : int = 31;
-    FG_GREEN    : int = 32;
-    FG_BLUE     : int = 34;
-    FG_DEFAULT  : int = 39;
-    BG_RED      : int = 41;
-    BG_GREEN    : int = 42;
-    BG_BLUE     : int = 44;
-    BG_DEFAULT  : int = 49;
-
-    start_color(FG_RED);
-    println("I am red!");
-    start_color(FG_DEFAULT);
-
-    return 1;
-}
-
-fn start_color(color : int) -> void {
-    print("\033[");
-    print(color);
-    print("m");
 }
 
 fn assert(value : bool, desc : string) -> void {
