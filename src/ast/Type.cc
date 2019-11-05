@@ -4,16 +4,12 @@
 
 Primitive TypeUtil::from_string(const std::string_view s) {
     auto it = string_to_type.find(s);
-
-    if (it == std::end(string_to_type)) {
-        throw 1;
-    }
-
+    assert(it != std::end(string_to_type));
     return it->second;
 }
 
 bool Type::operator==(const Type &other) const {
-    return primitive == other.primitive;
+    return primitive == other.primitive && kind == other.kind;
 }
 
 bool Type::operator!=(const Type &other) const {
@@ -35,5 +31,5 @@ std::string Type::to_string() const {
         }
     }
 
-    throw std::runtime_error("Invalid type");
+    ASSERT_NOT_REACHED();
 }

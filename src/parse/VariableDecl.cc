@@ -1,8 +1,9 @@
 #include "ast/VariableDecl.hh"
+#include <optional>
 #include "Parser.hh"
 #include "ast/Expression.hh"
 
-ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer &tokens) {
+ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer& tokens) {
     auto begin = tokens.top_iterator();
 
     if (!tokens.can_pop(IDENTIFIER) || !tokens.can_pop(COLON, 1))
@@ -16,8 +17,7 @@ ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer &tokens) {
 
     bool is_mutable = tokens.eat(MUTABLE);
 
-    Token type = tokens.top();
-    tokens.expect(TYPE);
+    Type type = parse_type(tokens);
     tokens.expect(ASSIGN);
 
     ptr_t<Expression> value = parse_expression(tokens);
@@ -26,8 +26,8 @@ ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer &tokens) {
 
     auto end = tokens.top_iterator();
 
-    auto var_decl = std::make_unique<VariableDecl>(identifier, type.value,
-                                                   value, is_mutable);
+    auto var_decl =
+        std::make_unique<VariableDecl>(identifier, type, value, is_mutable);
 
     var_decl->source_ref.begin = begin;
     var_decl->source_ref.end = end;

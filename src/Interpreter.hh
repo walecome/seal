@@ -80,7 +80,8 @@ struct Interpreter {
     expr_value_t interpret_variable_expr(VariableExpression *);
     void interpret_while(While *);
 
-    std::vector<expr_value_t> prepare_expression_values(ArgumentList *);
+    std::vector<expr_value_t> prepare_expression_values(
+        const std::vector<ptr_t<Expression>> &);
 
     void handle_print(Expression *);
 

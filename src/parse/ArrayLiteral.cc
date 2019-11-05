@@ -5,8 +5,10 @@
 ptr_t<ArrayLiteral> Parser::parse_array_literal(TokenBuffer &tokens) {
     auto begin = tokens.top_iterator();
 
-    if (!tokens.eat(LBRACKET)) return nullptr;
+    assert(tokens.previous().type == LBRACKET);
+
     ptr_t<ArrayLiteral> array = std::make_unique<ArrayLiteral>();
+    if (tokens.eat(RBRACKET)) return array;
 
     do {
         ptr_t<Expression> expression = Parser::parse_expression(tokens);

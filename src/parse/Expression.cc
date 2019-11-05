@@ -8,6 +8,7 @@
 #include "ast/EqualityExpression.hh"
 #include "ast/FloatLiteral.hh"
 #include "ast/FunctionCall.hh"
+#include "ast/IndexExpression.hh"
 #include "ast/IntegerLiteral.hh"
 #include "ast/Operator.hh"
 #include "ast/StringLiteral.hh"
@@ -111,6 +112,22 @@ ptr_t<Expression> Parser::parse_mult_div(TokenBuffer& tokens) {
     return first;
 }
 
+bool is_index(Token token) { return token.value == "["; }
+
+ptr_t<IndexExpression> Parser::parse_index_expression(
+    TokenBuffer& tokens, ptr_t<Expression>& indexed) {
+    tokens.expect(LBRACKET);
+    if (tokens.eat(RBRACKET)) {
+        // @TODO: Throw parse error
+        throw 1;
+    }
+
+    ptr_t<Expression> index = parse_expression(tokens);
+    tokens.expect(RBRACKET);
+
+    return std::make_unique<IndexExpression>(indexed, index);
+}
+
 ptr_t<Expression> Parser::parse_unary(TokenBuffer& tokens) {
     auto begin = tokens.top_iterator();
 
@@ -124,6 +141,10 @@ ptr_t<Expression> Parser::parse_unary(TokenBuffer& tokens) {
         expression = std::make_unique<UnaryExpression>(op, right);
     } else {
         expression = Parser::parse_primary(tokens);
+
+        if (is_index(tokens.top())) {
+            expression = parse_index_expression(tokens, expression);
+        }
     }
 
     auto end = tokens.top_iterator();
@@ -173,6 +194,8 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
         if (!(primary = parse_function_call(tokens))) {
             primary = std::make_unique<VariableExpression>(current);
         }
+    } else if (current.type == LBRACKET) {
+        primary = parse_array_literal(tokens);
     } else {
         // @TODO: Throw parse error
         throw std::runtime_error("Unexpected primary expression" +

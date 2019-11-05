@@ -202,10 +202,10 @@ void Interpreter::handle_print(Expression* expr) {
 }
 
 std::vector<expr_value_t> Interpreter::prepare_expression_values(
-    ArgumentList* argument_list) {
+    const std::vector<ptr_t<Expression>>& expressions) {
     std::vector<expr_value_t> values {};
 
-    for (auto& x : argument_list->arguments) {
+    for (auto& x : expressions) {
         values.push_back(interpret_expr(x.get()));
     }
 
@@ -219,8 +219,8 @@ expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
 
     if (BuiltIn::is_builtin(ident)) {
         BuiltIn::dispatch_builtin_function(
-            ident,
-            prepare_expression_values(function_call->argument_list.get()));
+            ident, prepare_expression_values(
+                       function_call->argument_list.get()->arguments));
         return 0;
     }
 
@@ -280,6 +280,9 @@ expr_value_t Interpreter::interpret_literal(Literal* literal) {
     }
     if (auto ptr = dynamic_cast<FloatLiteral*>(literal)) {
         return ptr->value;
+    }
+    if (auto ptr = dynamic_cast<ArrayLiteral*>(literal)) {
+        throw 1;
     }
 
     ASSERT_NOT_REACHED();

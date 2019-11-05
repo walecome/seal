@@ -32,6 +32,7 @@ struct VariableDecl;
 struct VariableExpression;
 struct While;
 struct UnaryExpression;
+struct IndexExpression;
 
 class Parser {
    public:
@@ -50,7 +51,6 @@ class Parser {
     ptr_t<VariableDecl> parse_variable_decl(TokenBuffer &tokens);
     ptr_t<While> parse_while(TokenBuffer &tokens);
     ptr_t<ReturnStatement> parse_return_statement(TokenBuffer &tokens);
-    TokenBuffer shunting_yard(TokenBuffer &tokens);
     ptr_t<ArrayLiteral> parse_array_literal(TokenBuffer &tokens);
     ptr_t<Expression> parse_primary(TokenBuffer &tokens);
     ptr_t<Expression> parse_unary(TokenBuffer &tokens);
@@ -59,6 +59,10 @@ class Parser {
     ptr_t<Expression> parse_compare(TokenBuffer &tokens);
     ptr_t<Expression> parse_equality(TokenBuffer &tokens);
     ptr_t<Expression> parse_assign(TokenBuffer &tokens);
+    Type parse_type(TokenBuffer &tokens);
+
+    ptr_t<IndexExpression> parse_index_expression(TokenBuffer &tokens,
+                                                  ptr_t<Expression> &indexed);
 
     ptr_t<FunctionCall> parse_function_call(TokenBuffer &tokens);
 

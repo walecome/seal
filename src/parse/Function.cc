@@ -16,15 +16,16 @@ ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
     ptr_t<ParameterList> parameters = parse_parameter_list(tokens);
 
     tokens.expect(ARROW);
-    Token type = tokens.top();
-    tokens.expect(TYPE);
+
+    Type type = parse_type(tokens);
 
     ptr_t<Block> body = parse_block(tokens);
+    // @TODO: Probably throw an error here
     if (!body) return nullptr;
 
     auto end = tokens.top_iterator();
-    auto function_decl = std::make_unique<FunctionDecl>(identifier, parameters,
-                                                        body, type.value);
+    auto function_decl =
+        std::make_unique<FunctionDecl>(identifier, parameters, body, type);
 
     function_decl->source_ref.begin = begin;
     function_decl->source_ref.end = end;
@@ -62,11 +63,10 @@ ptr_t<VariableDecl> Parser::parse_parameter(TokenBuffer &tokens) {
 
     tokens.expect(COLON);
 
-    Token type = tokens.top();
-    tokens.expect(TYPE);
+    Type type = parse_type(tokens);
 
     auto end = tokens.top_iterator();
-    auto parameter = std::make_unique<VariableDecl>(identifier, type.value);
+    auto parameter = std::make_unique<VariableDecl>(identifier, type);
 
     parameter->source_ref.begin = begin;
     parameter->source_ref.end = end;

@@ -18,6 +18,8 @@ ArgumentParser parse_args(int argc, char **argv) {
     ArgumentParser parser("CLI argument parser");
     parser.add_argument("--source", "The filename of the source file", true);
     parser.add_argument("--verbose", "Use verbose compiling", false);
+    parser.add_argument("--interpret", "Interpret instead of compiling", false);
+
     try {
         parser.parse(argc, argv);
     } catch (const ArgumentParser::ArgumentNotFound &ex) {
@@ -80,8 +82,10 @@ int main(int argc, char **argv) {
     std::cout << "Semantic analysis took " << semantic_duration
               << " milliseconds" << std::endl;
 
-    Interpreter interpreter { program_scope.get() };
-    interpreter.interpret_compilation_unit(parser.compilation_unit.get());
+    if (argument_parser.get<bool>("interpret")) {
+        Interpreter interpreter { program_scope.get() };
+        interpreter.interpret_compilation_unit(parser.compilation_unit.get());
+    }
 
     return 0;
 }

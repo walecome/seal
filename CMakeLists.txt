@@ -15,6 +15,7 @@ set(PROJECT_SOURCES
     src/ast/FunctionCall.cc
     src/ast/FunctionDecl.cc
     src/ast/IfStatement.cc
+    src/ast/IndexExpression.cc
     src/ast/IntegerLiteral.cc
     src/ast/Operator.cc
     src/ast/ParameterList.cc
@@ -43,6 +44,7 @@ set(PROJECT_SOURCES
     src/parse/Parser.cc
     src/parse/ReturnStatement.cc
     src/parse/Statement.cc
+    src/parse/Type.cc
     src/parse/VariableDecl.cc
     src/parse/While.cc
     src/semantic/Scope.cc
@@ -67,6 +69,7 @@ set(PROJECT_HEADERS
     src/ast/FunctionCall.hh
     src/ast/FunctionDecl.hh
     src/ast/IfStatement.hh
+    src/ast/IndexExpression.hh
     src/ast/IntegerLiteral.hh
     src/ast/Literal.hh
     src/ast/Node.hh
@@ -102,7 +105,7 @@ include_directories(src/ast)
 include_directories(src/parse)
 include_directories(src/semantic)
 
-set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -pedantic -fdiagnostics-color=always -stdlib=libc++")
+set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -stdlib=libc++")
 
 ## Force colored output (mostly needed for Ninja build)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
