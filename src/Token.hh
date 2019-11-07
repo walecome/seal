@@ -76,6 +76,7 @@ enum TokenType {
     ELSE,
     ELSE_IF,
     WHILE,
+    FOR,
 
     // Type
     TYPE,
@@ -104,7 +105,8 @@ static std::unordered_map<std::string_view, TokenType> string_token_map {
 static std::unordered_map<std::string_view, TokenType> keyword_map {
     { "fn", FUNC_KEYWORD }, { "if", IF },       { "else", ELSE },
     { "elsif", ELSE_IF },   { "while", WHILE }, { "return", RETURN },
-    { "mut", MUTABLE },     { "true", BOOL },   { "false", BOOL }
+    { "mut", MUTABLE },     { "true", BOOL },   { "false", BOOL },
+    { "for", FOR }
 };
 
 static std::unordered_map<TokenType, std::string_view> token_names {
@@ -132,7 +134,7 @@ static std::unordered_map<TokenType, std::string_view> token_names {
     REFLECT_TOKEN(ELSE),         REFLECT_TOKEN(ELSE_IF),
     REFLECT_TOKEN(WHILE),        REFLECT_TOKEN(MUTABLE),
     REFLECT_TOKEN(BOOL),         REFLECT_TOKEN(DEC),
-    REFLECT_TOKEN(INC)
+    REFLECT_TOKEN(INC),          REFLECT_TOKEN(FOR)
 };
 
 struct Token {

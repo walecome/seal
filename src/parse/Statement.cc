@@ -2,6 +2,7 @@
 #include "Parser.hh"
 #include "ast/Block.hh"
 #include "ast/Expression.hh"
+#include "ast/For.hh"
 #include "ast/IfStatement.hh"
 #include "ast/ReturnStatement.hh"
 #include "ast/VariableDecl.hh"
@@ -14,6 +15,7 @@ ptr_t<Statement> Parser::parse_statement(TokenBuffer &tokens) {
     if ((statement = parse_while(tokens))) return statement;
     if ((statement = parse_block(tokens))) return statement;
     if ((statement = parse_if_statement(tokens))) return statement;
+    if ((statement = parse_for(tokens))) return statement;
 
     statement = parse_expression(tokens);
     tokens.expect(SEMICOLON);

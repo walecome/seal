@@ -4,6 +4,9 @@ fn main() -> int {
 
     y : mut [int] = [0];
 
+    for (i : mut int = 0; i < 10; ++i) {
+        println("Hello world!");
+    }
 
     x = 3.0;
 

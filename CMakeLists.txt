@@ -26,6 +26,7 @@ set(PROJECT_SOURCES
     src/ast/VariableDecl.cc
     src/ast/VariableExpression.cc
     src/ast/While.cc
+    src/ast/For.cc
 
     src/builtin/BuiltIn.cc
     src/builtin/Print.cc
@@ -39,6 +40,7 @@ set(PROJECT_SOURCES
     src/parse/ArrayLiteral.cc
     src/parse/Block.cc
     src/parse/Expression.cc
+    src/parse/For.cc
     src/parse/Function.cc
     src/parse/IfStatement.cc
     src/parse/Parser.cc
@@ -83,6 +85,7 @@ set(PROJECT_HEADERS
     src/ast/VariableDecl.hh
     src/ast/VariableExpression.hh
     src/ast/While.hh
+    src/ast/For.hh
     
     src/builtin/BuiltIn.hh
     
@@ -105,7 +108,6 @@ include_directories(src/ast)
 include_directories(src/parse)
 include_directories(src/semantic)
 
-# set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -stdlib=libc++")
 set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
 
 ## Force colored output (mostly needed for Ninja build)
