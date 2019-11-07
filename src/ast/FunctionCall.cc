@@ -12,6 +12,7 @@ void FunctionCall::analyze(Scope *scope) {
     }
 
     if (!scope->has_function(identifier.value, true)) {
+        throw 1;
         error::add_semantic_error("Call to undeclared function", source_ref);
         type = Type { Primitive::VOID };
         return;

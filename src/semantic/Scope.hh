@@ -33,6 +33,7 @@ struct Scope {
     VariableDecl *get_variable(const std::string_view identifier) const;
 
     unsigned function_count() const;
+    bool is_top_level() const;
 
     std::unordered_map<std::string_view, VariableDecl *const> variables {};
     std::unordered_map<std::string_view, FunctionDecl *const> functions {};

@@ -15,7 +15,7 @@
 struct ArgumentList;
 struct ArrayLiteral;
 struct BinaryExpression;
-struct Block;
+class Block;
 struct Expression;
 struct Function;
 struct FunctionCall;

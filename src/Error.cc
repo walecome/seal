@@ -16,13 +16,6 @@ void error::syntax(const std::string &s, TokenBuffer &tokens) {
     report_error(oss.str());
 }
 
-void error::rpn(Token got) {
-    std::ostringstream oss {};
-    oss << "Invalid token when converting RPN to expression, "
-        << " got " << token_names[got.type];
-    report_error(oss.str());
-}
-
 void error::report_error(const std::string &error, bool quit) {
     std::cout << Color::Modifier(Color::FG_RED) << error
               << Color::Modifier(Color::FG_DEFAULT) << std::endl;

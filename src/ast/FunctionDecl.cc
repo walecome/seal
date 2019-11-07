@@ -1,9 +1,10 @@
 #include "FunctionDecl.hh"
 
 void FunctionDecl::analyze(Scope *scope) {
-    // @TODO: We don't check the function identifier since this is done in the
-    //        initial sematic pass. But this creates an issue with not allowing
-    //        functions inside other functions.
+    if (!scope->is_top_level()) {
+        scope->add_function(this);
+    }
+
     ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope, this);
     parameter_list->analyze(inner_scope.get());
     body->analyze(inner_scope.get());
