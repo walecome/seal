@@ -11,8 +11,12 @@ ptr_t<Block> Parser::parse_block(TokenBuffer &tokens) {
     ptr_t<Block> block = std::make_unique<Block>();
 
     while (!tokens.eat(RBRACE)) {
-        ptr_t<Statement> statement = parse_statement(tokens);
-        block->add_statement(statement);
+        if (ptr_t<Node> function = parse_function_decl(tokens)) {
+            block->add_node(function);
+        } else {
+            ptr_t<Node> statement = parse_statement(tokens);
+            block->add_node(statement);
+        }
     }
 
     auto end = tokens.top_iterator();

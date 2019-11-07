@@ -11,10 +11,8 @@ void CompilationUnit::function_pass(Scope *scope) {
 }
 
 void CompilationUnit::analyze(Scope *scope) {
-    std::shared_ptr<Scope> inner_scope = std::make_shared<Scope>(scope);
-
     for (auto &function : functions) {
-        function->analyze(inner_scope.get());
+        function->analyze(scope);
     }
 }
 

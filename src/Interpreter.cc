@@ -86,8 +86,9 @@ expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
 
 void Interpreter::interpret_block(Block* block) {
     ENV_GUARD()
-    for (auto& statement : block->statements) {
-        interpret_statement(statement.get());
+    for (auto& node : block->nodes()) {
+        // @FIXME
+        ASSERT_NOT_REACHED();
     }
 }
 
@@ -382,8 +383,8 @@ expr_value_t Environment::get_variable(std::string_view ident) const {
         return parent->get_variable(ident);
     }
 
-    // This should not be able to happen as the typechecker should find these
-    // instances and terminate.
+    // This should not be able to happen as the typechecker should find
+    // these instances and terminate.
     ASSERT_NOT_REACHED();
 }
 

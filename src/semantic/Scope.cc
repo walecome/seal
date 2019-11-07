@@ -39,6 +39,7 @@ bool Scope::has_variable(const std::string_view identifier,
 }
 
 unsigned Scope::function_count() const { return functions.size(); }
+bool Scope::is_top_level() const { return parent == nullptr; }
 
 FunctionDecl *Scope::get_function(const std::string_view identifier) const {
     auto it = functions.find(identifier);
