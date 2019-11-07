@@ -128,12 +128,24 @@ ptr_t<IndexExpression> Parser::parse_index_expression(
     return std::make_unique<IndexExpression>(indexed, index);
 }
 
+bool is_valid_prefix(TokenType token_type) {
+    switch (token_type) {
+        case MINUS:
+        case INC:
+        case DEC:
+            return true;
+
+        default:
+            return false;
+    }
+}
+
 ptr_t<Expression> Parser::parse_unary(TokenBuffer& tokens) {
     auto begin = tokens.top_iterator();
 
     ptr_t<Expression> expression;
 
-    if (tokens.top().type == MINUS) {
+    if (is_valid_prefix(tokens.top().type)) {
         // @REFACTOR: We should probably have like parse_operator
         // instead...
         ptr_t<Operator> op = std::make_unique<Operator>(tokens.pop());

@@ -8,17 +8,6 @@ static std::string_view from_sym(OperatorSym op_sym) {
     throw 1;
 }
 
-bool Operator::precedes(const Operator &other) const {
-    return operator_precedence[operator_symbol] >
-           operator_precedence[other.operator_symbol];
-}
-
-bool Operator::is_right_associative() const {
-    return operator_symbol == OperatorSym::ASSIGN;
-}
-
-bool Operator::is_left_associative() const { return !is_right_associative(); }
-
 std::string Operator::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << "{" << name() << ", "

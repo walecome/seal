@@ -4,6 +4,7 @@ fn main() -> int {
 
     y : mut [int] = [0];
 
+
     x = 3.0;
 
     y[0] = 3;
@@ -11,6 +12,8 @@ fn main() -> int {
     z : mut int = y[1 * 123];
 
     z = y[0];
+
+    z = 1 -(-- 3);
 
     println(x);
 

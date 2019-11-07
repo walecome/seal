@@ -105,7 +105,8 @@ include_directories(src/ast)
 include_directories(src/parse)
 include_directories(src/semantic)
 
-set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -stdlib=libc++")
+# set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -stdlib=libc++")
+set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
 
 ## Force colored output (mostly needed for Ninja build)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")

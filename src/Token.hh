@@ -38,6 +38,9 @@ enum TokenType {
     STAR,
     MODULO,
 
+    INC,
+    DEC,
+
     AMP,
     PIPE,
 
@@ -95,7 +98,7 @@ static std::unordered_map<std::string_view, TokenType> string_token_map {
     { ";", SEMICOLON },     { "==", EQ },     { "'", SINGLE_QUOTE },
     { "\"", DOUBLE_QUOTE }, { "!", EXCL },    { "&&", AMP_AMP },
     { "||", PIPE_PIPE },    { "~", TILDE },   { "?", QUESTION },
-    { "^", POWER },
+    { "^", POWER },         { "++", INC },    { "--", DEC }
 };
 
 static std::unordered_map<std::string_view, TokenType> keyword_map {
@@ -128,7 +131,8 @@ static std::unordered_map<TokenType, std::string_view> token_names {
     REFLECT_TOKEN(RETURN),       REFLECT_TOKEN(IF),
     REFLECT_TOKEN(ELSE),         REFLECT_TOKEN(ELSE_IF),
     REFLECT_TOKEN(WHILE),        REFLECT_TOKEN(MUTABLE),
-    REFLECT_TOKEN(BOOL)
+    REFLECT_TOKEN(BOOL),         REFLECT_TOKEN(DEC),
+    REFLECT_TOKEN(INC)
 };
 
 struct Token {
