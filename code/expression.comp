@@ -1,9 +1,9 @@
-func main() -> void {
+fn main() -> void {
     asd : int = 3;
     asd = 1 + 2 * asd + lmao(asd, 2);
 
 }
 
-func lmao(first : int, second:int) -> int {
+fn lmao(first : int, second:int) -> int {
     return 1;
 }

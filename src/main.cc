@@ -55,32 +55,39 @@ int main(int argc, char **argv) {
 
     long lexer_duration = measure_time([&]() { lexer.read_all(); });
 
-    if (verbose) lexer.get_tokens().print_tokens();
-
-    std::cout << "Lexed " << lexer.number_of_tokens() << " tokens in "
-              << lexer_duration << " milliseconds" << std::endl;
-
+    if (verbose) {
+        lexer.get_tokens().print_tokens();
+        std::cout << "Lexed " << lexer.number_of_tokens() << " tokens in "
+                  << lexer_duration << " milliseconds" << std::endl;
+    }
     Parser parser {};
 
     long parser_duration =
         measure_time([&]() { parser.parse(lexer.get_tokens()); });
 
-    std::cout << "Parsing took " << parser_duration << " milliseconds"
-              << std::endl;
+    if (verbose) {
+        std::cout << "Parsing took " << parser_duration << " milliseconds"
+                  << std::endl;
 
-    if (verbose) std::cout << parser.compilation_unit->dump() << std::endl;
+        std::cout << parser.compilation_unit->dump() << std::endl;
+    }
 
     ptr_t<Scope> program_scope = std::make_unique<Scope>();
 
     parser.compilation_unit->function_pass(program_scope.get());
-    std::cout << "Function pass got " << program_scope->function_count()
-              << " functions" << std::endl;
+    if (verbose) {
+        std::cout << "Function pass got " << program_scope->function_count()
+                  << " functions" << std::endl;
+    }
 
     long semantic_duration = measure_time(
         [&]() { parser.compilation_unit->analyze(program_scope.get()); });
     error::report_semantic_errors();
-    std::cout << "Semantic analysis took " << semantic_duration
-              << " milliseconds" << std::endl;
+
+    if (verbose) {
+        std::cout << "Semantic analysis took " << semantic_duration
+                  << " milliseconds" << std::endl;
+    }
 
     if (argument_parser.get<bool>("interpret")) {
         Interpreter interpreter { program_scope.get() };

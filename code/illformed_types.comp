@@ -1,7 +1,7 @@
-func main() -> void {
+fn main() -> void {
     var : string = 1;
 }
 
-func illformed() -> string {
+fn illformed() -> string {
     return 1;
 }
