@@ -18,6 +18,9 @@ NC='\033[0m' # No Color
 
 expected=0
 
+# Set CWD to script dir
+cd "${0%/*}"
+
 
 function run_and_print() {
    arr=("$@")
@@ -28,9 +31,9 @@ function run_and_print() {
         status=$?
         if [ "$status" == "$expected" ]
         then
-            printf ":: ${GREEN}PASSED${NC}\n"
+            printf "[${GREEN}PASSED${NC}]\n"
         else
-            printf ":: ${RED}FAILED ${NC}(Expected status $expected, got $status)\n"
+            printf "[${RED}FAILED${NC}] - (Expected status $expected, got $status)\n"
             printf "$ret\n"
         fi
       done

@@ -30,7 +30,6 @@ fn myfunc(var1: int) -> void {
 
     if (x == 3) {print("xd");}
 
-    x = -5--------------10;
 
     functioncall(var2);
     functioncallwithint(1);

@@ -12,27 +12,26 @@
 #include "TokenBuffer.hh"
 #include "ast/CompilationUnit.hh"
 
-struct ArgumentList;
-struct ArrayLiteral;
-struct BinaryExpression;
+class ArgumentList;
+class ArrayLiteral;
+class BinaryExpression;
 class Block;
-struct Expression;
-struct Function;
-struct FunctionCall;
-struct FunctionDecl;
-struct IfStatement;
-struct IntegerLiteral;
-struct Node;
-struct ParameterList;
-struct ReturnStatement;
-struct Statement;
-struct StringLiteral;
-struct Type;
-struct VariableDecl;
-struct VariableExpression;
-struct While;
-struct UnaryExpression;
-struct IndexExpression;
+class Expression;
+class FunctionCall;
+class FunctionDecl;
+class IfStatement;
+class IntegerLiteral;
+class Node;
+class ParameterList;
+class ReturnStatement;
+class Statement;
+class StringLiteral;
+class Type;
+class VariableDecl;
+class VariableExpression;
+class While;
+class UnaryExpression;
+class IndexExpression;
 class For;
 
 class Parser {

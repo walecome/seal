@@ -1,7 +1,7 @@
 #include "Interpreter.hh"
 
 void Interpreter::interpret_argument_list(ArgumentList* arg_list) {
-    for (auto& argument : arg_list->arguments) {
+    for (auto& argument : arg_list->arguments()) {
         interpret_expr(argument.get());
     }
 }
@@ -9,15 +9,16 @@ void Interpreter::interpret_argument_list(ArgumentList* arg_list) {
 // @TODO
 void Interpreter::interpret_array_literal(ArrayLiteral* array_literal) {
     ASSERT_NOT_REACHED();
-    for (auto& expr : array_literal->expressions) {
+    for (auto& expr : array_literal->expressions()) {
         interpret_expr(expr.get());
     }
 }
 
 expr_value_t Interpreter::interpret_assign_expr(AssignExpression* expr) {
-    expr_value_t value = interpret_expr(expr->right.get());
-    auto identifier =
-        dynamic_cast<VariableExpression*>(expr->left.get())->identifier.value;
+    expr_value_t value = interpret_expr(expr->right().get());
+    auto identifier = dynamic_cast<VariableExpression*>(expr->left().get())
+                          ->identifier()
+                          .value;
     current_env()->set_variable(identifier, value, false);
 
     return value;
@@ -58,45 +59,45 @@ std::string bin_op(const std::string& left, const std::string& right,
 
 // Operators other than +, -, * and / should be matched by the other functions
 expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
-    expr_value_t left_value = interpret_expr(expr->left.get());
-    expr_value_t right_value = interpret_expr(expr->right.get());
+    expr_value_t left_value = interpret_expr(expr->left().get());
+    expr_value_t right_value = interpret_expr(expr->right().get());
 
     ASSERT(right_value.index() == left_value.index());
 
     if (std::holds_alternative<int>(right_value)) {
         return bin_op(std::get<int>(left_value), std::get<int>(right_value),
-                      expr->op->operator_symbol);
+                      expr->op()->operator_symbol);
     }
     if (std::holds_alternative<float>(right_value)) {
         return bin_op(std::get<float>(left_value), std::get<float>(right_value),
-                      expr->op->operator_symbol);
+                      expr->op()->operator_symbol);
     }
     if (std::holds_alternative<std::string>(right_value)) {
         return bin_op(std::get<std::string>(left_value),
                       std::get<std::string>(right_value),
-                      expr->op->operator_symbol);
+                      expr->op()->operator_symbol);
     }
     if (std::holds_alternative<bool>(right_value)) {
         return bin_op(std::get<bool>(left_value), std::get<bool>(right_value),
-                      expr->op->operator_symbol);
+                      expr->op()->operator_symbol);
     }
 
     ASSERT_NOT_REACHED();
 }
 
-void Interpreter::interpret_block(Block* block) {
+void Interpreter::interpret_block(Block*) {
     ENV_GUARD()
-    for (auto& node : block->nodes()) {
-        // @FIXME
-        ASSERT_NOT_REACHED();
-    }
+    // for (auto& node : block->nodes()) {
+    //     // @FIXME
+    //     ASSERT_NOT_REACHED();
+    // }
 }
 
 expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
-    expr_value_t right_value = interpret_expr(expr->right.get());
-    expr_value_t left_value = interpret_expr(expr->left.get());
+    expr_value_t right_value = interpret_expr(expr->right().get());
+    expr_value_t left_value = interpret_expr(expr->left().get());
 
-    switch (expr->op->operator_symbol) {
+    switch (expr->op()->operator_symbol) {
         case OperatorSym::GT:
             return left_value > right_value;
             break;
@@ -117,14 +118,14 @@ expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
 void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {
     FunctionDecl* main { nullptr };
 
-    for (auto& function : unit->functions) {
-        if (function->identifier.value == "main") {
+    for (auto& function : unit->functions()) {
+        if (function->identifier().value == "main") {
             main = function.get();
             break;
         }
     }
     try {
-        interpret_block(main->body.get());
+        interpret_block(main->body().get());
         std::cout << "Function main finished without a status" << std::endl;
     } catch (const ReturnException& ret) {
         std::cout << "Function main finished with status: "
@@ -159,12 +160,12 @@ expr_value_t Interpreter::interpret_expr(Expression* expr) {
 }
 
 expr_value_t Interpreter::interpret_equality_expr(EqualityExpression* expr) {
-    expr_value_t right_value = interpret_expr(expr->right.get());
-    expr_value_t left_value = interpret_expr(expr->left.get());
+    expr_value_t right_value = interpret_expr(expr->right().get());
+    expr_value_t left_value = interpret_expr(expr->left().get());
 
-    if (expr->op->operator_symbol == OperatorSym::EQ) {
+    if (expr->op()->operator_symbol == OperatorSym::EQ) {
         return right_value == left_value;
-    } else if (expr->op->operator_symbol == OperatorSym::NOT_EQ) {
+    } else if (expr->op()->operator_symbol == OperatorSym::NOT_EQ) {
         return right_value != left_value;
     }
 
@@ -183,7 +184,7 @@ void print(T t, bool is_bool = false) {
 void Interpreter::handle_print(Expression* expr) {
     expr_value_t value = interpret_expr(expr);
 
-    switch (expr->type.primitive) {
+    switch (expr->type().primitive()) {
         case Primitive::FLOAT:
             print(std::get<float>(value));
             break;
@@ -216,29 +217,29 @@ std::vector<expr_value_t> Interpreter::prepare_expression_values(
 expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
     ENV_GUARD()
 
-    auto ident = function_call->identifier.value;
+    auto ident = function_call->identifier().value;
 
     if (BuiltIn::is_builtin(ident)) {
         BuiltIn::dispatch_builtin_function(
             ident, prepare_expression_values(
-                       function_call->argument_list.get()->arguments));
+                       function_call->argument_list().get()->arguments()));
         return 0;
     }
 
-    auto func = function_scope->get_function(function_call->identifier.value);
-    auto& arguments = function_call->argument_list->arguments;
+    auto func = function_scope->get_function(function_call->identifier().value);
+    auto& arguments = function_call->argument_list()->arguments();
     for (unsigned i = 0; i < arguments.size(); ++i) {
         expr_value_t value = interpret_expr(arguments.at(i).get());
         std::string_view ident =
-            func->parameter_list->parameters.at(i)->identifier.value;
+            func->parameter_list()->parameters().at(i)->identifier().value;
         current_env()->set_variable(ident, value, true);
     }
 
     expr_value_t value;
 
     try {
-        interpret_block(func->body.get());
-        if (func->type.primitive != Primitive::VOID) {
+        interpret_block(func->body().get());
+        if (func->type().primitive() != Primitive::VOID) {
             ASSERT_NOT_REACHED();
         }
     } catch (const ReturnException& ret) {
@@ -260,27 +261,27 @@ bool is_truthy(expr_value_t value) {
 
 void Interpreter::interpret_if_statement(IfStatement* if_statement) {
     expr_value_t condition_value =
-        interpret_expr(if_statement->condition.get());
+        interpret_expr(if_statement->condition().get());
 
     if (is_truthy(condition_value)) {
-        interpret_block(if_statement->if_body.get());
-    } else if (if_statement->else_body) {
-        interpret_block(if_statement->else_body.get());
+        interpret_block(if_statement->if_body().get());
+    } else if (if_statement->else_body()) {
+        interpret_block(if_statement->else_body().get());
     }
 }
 
 expr_value_t Interpreter::interpret_literal(Literal* literal) {
     if (auto ptr = dynamic_cast<BooleanLiteral*>(literal)) {
-        return ptr->value;
+        return ptr->value();
     }
     if (auto ptr = dynamic_cast<StringLiteral*>(literal)) {
-        return std::string(ptr->value);
+        return std::string(ptr->value());
     }
     if (auto ptr = dynamic_cast<IntegerLiteral*>(literal)) {
-        return ptr->value;
+        return ptr->value();
     }
     if (auto ptr = dynamic_cast<FloatLiteral*>(literal)) {
-        return ptr->value;
+        return ptr->value();
     }
     if (auto ptr = dynamic_cast<ArrayLiteral*>(literal)) {
         throw 1;
@@ -291,7 +292,7 @@ expr_value_t Interpreter::interpret_literal(Literal* literal) {
 
 void Interpreter::interpret_return(ReturnStatement* ret) {
     // Unwind stack to caller
-    throw ReturnException(interpret_expr(ret->return_value.get()));
+    throw ReturnException(interpret_expr(ret->return_value().get()));
 }
 
 void Interpreter::interpret_statement(Statement* statement) {
@@ -315,9 +316,9 @@ void Interpreter::interpret_statement(Statement* statement) {
 void Interpreter::interpret_type(Type*) { ASSERT_NOT_REACHED(); }
 
 expr_value_t Interpreter::interpret_unary_expr(UnaryExpression* expr) {
-    expr_value_t value = interpret_expr(expr->expression.get());
+    expr_value_t value = interpret_expr(expr->expression().get());
 
-    if (expr->op->operator_symbol == OperatorSym::MINUS) {
+    if (expr->op()->operator_symbol == OperatorSym::MINUS) {
         if (std::holds_alternative<int>(value)) {
             return -std::get<int>(value);
         } else if (std::holds_alternative<float>(value)) {
@@ -331,21 +332,21 @@ expr_value_t Interpreter::interpret_unary_expr(UnaryExpression* expr) {
 }
 
 void Interpreter::interpret_variable_decl(VariableDecl* var_decl) {
-    current_env()->set_variable(var_decl->identifier.value,
-                                interpret_expr(var_decl->value.get()), true);
+    current_env()->set_variable(var_decl->identifier().value,
+                                interpret_expr(var_decl->value().get()), true);
 }
 
 expr_value_t Interpreter::interpret_variable_expr(VariableExpression* expr) {
-    return current_env()->get_variable(expr->identifier.value);
+    return current_env()->get_variable(expr->identifier().value);
 }
 
 void Interpreter::interpret_while(While* while_statement) {
     expr_value_t condition_value =
-        interpret_expr(while_statement->condition.get());
+        interpret_expr(while_statement->condition().get());
 
     while (is_truthy(condition_value)) {
-        interpret_block(while_statement->body.get());
-        condition_value = interpret_expr(while_statement->condition.get());
+        interpret_block(while_statement->body().get());
+        condition_value = interpret_expr(while_statement->condition().get());
     }
 }
 

@@ -7,8 +7,8 @@
 #include "Constants.hh"
 #include "Error.hh"
 
-struct FunctionDecl;
-struct VariableDecl;
+class FunctionDecl;
+class VariableDecl;
 struct Scope;
 
 static FunctionDecl *get_context(Scope *, FunctionDecl *);

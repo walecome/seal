@@ -7,7 +7,7 @@
 #include "ast/ArgumentList.hh"
 #include "ast/Type.hh"
 
-struct ArgumentList;
+class ArgumentList;
 
 namespace BuiltIn {
 

@@ -1,5 +1,5 @@
 fn main() -> void {
-    asd : int = 3;
+    asd : mut int = 3;
     asd = 1 + 2 * asd + lmao(asd, 2);
 
 }

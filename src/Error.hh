@@ -30,7 +30,7 @@ class Modifier {
 };
 }  // namespace Color
 
-struct Type;
+class Type;
 
 namespace error {
 static std::vector<std::string> semantic_errors {};

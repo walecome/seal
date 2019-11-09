@@ -18,9 +18,9 @@ using sptr_t = std::shared_ptr<T>;
 
 using expr_value_t = std::variant<int, float, bool, std::string>;
 
-#define AST_NODE_NAME(node_name) \
-   private:                      \
-    virtual std::string name() const override { return #node_name; }
+#define MAKE_DEFAULT_CONSTRUCTABLE(c) \
+   public:                            \
+    c() = default;
 
 #define MAKE_NONCOPYABLE(c) \
    private:                 \
