@@ -1,18 +1,18 @@
 #include "ArgumentList.hh"
 
 void ArgumentList::add_argument(ptr_t<Expression> &expression) {
-    arguments.push_back(std::move(expression));
+    m_arguments.push_back(std::move(expression));
 }
 
 template <typename Function>
 void ArgumentList::for_each_argument(Function callback) const {
-    for (auto &argument : arguments) {
+    for (auto &argument : m_arguments) {
         callback(argument.get());
     }
 }
 
 void ArgumentList::analyze(Scope *scope) {
-    for (auto &argument : arguments) {
+    for (auto &argument : m_arguments) {
         argument->analyze(scope);
     }
 }
@@ -22,7 +22,7 @@ std::string ArgumentList::dump(unsigned indent) const {
 
     oss << util::indent(indent) << name() << " [" << std::endl;
 
-    for (auto &x : arguments) {
+    for (auto &x : m_arguments) {
         oss << x->dump(indent + 1) << std::endl;
     }
 

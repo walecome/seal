@@ -9,11 +9,23 @@ Primitive TypeUtil::from_string(const std::string_view s) {
 }
 
 bool Type::operator==(const Type &other) const {
-    return primitive == other.primitive && kind == other.kind;
+    return m_primitive == other.m_primitive && m_kind == other.m_kind;
 }
 
 bool Type::operator!=(const Type &other) const {
     return !this->operator==(other);
+}
+
+void Type::change_kind(const Kind new_kind) {
+    // @TODO: We should be about to assert this when we add support for more
+    //        complex types
+    // ASSERT(m_kind == Kind::NONE);
+    m_kind = new_kind;
+}
+void Type::change_primitive(const Primitive new_primitive) {
+    ASSERT(m_primitive == Primitive::VOID ||
+           m_primitive == Primitive::DONT_CARE);
+    m_primitive = new_primitive;
 }
 
 std::string Type::dump(unsigned) const {
@@ -26,7 +38,7 @@ std::string Type::dump(unsigned) const {
 
 std::string Type::to_string() const {
     for (auto &x : TypeUtil::string_to_type) {
-        if (x.second == primitive) {
+        if (x.second == m_primitive) {
             return std::string(x.first);
         }
     }

@@ -4,7 +4,7 @@
 
 std::string StringLiteral::dump(unsigned indent) const {
     std::ostringstream oss {};
-    oss << util::indent(indent) << "{" << name() << ", " << std::quoted(value)
+    oss << util::indent(indent) << "{" << name() << ", " << std::quoted(m_value)
         << "}";
     return oss.str();
 }

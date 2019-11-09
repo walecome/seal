@@ -3,12 +3,20 @@
 #include "Literal.hh"
 #include "Token.hh"
 
-struct StringLiteral : public Literal {
-    StringLiteral(std::string_view value)
-        : Literal(Primitive::STRING), value { value } {}
-    virtual std::string name() const override { return "StringLiteral"; }
-    virtual std::string dump(unsigned indent) const override;
+class StringLiteral : public Literal {
+    MAKE_NONMOVABLE(StringLiteral)
+    MAKE_NONCOPYABLE(StringLiteral)
 
+    AST_NODE_NAME(StringLiteral)
+    AST_DUMPABLE()
+
+   public:
+    StringLiteral(std::string_view value)
+        : Literal(Primitive::STRING), m_value { value } {}
+
+    const auto& value() const { return m_value; }
+
+   private:
     // @TODO: This should be string_view but creates weird bugs...
-    std::string value;
+    std::string m_value;
 };

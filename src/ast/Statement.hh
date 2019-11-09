@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Node.hh"
-struct Statement : public Node {
+class Statement : public Node {
+   public:
     virtual std::string name() const override { return "Statement"; }
     virtual std::string dump(unsigned) const override {
         throw std::runtime_error("Pure statement node not allowed");

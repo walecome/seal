@@ -8,7 +8,20 @@
 #include "SourceRef.hh"
 #include "Util.hh"
 
-struct Node {
+#define AST_NODE_NAME(node_name) \
+   private:                      \
+    virtual std::string name() const override { return #node_name; }
+
+#define AST_DUMPABLE(node_name) \
+   public:                      \
+    virtual std::string dump(unsigned indent) const override;
+
+#define AST_ANALYZABLE(node_name) \
+   public:                        \
+    virtual void analyze(Scope *scope) override;
+
+class Node {
+   public:
     virtual ~Node() = default;
 
     virtual void analyze(Scope *) {}

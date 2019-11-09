@@ -2,13 +2,19 @@
 
 #include "Literal.hh"
 
-struct ArrayLiteral : public Literal {
-    void add_expression(ptr_t<Expression> &expression);
+class ArrayLiteral : public Literal {
+    MAKE_DEFAULT_CONSTRUCTABLE(ArrayLiteral)
+    MAKE_NONMOVABLE(ArrayLiteral)
+    MAKE_NONCOPYABLE(ArrayLiteral)
 
-    virtual std::string name() const override { return "ArrayLiteral"; }
-    virtual std::string dump(unsigned indent) const override;
+    AST_NODE_NAME(ArrayLiteral)
+    AST_DUMPABLE()
+    AST_ANALYZABLE()
 
-    virtual void analyze(Scope *scope) override;
+   public:
+    void add_expression(ptr_t<Expression>& expression);
+    const auto& expressions() const { return m_expressions; }
 
-    std::vector<ptr_t<Expression>> expressions {};
+   private:
+    std::vector<ptr_t<Expression>> m_expressions {};
 };

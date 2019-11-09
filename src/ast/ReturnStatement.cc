@@ -2,10 +2,10 @@
 #include "FunctionDecl.hh"
 
 void ReturnStatement::analyze(Scope *scope) {
-    return_value->analyze(scope);
+    m_return_value->analyze(scope);
 
-    if (return_value->type != scope->context->type) {
-        error::mismatched_type(scope->context->type, return_value->type,
+    if (m_return_value->type() != scope->context->type()) {
+        error::mismatched_type(scope->context->type(), m_return_value->type(),
                                source_ref);
     }
 }
@@ -13,7 +13,7 @@ void ReturnStatement::analyze(Scope *scope) {
 std::string ReturnStatement::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << name() << " (" << std::endl;
-    oss << return_value->dump(indent + 1) << std::endl;
+    oss << m_return_value->dump(indent + 1) << std::endl;
     oss << util::indent(indent) << ")";
     return oss.str();
 }

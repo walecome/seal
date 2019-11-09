@@ -2,14 +2,23 @@
 
 #include "Expression.hh"
 
-struct UnaryExpression : public Expression {
+class UnaryExpression : public Expression {
+    MAKE_NONMOVABLE(UnaryExpression)
+    MAKE_NONCOPYABLE(UnaryExpression)
+
+    AST_NODE_NAME(UnaryExpression)
+    AST_DUMPABLE()
+    AST_ANALYZABLE()
+
+   public:
     UnaryExpression(ptr_t<Operator> &op, ptr_t<Expression> &expression)
-        : op { std::move(op) }, expression { std::move(expression) } {}
+        : m_operator { std::move(op) },
+          m_expression { std::move(expression) } {}
 
-    virtual std::string name() const override { return "UnaryExpression"; }
-    virtual std::string dump(unsigned indent) const override;
-    virtual void analyze(Scope *scope) override;
+    const auto &op() const { return m_operator; }
+    const auto &expression() const { return m_expression; }
 
-    ptr_t<Operator> op;
-    ptr_t<Expression> expression;
+   private:
+    ptr_t<Operator> m_operator;
+    ptr_t<Expression> m_expression;
 };

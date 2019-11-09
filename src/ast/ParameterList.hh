@@ -5,13 +5,20 @@
 
 #include <vector>
 
-struct ParameterList : public Node {
+class ParameterList : public Node {
+    MAKE_DEFAULT_CONSTRUCTABLE(ParameterList)
+    MAKE_NONMOVABLE(ParameterList)
+    MAKE_NONCOPYABLE(ParameterList)
+
+    AST_NODE_NAME(ParameterList)
+    AST_DUMPABLE()
+    AST_ANALYZABLE()
+
+   public:
     void add_parameter(ptr_t<VariableDecl> &parameter);
 
-    virtual std::string name() const override { return "ParameterList"; }
-    virtual std::string dump(unsigned indent) const override;
+    const auto &parameters() const { return m_parameters; }
 
-    virtual void analyze(Scope *scope) override;
-
-    std::vector<ptr_t<VariableDecl>> parameters {};
+   private:
+    std::vector<ptr_t<VariableDecl>> m_parameters {};
 };

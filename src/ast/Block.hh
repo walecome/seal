@@ -7,17 +7,16 @@
 #include <vector>
 
 class Block : public Statement {
-    AST_NODE_NAME(Block)
+    MAKE_DEFAULT_CONSTRUCTABLE(Block)
     MAKE_NONMOVABLE(Block)
     MAKE_NONCOPYABLE(Block)
 
+    AST_NODE_NAME(Block)
+    AST_DUMPABLE()
+    AST_ANALYZABLE()
+
    public:
-    Block() = default;
-
-    virtual std::string dump(unsigned indent) const override;
     void add_node(ptr_t<Node> &node);
-    virtual void analyze(Scope *scope) override;
-
     const auto &nodes() const { return m_nodes; }
 
    private:

@@ -2,11 +2,16 @@
 
 #include "BinaryExpression.hh"
 
-struct EqualityExpression : public BinaryExpression {
+class EqualityExpression : public BinaryExpression {
+    MAKE_NONMOVABLE(EqualityExpression)
+    MAKE_NONCOPYABLE(EqualityExpression)
+
+    AST_NODE_NAME(EqualityExpression)
+
+   public:
     EqualityExpression(ptr_t<Expression> &left, ptr_t<Operator> &op,
                        ptr_t<Expression> &right)
         : BinaryExpression(left, op, right) {
-        type = Type(Primitive::BOOL);
+        m_type = Type(Primitive::BOOL);
     }
-    virtual std::string name() const override { return "EqualityExpression"; }
 };

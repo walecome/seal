@@ -9,8 +9,8 @@
 enum class Primitive { STRING, INT, FLOAT, VOID, BOOL, DONT_CARE };
 enum class Kind { PRIMITIVE, ARRAY, STRUCT, NONE };
 
-struct Operator;
-struct Expression;
+class Operator;
+class Expression;
 
 namespace TypeUtil {
 
@@ -27,21 +27,29 @@ Primitive from_string(const std::string_view s);
 
 }  // namespace TypeUtil
 
-struct Type {
-    Type() : primitive { Primitive::VOID }, kind { Kind::NONE } {}
+class Type {
+   public:
+    Type() : m_primitive { Primitive::VOID }, m_kind { Kind::NONE } {}
     Type(const std::string_view s, Kind kind)
-        : primitive { TypeUtil::from_string(s) }, kind { kind } {}
+        : m_primitive { TypeUtil::from_string(s) }, m_kind { kind } {}
 
     Type(Primitive primitive)
-        : primitive { primitive }, kind { Kind::PRIMITIVE } {}
+        : m_primitive { primitive }, m_kind { Kind::PRIMITIVE } {}
 
     std::string dump(unsigned indent) const;
 
     bool operator==(const Type &other) const;
     bool operator!=(const Type &other) const;
 
+    const auto &primitive() const { return m_primitive; }
+    const auto &kind() const { return m_kind; }
+
+    void change_primitive(const Primitive);
+    void change_kind(const Kind);
+
     std::string to_string() const;
 
-    Primitive primitive;
-    Kind kind;
+   private:
+    Primitive m_primitive;
+    Kind m_kind;
 };

@@ -3,13 +3,19 @@
 #include "Expression.hh"
 #include "Token.hh"
 
-struct VariableExpression : public Expression {
-    VariableExpression(const Token identifier) : identifier { identifier } {}
+class VariableExpression : public Expression {
+    MAKE_NONMOVABLE(VariableExpression)
+    MAKE_NONCOPYABLE(VariableExpression)
 
-    virtual std::string name() const override { return "VariableExpression"; }
-    virtual std::string dump(unsigned indent) const override;
+    AST_NODE_NAME(VariableExpression)
+    AST_ANALYZABLE()
+    AST_DUMPABLE()
 
-    virtual void analyze(Scope *scope) override;
+   public:
+    VariableExpression(const Token identifier) : m_identifier { identifier } {}
 
-    const Token identifier;
+    const auto& identifier() const { return m_identifier; }
+
+   private:
+    const Token m_identifier;
 };

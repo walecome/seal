@@ -36,6 +36,11 @@
 },
 {
   "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/ast/Expression.cc.o -c /home/alexander/projects/compiler/src/ast/Expression.cc",
+  "file": "/home/alexander/projects/compiler/src/ast/Expression.cc"
+},
+{
+  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/ast/FloatLiteral.cc.o -c /home/alexander/projects/compiler/src/ast/FloatLiteral.cc",
   "file": "/home/alexander/projects/compiler/src/ast/FloatLiteral.cc"
 },

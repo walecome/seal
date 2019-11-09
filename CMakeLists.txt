@@ -11,6 +11,7 @@ set(PROJECT_SOURCES
     src/ast/Block.cc
     src/ast/BooleanLiteral.cc
     src/ast/CompilationUnit.cc
+    src/ast/Expression.cc
     src/ast/FloatLiteral.cc
     src/ast/FunctionCall.cc
     src/ast/FunctionDecl.cc

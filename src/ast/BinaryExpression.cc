@@ -1,26 +1,30 @@
 #include "BinaryExpression.hh"
 #include "Operator.hh"
-void BinaryExpression::analyze(Scope *scope) {
-    left->analyze(scope);
-    op->analyze(scope);
-    right->analyze(scope);
 
-    if (left->type.primitive == Primitive::DONT_CARE &&
-        right->type.primitive == Primitive::DONT_CARE) {
+void BinaryExpression::analyze(Scope *scope) {
+    m_left->analyze(scope);
+    m_operator->analyze(scope);
+    m_right->analyze(scope);
+
+    if (m_left->type().primitive() == Primitive::DONT_CARE &&
+        m_right->type().primitive() == Primitive::DONT_CARE) {
         throw std::runtime_error("Can't deduce type of binary expression");
-    } else if (left->type.primitive == Primitive::DONT_CARE) {
-        left->type.primitive = right->type.primitive;
-    } else if (right->type.primitive == Primitive::DONT_CARE) {
-        right->type.primitive = left->type.primitive;
+    } else if (m_left->type().primitive() == Primitive::DONT_CARE) {
+        // @TODO: Should we only set the primitive and not the kind?
+
+        m_left->set_primitive(m_right->type().primitive());
+    } else if (m_right->type().primitive() == Primitive::DONT_CARE) {
+        m_right->set_primitive(m_left->type().primitive());
     }
 
-    if (left->type == right->type) {
+    if (m_left->type() == m_right->type()) {
         // @REFACTOR: Ugly logic
-        if (this->type.primitive != Primitive::VOID) return;
-        this->type = left->type;
+        if (this->type().primitive() != Primitive::VOID) return;
+        m_type = m_left->type();
+
     } else {
-        this->type = Type { Primitive::VOID };
-        error::mismatched_type(left->type, right->type, source_ref);
+        m_type = Type { Primitive::VOID };
+        error::mismatched_type(m_left->type(), m_right->type(), source_ref);
     }
 }
 
@@ -28,9 +32,9 @@ std::string BinaryExpression::dump(unsigned indent) const {
     std::ostringstream oss {};
 
     oss << util::indent(indent) << name() << " (" << std::endl;
-    oss << left->dump(indent + 1) << std::endl;
-    oss << op->dump(indent + 1) << std::endl;
-    oss << right->dump(indent + 1) << std::endl;
+    oss << m_left->dump(indent + 1) << std::endl;
+    oss << m_operator->dump(indent + 1) << std::endl;
+    oss << m_right->dump(indent + 1) << std::endl;
     oss << util::indent(indent) << ")";
 
     return oss.str();

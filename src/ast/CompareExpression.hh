@@ -2,11 +2,16 @@
 
 #include "BinaryExpression.hh"
 
-struct CompareExpression : public BinaryExpression {
+class CompareExpression : public BinaryExpression {
+    MAKE_NONMOVABLE(CompareExpression)
+    MAKE_NONCOPYABLE(CompareExpression)
+
+    AST_NODE_NAME(CompareExpression)
+
+   public:
     CompareExpression(ptr_t<Expression> &left, ptr_t<Operator> &op,
                       ptr_t<Expression> &right)
         : BinaryExpression(left, op, right) {
-        type = Type(Primitive::BOOL);
+        m_type = Type(Primitive::BOOL);
     }
-    virtual std::string name() const override { return "CompareExpression"; }
 };

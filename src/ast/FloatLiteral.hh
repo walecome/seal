@@ -3,11 +3,17 @@
 #include "Literal.hh"
 #include "Token.hh"
 
-struct FloatLiteral : public Literal {
-    FloatLiteral(float value) : Literal(Primitive::FLOAT), value { value } {}
+class FloatLiteral : public Literal {
+    MAKE_NONMOVABLE(FloatLiteral)
+    MAKE_NONCOPYABLE(FloatLiteral)
 
-    virtual std::string name() const override { return "FloatLiteral"; }
-    virtual std::string dump(unsigned indent) const override;
+    AST_NODE_NAME(FloatLiteral)
+    AST_DUMPABLE()
 
-    float value;
+    FloatLiteral(float value) : Literal(Primitive::FLOAT), m_value { value } {}
+
+    auto value() const { return m_value; }
+
+   private:
+    float m_value;
 };

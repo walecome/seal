@@ -2,8 +2,13 @@
 
 #include "Expression.hh"
 
-struct Literal : public Expression {
+class Literal : public Expression {
     using Expression::Expression;
-    virtual std::string name() const override { return "Literal"; }
+
+    MAKE_NONMOVABLE(Literal)
+    MAKE_NONCOPYABLE(Literal)
+
+    AST_NODE_NAME(Literal)
+
     virtual void analyze(Scope *) override {};
 };

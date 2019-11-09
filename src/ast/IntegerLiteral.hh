@@ -3,9 +3,18 @@
 #include "Literal.hh"
 #include "Token.hh"
 
-struct IntegerLiteral : public Literal {
-    IntegerLiteral(int value) : Literal(Primitive::INT), value { value } {}
-    virtual std::string name() const override { return "IntegerLiteral"; }
-    virtual std::string dump(unsigned indent) const override;
-    int value;
+class IntegerLiteral : public Literal {
+    MAKE_NONMOVABLE(IntegerLiteral)
+    MAKE_NONCOPYABLE(IntegerLiteral)
+
+    AST_NODE_NAME(IntegerLiteral)
+    AST_DUMPABLE()
+
+    const auto& value() const { return m_value; }
+
+   public:
+    IntegerLiteral(int value) : Literal(Primitive::INT), m_value { value } {}
+
+   private:
+    int m_value;
 };

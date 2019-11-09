@@ -37,7 +37,9 @@ static std::unordered_map<std::string_view, OperatorSym> string_to_op_sym {
     { "++", OperatorSym::INC },    { "--", OperatorSym::DEC }
 };
 
-struct Operator : public Node {
+class Operator : public Node {
+    MAKE_DEFAULT_CONSTRUCTABLE(Operator)
+
     Operator(const Token &token)
         : token { token }, operator_symbol { string_to_op_sym[token.value] } {}
 

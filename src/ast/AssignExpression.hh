@@ -2,9 +2,13 @@
 
 #include "BinaryExpression.hh"
 
-struct AssignExpression : public BinaryExpression {
-    using BinaryExpression::BinaryExpression;
-    virtual std::string name() const override { return "AssignExpression"; }
+class AssignExpression : public BinaryExpression {
+    MAKE_NONMOVABLE(AssignExpression)
+    MAKE_NONCOPYABLE(AssignExpression)
 
-    virtual void analyze(Scope *scope) override;
+    AST_NODE_NAME(AssignExpression)
+    AST_ANALYZABLE()
+
+   public:
+    using BinaryExpression::BinaryExpression;
 };

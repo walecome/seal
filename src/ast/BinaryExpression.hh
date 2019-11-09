@@ -2,19 +2,27 @@
 
 #include "Expression.hh"
 
-struct BinaryExpression : public Expression {
-    BinaryExpression(ptr_t<Expression> &left, ptr_t<Operator> &op,
-                     ptr_t<Expression> &right)
-        : left { std::move(left) },
-          op { std::move(op) },
-          right { std::move(right) } {}
+class BinaryExpression : public Expression {
+    MAKE_NONMOVABLE(BinaryExpression)
+    MAKE_NONCOPYABLE(BinaryExpression)
 
-    virtual std::string name() const override { return "BinaryExpression"; }
-    virtual std::string dump(unsigned indent) const override;
+    AST_NODE_NAME(BinaryExpression)
+    AST_DUMPABLE()
+    AST_ANALYZABLE()
 
-    virtual void analyze(Scope *scope) override;
+   public:
+    BinaryExpression(ptr_t<Expression>& left, ptr_t<Operator>& op,
+                     ptr_t<Expression>& right)
+        : m_left { std::move(left) },
+          m_operator { std::move(op) },
+          m_right { std::move(right) } {}
 
-    ptr_t<Expression> left;
-    ptr_t<Operator> op;
-    ptr_t<Expression> right;
+    const auto& left() const { return m_left; }
+    const auto& op() const { return m_operator; }
+    const auto& right() const { return m_right; }
+
+   protected:
+    ptr_t<Expression> m_left;
+    ptr_t<Operator> m_operator;
+    ptr_t<Expression> m_right;
 };

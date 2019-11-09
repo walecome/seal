@@ -3,14 +3,20 @@
 #include "Expression.hh"
 #include "Statement.hh"
 
-struct ReturnStatement : public Statement {
-    ReturnStatement(ptr_t<Expression> &return_value)
-        : return_value { std::move(return_value) } {}
+class ReturnStatement : public Statement {
+    MAKE_NONMOVABLE(ReturnStatement)
+    MAKE_NONCOPYABLE(ReturnStatement)
 
-    virtual std::string name() const override { return "ReturnStatement"; }
-    virtual std::string dump(unsigned indent) const override;
+    AST_NODE_NAME(ReturnStatement)
+    AST_DUMPABLE()
+    AST_ANALYZABLE()
 
-    virtual void analyze(Scope *scope) override;
+   public:
+    ReturnStatement(ptr_t<Expression>& return_value)
+        : m_return_value { std::move(return_value) } {}
 
-    ptr_t<Expression> return_value;
+    const auto& return_value() const { return m_return_value; }
+
+   private:
+    ptr_t<Expression> m_return_value;
 };

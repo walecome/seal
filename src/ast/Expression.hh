@@ -7,15 +7,24 @@
 #include <queue>
 #include <stack>
 
-struct Expression : public Statement {
-    Expression() = default;
-    Expression(Type type) : type { type } {}
+class Expression : public Statement {
+    MAKE_DEFAULT_CONSTRUCTABLE(Expression)
+    MAKE_NONMOVABLE(Expression)
+    MAKE_NONCOPYABLE(Expression)
 
-    virtual std::string name() const override { return "Expression"; }
+    AST_NODE_NAME(Expression)
+
+   public:
+    Expression(Type type) : m_type { type } {}
 
     virtual void analyze(Scope *) override {
         throw std::runtime_error("Analysis of pure expression not allowed");
     };
 
-    Type type {};
+    void set_primitive(const Primitive primitive);
+
+    const auto &type() const { return m_type; }
+
+   protected:
+    Type m_type {};
 };

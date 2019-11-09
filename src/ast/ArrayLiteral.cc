@@ -1,36 +1,36 @@
 #include "ArrayLiteral.hh"
 
 void ArrayLiteral::add_expression(ptr_t<Expression> &expression) {
-    expressions.push_back(std::move(expression));
+    m_expressions.push_back(std::move(expression));
 }
 
 void ArrayLiteral::analyze(Scope *scope) {
-    type.kind = Kind::ARRAY;
+    m_type.change_kind(Kind::ARRAY);
 
-    if (expressions.empty()) {
-        type.primitive = Primitive::DONT_CARE;
+    if (m_expressions.empty()) {
+        m_type.change_primitive(Primitive::DONT_CARE);
         return;
     }
 
-    expressions.front()->analyze(scope);
-    Type first = expressions.front()->type;
+    m_expressions.front()->analyze(scope);
+    Type first = m_expressions.front()->type();
 
-    for (unsigned i = 1; i < expressions.size(); ++i) {
-        auto &current = expressions.at(i);
+    for (unsigned i = 1; i < m_expressions.size(); ++i) {
+        auto &current = m_expressions.at(i);
         current->analyze(scope);
-        if (current->type != first) {
+        if (current->type() != first) {
             throw std::runtime_error("Mismatched types in array literal");
         }
     }
 
-    type.primitive = first.primitive;
+    m_type.change_primitive(first.primitive());
 }
 
 std::string ArrayLiteral::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << name() << " [" << std::endl;
 
-    for (auto &x : expressions) {
+    for (auto &x : m_expressions) {
         oss << x->dump(indent + 1) << std::endl;
     }
 

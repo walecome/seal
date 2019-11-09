@@ -4,15 +4,22 @@
 #include "Expression.hh"
 #include "Statement.hh"
 
-struct While : public Statement {
-    While(ptr_t<Expression> &condition, ptr_t<Block> &body)
-        : condition { std::move(condition) }, body { std::move(body) } {}
+class While : public Statement {
+    MAKE_NONMOVABLE(While)
+    MAKE_NONCOPYABLE(While)
 
-    virtual std::string name() const override { return "While"; }
-    virtual std::string dump(unsigned indent) const override;
+    AST_NODE_NAME(While)
+    AST_ANALYZABLE()
+    AST_DUMPABLE()
 
-    virtual void analyze(Scope *scope) override;
+   public:
+    While(ptr_t<Expression>& condition, ptr_t<Block>& body)
+        : m_condition { std::move(condition) }, m_body { std::move(body) } {}
 
-    ptr_t<Expression> condition;
-    ptr_t<Block> body;
+    const auto& condition() const { return m_condition; }
+    const auto& body() const { return m_body; }
+
+   private:
+    ptr_t<Expression> m_condition;
+    ptr_t<Block> m_body;
 };

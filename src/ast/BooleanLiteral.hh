@@ -3,11 +3,18 @@
 #include "Literal.hh"
 #include "Token.hh"
 
-struct BooleanLiteral : public Literal {
-    BooleanLiteral(bool value) : Literal(Primitive::BOOL), value { value } {}
+class BooleanLiteral : public Literal {
+    MAKE_NONMOVABLE(BooleanLiteral)
+    MAKE_NONCOPYABLE(BooleanLiteral)
 
-    virtual std::string name() const override { return "BooleanLiteral"; }
-    virtual std::string dump(unsigned indent) const override;
+    AST_NODE_NAME(BooleanLiteral)
+    AST_DUMPABLE()
 
-    bool value;
+   public:
+    BooleanLiteral(bool value) : Literal(Primitive::BOOL), m_value { value } {}
+
+    auto value() const { return m_value; }
+
+   private:
+    bool m_value;
 };

@@ -5,27 +5,36 @@
 #include "Token.hh"
 #include "Type.hh"
 
-struct VariableDecl : public Decl {
+class VariableDecl : public Decl {
+    MAKE_NONMOVABLE(VariableDecl)
+    MAKE_NONCOPYABLE(VariableDecl)
+
+    AST_NODE_NAME(VariableDecl)
+    AST_DUMPABLE()
+    AST_ANALYZABLE()
+
+   public:
     VariableDecl(const Token identifier, const Type type,
                  ptr_t<Expression> &value, bool is_mutable)
-        : identifier { identifier },
-          type { type },
-          value { std::move(value) },
-          is_mutable { is_mutable } {}
+        : m_identifier { identifier },
+          m_type { type },
+          m_value { std::move(value) },
+          m_is_mutable { is_mutable } {}
 
     VariableDecl(const Token identifier, const Type type)
-        : identifier { identifier },
-          type { type },
-          value { nullptr },
-          is_mutable { false } {}
+        : m_identifier { identifier },
+          m_type { type },
+          m_value { nullptr },
+          m_is_mutable { false } {}
 
-    virtual std::string name() const override { return "VariableDecl"; }
-    virtual std::string dump(unsigned indent) const override;
+    auto is_mutable() const { return m_is_mutable; }
+    const auto &type() const { return m_type; }
+    const auto &identifier() const { return m_identifier; }
+    const auto &value() const { return m_value; }
 
-    virtual void analyze(Scope *scope) override;
-
-    const Token identifier;
-    const Type type;
-    ptr_t<Expression> value;
-    bool is_mutable;
+   private:
+    const Token m_identifier;
+    const Type m_type;
+    ptr_t<Expression> m_value;
+    bool m_is_mutable;
 };
