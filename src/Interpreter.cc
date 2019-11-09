@@ -351,8 +351,7 @@ void Interpreter::interpret_while(While* while_statement) {
 }
 
 void Interpreter::enter_block() {
-    auto new_env = std::make_unique<Environment>();
-    new_env->parent = current_env();
+    auto new_env = std::make_unique<Environment>(current_env());
     environments.push(std::move(new_env));
 }
 
@@ -368,7 +367,7 @@ EnvGuard Interpreter::acquire_block() { return EnvGuard(this); }
 void Environment::set_variable(std::string_view ident, expr_value_t data,
                                bool force_local) {
     if (force_local) {
-        variable_data[ident] = data;
+        m_variables[ident] = data;
     } else {
         Environment* variable_env = env_of_variable(ident);
         if (!variable_env) variable_env = this;
@@ -377,11 +376,11 @@ void Environment::set_variable(std::string_view ident, expr_value_t data,
 }
 
 expr_value_t Environment::get_variable(std::string_view ident) const {
-    auto it = variable_data.find(ident);
-    if (it != std::end(variable_data)) {
+    auto it = m_variables.find(ident);
+    if (it != std::end(m_variables)) {
         return it->second;
-    } else if (parent) {
-        return parent->get_variable(ident);
+    } else if (m_parent) {
+        return m_parent->get_variable(ident);
     }
 
     // This should not be able to happen as the typechecker should find
@@ -390,14 +389,14 @@ expr_value_t Environment::get_variable(std::string_view ident) const {
 }
 
 Environment* Environment::env_of_variable(std::string_view ident) const {
-    auto it = variable_data.find(ident);
+    auto it = m_variables.find(ident);
 
-    if (it != std::end(variable_data)) {
+    if (it != std::end(m_variables)) {
         return const_cast<Environment*>(this);
     }
 
-    if (parent) {
-        return parent->env_of_variable(ident);
+    if (m_parent) {
+        return m_parent->env_of_variable(ident);
     }
 
     return nullptr;

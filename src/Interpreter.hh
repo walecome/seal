@@ -39,15 +39,22 @@
 #include "ast/While.hh"
 #include "builtin/BuiltIn.hh"
 
-struct Environment {
-    Environment *parent { nullptr };
+class Environment {
+    MAKE_DEFAULT_CONSTRUCTABLE(Environment)
+    MAKE_NONMOVABLE(Environment)
+    MAKE_NONCOPYABLE(Environment)
+
+   public:
+    Environment(Environment *parent) : m_parent { parent } {}
 
     void set_variable(std::string_view ident, expr_value_t data,
                       bool force_local);
     expr_value_t get_variable(std::string_view ident) const;
     Environment *env_of_variable(std::string_view ident) const;
 
-    std::unordered_map<std::string_view, expr_value_t> variable_data {};
+   private:
+    std::unordered_map<std::string_view, expr_value_t> m_variables {};
+    Environment *m_parent { nullptr };
 };
 
 struct ReturnException : public std::exception {
@@ -62,23 +69,24 @@ struct Interpreter {
 
     void interpret_argument_list(ArgumentList *);
     void interpret_array_literal(ArrayLiteral *);
-    expr_value_t interpret_assign_expr(AssignExpression *);
-    expr_value_t interpret_binary_expr(BinaryExpression *);
     void interpret_block(Block *);
-    expr_value_t interpret_compare_expr(CompareExpression *);
     void interpret_compilation_unit(CompilationUnit *);
-    expr_value_t interpret_expr(Expression *);
-    expr_value_t interpret_equality_expr(EqualityExpression *);
-    expr_value_t interpret_function_call(FunctionCall *);
     void interpret_if_statement(IfStatement *);
-    expr_value_t interpret_literal(Literal *);
     void interpret_return(ReturnStatement *);
     void interpret_statement(Statement *);
     void interpret_type(Type *);
-    expr_value_t interpret_unary_expr(UnaryExpression *);
     void interpret_variable_decl(VariableDecl *);
-    expr_value_t interpret_variable_expr(VariableExpression *);
     void interpret_while(While *);
+
+    expr_value_t interpret_assign_expr(AssignExpression *);
+    expr_value_t interpret_binary_expr(BinaryExpression *);
+    expr_value_t interpret_compare_expr(CompareExpression *);
+    expr_value_t interpret_expr(Expression *);
+    expr_value_t interpret_equality_expr(EqualityExpression *);
+    expr_value_t interpret_function_call(FunctionCall *);
+    expr_value_t interpret_literal(Literal *);
+    expr_value_t interpret_unary_expr(UnaryExpression *);
+    expr_value_t interpret_variable_expr(VariableExpression *);
 
     std::vector<expr_value_t> prepare_expression_values(
         const std::vector<ptr_t<Expression>> &);
