@@ -8,83 +8,74 @@
 
 #include "ast/Type.hh"
 
-#define REFLECT_TOKEN(token) \
-    { (token), #token }
+#define ENUMERATE_TOKENS()          \
+    __ENUMERATE_TOKEN(LPARENS)      \
+    __ENUMERATE_TOKEN(RPARENS)      \
+    __ENUMERATE_TOKEN(LARGPARENS)   \
+    __ENUMERATE_TOKEN(RARGPARENS)   \
+    __ENUMERATE_TOKEN(HASH)         \
+    __ENUMERATE_TOKEN(ARROW)        \
+    __ENUMERATE_TOKEN(LT)           \
+    __ENUMERATE_TOKEN(GT)           \
+    __ENUMERATE_TOKEN(LTEQ)         \
+    __ENUMERATE_TOKEN(GTEQ)         \
+    __ENUMERATE_TOKEN(ASSIGN)       \
+    __ENUMERATE_TOKEN(EQ)           \
+    __ENUMERATE_TOKEN(NOT_EQ)       \
+    __ENUMERATE_TOKEN(SLASH)        \
+    __ENUMERATE_TOKEN(LBRACKET)     \
+    __ENUMERATE_TOKEN(RBRACKET)     \
+    __ENUMERATE_TOKEN(LBRACE)       \
+    __ENUMERATE_TOKEN(RBRACE)       \
+    __ENUMERATE_TOKEN(MINUS)        \
+    __ENUMERATE_TOKEN(PLUS)         \
+    __ENUMERATE_TOKEN(STAR)         \
+    __ENUMERATE_TOKEN(MODULO)       \
+    __ENUMERATE_TOKEN(INC)          \
+    __ENUMERATE_TOKEN(DEC)          \
+    __ENUMERATE_TOKEN(AMP)          \
+    __ENUMERATE_TOKEN(PIPE)         \
+    __ENUMERATE_TOKEN(AMP_AMP)      \
+    __ENUMERATE_TOKEN(PIPE_PIPE)    \
+    __ENUMERATE_TOKEN(COMMA)        \
+    __ENUMERATE_TOKEN(DOT)          \
+    __ENUMERATE_TOKEN(TILDE)        \
+    __ENUMERATE_TOKEN(SINGLE_QUOTE) \
+    __ENUMERATE_TOKEN(DOUBLE_QUOTE) \
+    __ENUMERATE_TOKEN(EXCL)         \
+    __ENUMERATE_TOKEN(QUESTION)     \
+    __ENUMERATE_TOKEN(POWER)        \
+    __ENUMERATE_TOKEN(COLON)        \
+    __ENUMERATE_TOKEN(SEMICOLON)    \
+    __ENUMERATE_TOKEN(IDENTIFIER)   \
+    __ENUMERATE_TOKEN(NUMBER)       \
+    __ENUMERATE_TOKEN(STRING)       \
+    __ENUMERATE_TOKEN(UNEXPECTED)   \
+    __ENUMERATE_TOKEN(FUNC_KEYWORD) \
+    __ENUMERATE_TOKEN(RETURN)       \
+    __ENUMERATE_TOKEN(IF)           \
+    __ENUMERATE_TOKEN(ELSE)         \
+    __ENUMERATE_TOKEN(ELSE_IF)      \
+    __ENUMERATE_TOKEN(WHILE)        \
+    __ENUMERATE_TOKEN(FOR)          \
+    __ENUMERATE_TOKEN(TYPE)         \
+    __ENUMERATE_TOKEN(BOOL)         \
+    __ENUMERATE_TOKEN(FUNC_CALL)    \
+    __ENUMERATE_TOKEN(MUTABLE)
 
 enum TokenType {
-    LPARENS,
-    RPARENS,
-    LARGPARENS,
-    RARGPARENS,
+#undef __ENUMERATE_TOKEN
+#define __ENUMERATE_TOKEN(token) token,
+    ENUMERATE_TOKENS()
+#undef __ENUMERATE_TOKEN
 
-    HASH,
-    ARROW,
+};
 
-    LT,
-    GT,
-    LTEQ,
-    GTEQ,
-    ASSIGN,
-    EQ,
-    NOT_EQ,
-    SLASH,
-
-    LBRACKET,
-    RBRACKET,
-    LBRACE,
-    RBRACE,
-    MINUS,
-    PLUS,
-    STAR,
-    MODULO,
-
-    INC,
-    DEC,
-
-    AMP,
-    PIPE,
-
-    AMP_AMP,
-    PIPE_PIPE,
-
-    COMMA,
-    DOT,
-
-    TILDE,
-
-    SINGLE_QUOTE,
-    DOUBLE_QUOTE,
-
-    EXCL,
-    QUESTION,
-
-    POWER,
-
-    COLON,
-    SEMICOLON,
-
-    IDENTIFIER,
-    NUMBER,
-    STRING,
-
-    UNEXPECTED,
-
-    // Keywords
-    FUNC_KEYWORD,
-    RETURN,
-    IF,
-    ELSE,
-    ELSE_IF,
-    WHILE,
-    FOR,
-
-    // Type
-    TYPE,
-    BOOL,
-
-    // Semantic
-    FUNC_CALL,
-    MUTABLE
+static std::unordered_map<TokenType, std::string_view> token_names {
+#undef __ENUMERATE_TOKEN
+#define __ENUMERATE_TOKEN(token) { token, #token },
+    ENUMERATE_TOKENS()
+#undef __ENUMERATE_TOKEN
 };
 
 static std::unordered_map<std::string_view, TokenType> string_token_map {
@@ -107,34 +98,6 @@ static std::unordered_map<std::string_view, TokenType> keyword_map {
     { "elsif", ELSE_IF },   { "while", WHILE }, { "return", RETURN },
     { "mut", MUTABLE },     { "true", BOOL },   { "false", BOOL },
     { "for", FOR }
-};
-
-static std::unordered_map<TokenType, std::string_view> token_names {
-    REFLECT_TOKEN(AMP_AMP),      REFLECT_TOKEN(AMP),
-    REFLECT_TOKEN(ARROW),        REFLECT_TOKEN(COLON),
-    REFLECT_TOKEN(COMMA),        REFLECT_TOKEN(DOT),
-    REFLECT_TOKEN(DOUBLE_QUOTE), REFLECT_TOKEN(EQ),
-    REFLECT_TOKEN(EXCL),         REFLECT_TOKEN(FUNC_KEYWORD),
-    REFLECT_TOKEN(GT),           REFLECT_TOKEN(GTEQ),
-    REFLECT_TOKEN(HASH),         REFLECT_TOKEN(IDENTIFIER),
-    REFLECT_TOKEN(LBRACE),       REFLECT_TOKEN(LBRACKET),
-    REFLECT_TOKEN(LPARENS),      REFLECT_TOKEN(LT),
-    REFLECT_TOKEN(LTEQ),         REFLECT_TOKEN(MINUS),
-    REFLECT_TOKEN(MODULO),       REFLECT_TOKEN(NUMBER),
-    REFLECT_TOKEN(PIPE_PIPE),    REFLECT_TOKEN(PIPE),
-    REFLECT_TOKEN(PLUS),         REFLECT_TOKEN(POWER),
-    REFLECT_TOKEN(QUESTION),     REFLECT_TOKEN(RBRACE),
-    REFLECT_TOKEN(RBRACKET),     REFLECT_TOKEN(RPARENS),
-    REFLECT_TOKEN(SEMICOLON),    REFLECT_TOKEN(SINGLE_QUOTE),
-    REFLECT_TOKEN(SLASH),        REFLECT_TOKEN(STAR),
-    REFLECT_TOKEN(STRING),       REFLECT_TOKEN(TILDE),
-    REFLECT_TOKEN(TYPE),         REFLECT_TOKEN(UNEXPECTED),
-    REFLECT_TOKEN(FUNC_CALL),    REFLECT_TOKEN(ASSIGN),
-    REFLECT_TOKEN(RETURN),       REFLECT_TOKEN(IF),
-    REFLECT_TOKEN(ELSE),         REFLECT_TOKEN(ELSE_IF),
-    REFLECT_TOKEN(WHILE),        REFLECT_TOKEN(MUTABLE),
-    REFLECT_TOKEN(BOOL),         REFLECT_TOKEN(DEC),
-    REFLECT_TOKEN(INC),          REFLECT_TOKEN(FOR)
 };
 
 struct Token {
