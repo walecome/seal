@@ -22,6 +22,16 @@ using expr_value_t = std::variant<int, float, bool, std::string>;
    public:                            \
     c() = default;
 
+#define MAKE_DEFAULT_COPYABLE(c) \
+   public:                       \
+    c(const c&) = default;       \
+    c& operator=(const c&) = default;
+
+#define MAKE_DEFAULT_MOVABLE(c) \
+   public:                      \
+    c(c&&) = default;           \
+    c& operator=(c&&) = default;
+
 #define MAKE_NONCOPYABLE(c) \
    private:                 \
     c(const c&) = delete;   \

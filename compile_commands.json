@@ -131,6 +131,31 @@
 },
 {
   "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/ir/Generate.cc.o -c /home/alexander/projects/compiler/src/ir/Generate.cc",
+  "file": "/home/alexander/projects/compiler/src/ir/Generate.cc"
+},
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/ir/Operand.cc.o -c /home/alexander/projects/compiler/src/ir/Operand.cc",
+  "file": "/home/alexander/projects/compiler/src/ir/Operand.cc"
+},
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/ir/IrFunction.cc.o -c /home/alexander/projects/compiler/src/ir/IrFunction.cc",
+  "file": "/home/alexander/projects/compiler/src/ir/IrFunction.cc"
+},
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/ir/IrProgram.cc.o -c /home/alexander/projects/compiler/src/ir/IrProgram.cc",
+  "file": "/home/alexander/projects/compiler/src/ir/IrProgram.cc"
+},
+{
+  "directory": "/home/alexander/projects/compiler/build",
+  "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/ir/Quad.cc.o -c /home/alexander/projects/compiler/src/ir/Quad.cc",
+  "file": "/home/alexander/projects/compiler/src/ir/Quad.cc"
+},
+{
+  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/Error.cc.o -c /home/alexander/projects/compiler/src/Error.cc",
   "file": "/home/alexander/projects/compiler/src/Error.cc"
 },

@@ -32,6 +32,12 @@ set(PROJECT_SOURCES
     src/builtin/BuiltIn.cc
     src/builtin/Print.cc
 
+    src/ir/Generate.cc
+    src/ir/Operand.cc
+    src/ir/IrFunction.cc
+    src/ir/IrProgram.cc
+    src/ir/Quad.cc
+
     src/Error.cc
     src/Interpreter.cc
     src/Lexer.cc
@@ -89,7 +95,15 @@ set(PROJECT_HEADERS
     src/ast/For.hh
     
     src/builtin/BuiltIn.hh
-    
+
+    src/ir/Generate.hh
+    src/ir/IrFunction.hh
+    src/ir/IrProgram.hh
+    src/ir/OPCode.hh
+    src/ir/Operand.hh
+    src/ir/OperandType.hh
+    src/ir/Quad.hh
+
     src/Constants.hh
     src/Error.hh
     src/Interpreter.hh
