@@ -17,7 +17,8 @@ class ParameterList : public Node {
    public:
     void add_parameter(ptr_t<VariableDecl> &parameter);
 
-    const auto &parameters() const { return m_parameters; }
+    size_t nr_params() const { return m_parameters.size(); }
+    auto parameter_at(unsigned i) const { return m_parameters.at(i).get(); }
 
    private:
     std::vector<ptr_t<VariableDecl>> m_parameters {};

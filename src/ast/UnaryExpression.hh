@@ -15,8 +15,8 @@ class UnaryExpression : public Expression {
         : m_operator { std::move(op) },
           m_expression { std::move(expression) } {}
 
-    const auto &op() const { return m_operator; }
-    const auto &expression() const { return m_expression; }
+    auto op() const { return m_operator.get(); }
+    auto expression() const { return m_expression.get(); }
 
    private:
     ptr_t<Operator> m_operator;

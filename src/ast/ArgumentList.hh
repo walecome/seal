@@ -14,11 +14,19 @@ class ArgumentList : public Node {
     AST_DUMPABLE()
     AST_ANALYZABLE()
 
-    void add_argument(ptr_t<Expression> &expression);
-    const auto &arguments() const { return m_arguments; }
+    void add_argument(ptr_t<Expression>& expression);
 
+    size_t nr_args() const { return m_arguments.size(); }
+    auto argument_at(unsigned i) const { return m_arguments.at(i).get(); }
+    const auto& arguments() const { return m_arguments; }
+
+    // @TODO: Check why this cannot be in the source file...
     template <typename Function>
-    void for_each_argument(Function f) const;
+    void for_each_argument(Function callback) const {
+        for (auto& argument : m_arguments) {
+            callback(argument.get());
+        }
+    }
 
    private:
     std::vector<ptr_t<Expression>> m_arguments {};

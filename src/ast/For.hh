@@ -22,6 +22,13 @@ class For : public Statement {
     virtual void analyze(Scope *scope) override;
     virtual std::string dump(unsigned indent) const override;
 
+    auto initial_expression() const { return m_initial_expression.get(); }
+    auto stop_condition() const { return m_stop_condition.get(); }
+    auto per_iteration_expression() const {
+        return m_per_iteration_expression.get();
+    }
+    auto body() const { return m_body.get(); }
+
    private:
     // This should be something else than a variable declaration
     ptr_t<VariableDecl> m_initial_expression;

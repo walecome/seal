@@ -20,7 +20,7 @@ class FunctionCall : public Expression {
           m_argument_list { std::move(argument_list) } {}
 
     const auto& identifier() const { return m_identifier; }
-    const auto& argument_list() const { return m_argument_list; }
+    auto argument_list() const { return m_argument_list.get(); }
 
    private:
     const Token m_identifier;

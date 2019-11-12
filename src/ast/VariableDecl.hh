@@ -30,7 +30,7 @@ class VariableDecl : public Decl {
     auto is_mutable() const { return m_is_mutable; }
     const auto &type() const { return m_type; }
     const auto &identifier() const { return m_identifier; }
-    const auto &value() const { return m_value; }
+    auto value() const { return m_value.get(); }
 
    private:
     const Token m_identifier;

@@ -22,8 +22,7 @@ void FunctionCall::analyze(Scope *scope) {
 
     m_type = decl->type();
 
-    if (decl->parameter_list()->parameters().size() !=
-        m_argument_list->arguments().size()) {
+    if (decl->parameter_list()->nr_params() != m_argument_list->nr_args()) {
         error::add_semantic_error(
             "Function call argument list length does not match declaration",
             source_ref);
@@ -33,9 +32,9 @@ void FunctionCall::analyze(Scope *scope) {
     // Resolves the type for the arguments
     m_argument_list->analyze(scope);
 
-    for (unsigned i = 0; i < m_argument_list->arguments().size(); ++i) {
-        const auto &arg = m_argument_list->arguments().at(i);
-        const auto &param = decl->parameter_list()->parameters().at(i);
+    for (unsigned i = 0; i < m_argument_list->nr_args(); ++i) {
+        const auto &arg = m_argument_list->argument_at(i);
+        const auto &param = decl->parameter_list()->parameter_at(i);
 
         if (arg->type() != param->type()) {
             error::mismatched_type(arg->type(), param->type(), source_ref);

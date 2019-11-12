@@ -32,11 +32,11 @@ void Generate::gen_block(const Block *block) {
 }
 
 void Generate::gen_function_decl(const FunctionDecl *function_decl) {
-    gen_block(function_decl->body().get());
+    gen_block(function_decl->body());
 }
 
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
-    auto value = gen_expression(variable_decl->value().get());
+    auto value = gen_expression(variable_decl->value());
 
     // auto var = Operand::create_variable(
     //     // @FIXME: What is the Type?
@@ -69,7 +69,7 @@ void Generate::gen_statement(const Statement *statement) {
 }
 
 void Generate::gen_if_statement(const IfStatement *if_statement) {
-    auto condition = gen_expression(if_statement->condition().get());
+    auto condition = gen_expression(if_statement->condition());
 
     ASSERT_NOT_REACHED();
 }
@@ -84,8 +84,8 @@ Operand Generate::gen_expression(const Expression *expression) {
 }
 
 void Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
-    auto right = gen_expression(bin_expr->right().get());
-    auto left = gen_expression(bin_expr->left().get());
+    auto right = gen_expression(bin_expr->right());
+    auto left = gen_expression(bin_expr->left());
 
     auto var = m_ir_function->create_variable();
 

@@ -24,8 +24,8 @@ class FunctionDecl : public Node {
           m_type { type } {}
 
     const auto &identifier() const { return m_identifier; }
-    const auto &parameter_list() const { return m_parameter_list; }
-    const auto &body() const { return m_body; }
+    auto parameter_list() const { return m_parameter_list.get(); }
+    auto body() const { return m_body.get(); }
     const auto &type() const { return m_type; }
 
    private:

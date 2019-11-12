@@ -17,10 +17,9 @@ class BinaryExpression : public Expression {
           m_operator { std::move(op) },
           m_right { std::move(right) } {}
 
-    // These should probably return the raw pointers instead
-    const auto& left() const { return m_left; }
-    const auto& op() const { return m_operator; }
-    const auto& right() const { return m_right; }
+    auto left() const { return m_left.get(); }
+    auto op() const { return m_operator.get(); }
+    auto right() const { return m_right.get(); }
 
    protected:
     ptr_t<Expression> m_left;

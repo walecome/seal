@@ -16,8 +16,8 @@ class While : public Statement {
     While(ptr_t<Expression>& condition, ptr_t<Block>& body)
         : m_condition { std::move(condition) }, m_body { std::move(body) } {}
 
-    const auto& condition() const { return m_condition; }
-    const auto& body() const { return m_body; }
+    auto condition() const { return m_condition.get(); }
+    auto body() const { return m_body.get(); }
 
    private:
     ptr_t<Expression> m_condition;

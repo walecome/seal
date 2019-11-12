@@ -1,24 +1,20 @@
 #include "Interpreter.hh"
 
 void Interpreter::interpret_argument_list(ArgumentList* arg_list) {
-    for (auto& argument : arg_list->arguments()) {
-        interpret_expr(argument.get());
-    }
+    arg_list->for_each_argument([this](auto arg) { interpret_expr(arg); });
 }
 
 // @TODO
 void Interpreter::interpret_array_literal(ArrayLiteral* array_literal) {
     ASSERT_NOT_REACHED();
-    for (auto& expr : array_literal->expressions()) {
-        interpret_expr(expr.get());
-    }
+    array_literal->for_each_element(
+        [this](auto element) { interpret_expr(element); });
 }
 
 expr_value_t Interpreter::interpret_assign_expr(AssignExpression* expr) {
-    expr_value_t value = interpret_expr(expr->right().get());
-    auto identifier = dynamic_cast<VariableExpression*>(expr->left().get())
-                          ->identifier()
-                          .value;
+    expr_value_t value = interpret_expr(expr->right());
+    auto identifier =
+        dynamic_cast<VariableExpression*>(expr->left())->identifier().value;
     current_env()->set_variable(identifier, value, false);
 
     return value;
@@ -59,8 +55,8 @@ std::string bin_op(const std::string& left, const std::string& right,
 
 // Operators other than +, -, * and / should be matched by the other functions
 expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
-    expr_value_t left_value = interpret_expr(expr->left().get());
-    expr_value_t right_value = interpret_expr(expr->right().get());
+    expr_value_t left_value = interpret_expr(expr->left());
+    expr_value_t right_value = interpret_expr(expr->right());
 
     ASSERT(right_value.index() == left_value.index());
 
@@ -93,8 +89,8 @@ void Interpreter::interpret_block(Block*) {
 }
 
 expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
-    expr_value_t right_value = interpret_expr(expr->right().get());
-    expr_value_t left_value = interpret_expr(expr->left().get());
+    expr_value_t right_value = interpret_expr(expr->right());
+    expr_value_t left_value = interpret_expr(expr->left());
 
     switch (expr->op()->symbol()) {
         case OperatorSym::GT:
@@ -124,7 +120,7 @@ void Interpreter::interpret_compilation_unit(CompilationUnit* unit) {
         }
     }
     try {
-        interpret_block(main->body().get());
+        interpret_block(main->body());
         std::cout << "Function main finished without a status" << std::endl;
     } catch (const ReturnException& ret) {
         std::cout << "Function main finished with status: "
@@ -159,8 +155,8 @@ expr_value_t Interpreter::interpret_expr(Expression* expr) {
 }
 
 expr_value_t Interpreter::interpret_equality_expr(EqualityExpression* expr) {
-    expr_value_t right_value = interpret_expr(expr->right().get());
-    expr_value_t left_value = interpret_expr(expr->left().get());
+    expr_value_t right_value = interpret_expr(expr->right());
+    expr_value_t left_value = interpret_expr(expr->left());
 
     if (expr->op()->symbol() == OperatorSym::EQ) {
         return right_value == left_value;
@@ -221,23 +217,24 @@ expr_value_t Interpreter::interpret_function_call(FunctionCall* function_call) {
     if (BuiltIn::is_builtin(ident)) {
         BuiltIn::dispatch_builtin_function(
             ident, prepare_expression_values(
-                       function_call->argument_list().get()->arguments()));
+                       function_call->argument_list()->arguments()));
         return 0;
     }
 
     auto func = function_scope->get_function(function_call->identifier().value);
-    auto& arguments = function_call->argument_list()->arguments();
-    for (unsigned i = 0; i < arguments.size(); ++i) {
-        expr_value_t value = interpret_expr(arguments.at(i).get());
+    auto arg_list = function_call->argument_list();
+
+    for (unsigned i = 0; i < arg_list->nr_args(); ++i) {
+        expr_value_t value = interpret_expr(arg_list->argument_at(i));
         std::string_view ident =
-            func->parameter_list()->parameters().at(i)->identifier().value;
+            func->parameter_list()->parameter_at(i)->identifier().value;
         current_env()->set_variable(ident, value, true);
     }
 
     expr_value_t value;
 
     try {
-        interpret_block(func->body().get());
+        interpret_block(func->body());
         if (func->type().primitive() != Primitive::VOID) {
             ASSERT_NOT_REACHED();
         }
@@ -259,13 +256,12 @@ bool is_truthy(expr_value_t value) {
 }
 
 void Interpreter::interpret_if_statement(IfStatement* if_statement) {
-    expr_value_t condition_value =
-        interpret_expr(if_statement->condition().get());
+    expr_value_t condition_value = interpret_expr(if_statement->condition());
 
     if (is_truthy(condition_value)) {
-        interpret_block(if_statement->if_body().get());
+        interpret_block(if_statement->if_body());
     } else if (if_statement->else_body()) {
-        interpret_block(if_statement->else_body().get());
+        interpret_block(if_statement->else_body());
     }
 }
 
@@ -291,7 +287,7 @@ expr_value_t Interpreter::interpret_literal(Literal* literal) {
 
 void Interpreter::interpret_return(ReturnStatement* ret) {
     // Unwind stack to caller
-    throw ReturnException(interpret_expr(ret->return_value().get()));
+    throw ReturnException(interpret_expr(ret->return_value()));
 }
 
 void Interpreter::interpret_statement(Statement* statement) {
@@ -315,7 +311,7 @@ void Interpreter::interpret_statement(Statement* statement) {
 void Interpreter::interpret_type(Type*) { ASSERT_NOT_REACHED(); }
 
 expr_value_t Interpreter::interpret_unary_expr(UnaryExpression* expr) {
-    expr_value_t value = interpret_expr(expr->expression().get());
+    expr_value_t value = interpret_expr(expr->expression());
 
     if (expr->op()->symbol() == OperatorSym::MINUS) {
         if (std::holds_alternative<int>(value)) {
@@ -332,7 +328,7 @@ expr_value_t Interpreter::interpret_unary_expr(UnaryExpression* expr) {
 
 void Interpreter::interpret_variable_decl(VariableDecl* var_decl) {
     current_env()->set_variable(var_decl->identifier().value,
-                                interpret_expr(var_decl->value().get()), true);
+                                interpret_expr(var_decl->value()), true);
 }
 
 expr_value_t Interpreter::interpret_variable_expr(VariableExpression* expr) {
@@ -340,12 +336,11 @@ expr_value_t Interpreter::interpret_variable_expr(VariableExpression* expr) {
 }
 
 void Interpreter::interpret_while(While* while_statement) {
-    expr_value_t condition_value =
-        interpret_expr(while_statement->condition().get());
+    expr_value_t condition_value = interpret_expr(while_statement->condition());
 
     while (is_truthy(condition_value)) {
-        interpret_block(while_statement->body().get());
-        condition_value = interpret_expr(while_statement->condition().get());
+        interpret_block(while_statement->body());
+        condition_value = interpret_expr(while_statement->condition());
     }
 }
 

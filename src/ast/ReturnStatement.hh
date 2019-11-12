@@ -15,7 +15,7 @@ class ReturnStatement : public Statement {
     ReturnStatement(ptr_t<Expression>& return_value)
         : m_return_value { std::move(return_value) } {}
 
-    const auto& return_value() const { return m_return_value; }
+    auto return_value() const { return m_return_value.get(); }
 
    private:
     ptr_t<Expression> m_return_value;

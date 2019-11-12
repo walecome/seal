@@ -12,8 +12,8 @@ void AssignExpression::analyze(Scope* scope) {
     if (variable_expr) {
         ;
     } else if (index_expr) {
-        variable_expr = dynamic_cast<VariableExpression*>(
-            index_expr->indexed_expression().get());
+        variable_expr =
+            dynamic_cast<VariableExpression*>(index_expr->indexed_expression());
 
     } else {
         error::add_semantic_error("Left of assign is not variable", source_ref);

@@ -16,7 +16,7 @@ class IndexExpression : public Expression {
         : m_indexed_expression { std::move(indexed_expression) },
           m_index { std::move(index) } {}
 
-    const auto &indexed_expression() const { return m_indexed_expression; }
+    auto indexed_expression() const { return m_indexed_expression.get(); }
 
    private:
     ptr_t<Expression> m_indexed_expression;
