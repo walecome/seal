@@ -16,14 +16,11 @@ union OperandData {
 };
 
 class Operand {
-    MAKE_DEFAULT_CONSTRUCTABLE(Operand)
-
    public:
-    static Operand create_immediate(const OperandType&& type,
-                                    unsigned long value);
-    static Operand create_label(const std::string&& name);
-    static Operand create_variable(const OperandType&& type,
-                                   const std::string&& name);
+    Operand() : m_kind {}, m_data {}, used { false } {}
+
+    OperandKind& kind() { return m_kind; }
+    OperandData& data() { return m_data; }
 
     bool is_immediate() const;
     bool is_label() const;
@@ -33,6 +30,7 @@ class Operand {
 
    private:
     OperandKind m_kind;
-    OperandType m_type;
     OperandData m_data;
+
+    bool used;
 };

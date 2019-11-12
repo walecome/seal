@@ -11,6 +11,6 @@ static std::string_view from_sym(OperatorSym op_sym) {
 std::string Operator::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << "{" << name() << ", "
-        << from_sym(operator_symbol) << "}";
+        << from_sym(m_operator_symbol) << "}";
     return oss.str();
 }

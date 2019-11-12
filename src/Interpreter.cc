@@ -66,20 +66,19 @@ expr_value_t Interpreter::interpret_binary_expr(BinaryExpression* expr) {
 
     if (std::holds_alternative<int>(right_value)) {
         return bin_op(std::get<int>(left_value), std::get<int>(right_value),
-                      expr->op()->operator_symbol);
+                      expr->op()->symbol());
     }
     if (std::holds_alternative<float>(right_value)) {
         return bin_op(std::get<float>(left_value), std::get<float>(right_value),
-                      expr->op()->operator_symbol);
+                      expr->op()->symbol());
     }
     if (std::holds_alternative<std::string>(right_value)) {
         return bin_op(std::get<std::string>(left_value),
-                      std::get<std::string>(right_value),
-                      expr->op()->operator_symbol);
+                      std::get<std::string>(right_value), expr->op()->symbol());
     }
     if (std::holds_alternative<bool>(right_value)) {
         return bin_op(std::get<bool>(left_value), std::get<bool>(right_value),
-                      expr->op()->operator_symbol);
+                      expr->op()->symbol());
     }
 
     ASSERT_NOT_REACHED();
@@ -97,7 +96,7 @@ expr_value_t Interpreter::interpret_compare_expr(CompareExpression* expr) {
     expr_value_t right_value = interpret_expr(expr->right().get());
     expr_value_t left_value = interpret_expr(expr->left().get());
 
-    switch (expr->op()->operator_symbol) {
+    switch (expr->op()->symbol()) {
         case OperatorSym::GT:
             return left_value > right_value;
             break;
@@ -163,9 +162,9 @@ expr_value_t Interpreter::interpret_equality_expr(EqualityExpression* expr) {
     expr_value_t right_value = interpret_expr(expr->right().get());
     expr_value_t left_value = interpret_expr(expr->left().get());
 
-    if (expr->op()->operator_symbol == OperatorSym::EQ) {
+    if (expr->op()->symbol() == OperatorSym::EQ) {
         return right_value == left_value;
-    } else if (expr->op()->operator_symbol == OperatorSym::NOT_EQ) {
+    } else if (expr->op()->symbol() == OperatorSym::NOT_EQ) {
         return right_value != left_value;
     }
 
@@ -318,7 +317,7 @@ void Interpreter::interpret_type(Type*) { ASSERT_NOT_REACHED(); }
 expr_value_t Interpreter::interpret_unary_expr(UnaryExpression* expr) {
     expr_value_t value = interpret_expr(expr->expression().get());
 
-    if (expr->op()->operator_symbol == OperatorSym::MINUS) {
+    if (expr->op()->symbol() == OperatorSym::MINUS) {
         if (std::holds_alternative<int>(value)) {
             return -std::get<int>(value);
         } else if (std::holds_alternative<float>(value)) {

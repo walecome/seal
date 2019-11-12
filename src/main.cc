@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
     sptr_t<std::string> source = util::read_source(source_file);
     Lexer lexer { *source };
 
-    long lexer_duration = measure_time([&]() { lexer.read_all(); });
+    long lexer_duration = measure_time([&] { lexer.read_all(); });
 
     if (verbose) {
         lexer.get_tokens().print_tokens();
@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
     Parser parser {};
 
     long parser_duration =
-        measure_time([&]() { parser.parse(lexer.get_tokens()); });
+        measure_time([&] { parser.parse(lexer.get_tokens()); });
 
     if (verbose) {
         std::cout << "Parsing took " << parser_duration << " milliseconds"
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     }
 
     long semantic_duration = measure_time(
-        [&]() { parser.compilation_unit->analyze(program_scope.get()); });
+        [&] { parser.compilation_unit->analyze(program_scope.get()); });
     error::report_semantic_errors();
 
     if (verbose) {

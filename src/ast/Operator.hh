@@ -41,21 +41,18 @@ class Operator : public Node {
     MAKE_DEFAULT_CONSTRUCTABLE(Operator)
 
     Operator(const Token &token)
-        : token { token }, operator_symbol { string_to_op_sym[token.value] } {}
+        : m_operator_symbol { string_to_op_sym[token.value] } {}
 
     static bool is_operator(const Token &token) {
         return string_to_op_sym.find(token.value) != std::end(string_to_op_sym);
     }
 
-    bool is_right_associative() const;
-    bool is_left_associative() const;
-
     virtual void analyze(Scope *) override {}
-
     virtual std::string name() const override { return "Operator"; }
-
     virtual std::string dump(unsigned indent) const override;
 
-    const Token token;
-    OperatorSym operator_symbol;
+    OperatorSym symbol() const { return m_operator_symbol; }
+
+   private:
+    OperatorSym m_operator_symbol;
 };
