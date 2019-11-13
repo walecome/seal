@@ -87,11 +87,42 @@ void Generate::gen_if_statement(const IfStatement *if_statement) {
     }
 }
 
-void Generate::gen_while(const While *while_statement) {}
+void Generate::gen_while(const While *while_statement) {
+    auto condition_label = env()->create_label();
+    env()->queue_label(condition_label);
+    auto condition = gen_expression(while_statement->condition());
+
+    auto end_label = env()->create_label();
+    env()->add_quad(OPCode::JMP_NZ, end_label, condition, {});
+
+    gen_block(while_statement->body());
+
+    env()->add_quad(OPCode::JMP, condition_label, {}, {});
+    env()->queue_label(end_label);
+
+    while_statement->body();
+}
+
+void Generate::gen_for(const For *for_statement) {
+    gen_variable_decl(for_statement->initial_expression());
+
+    auto condition_label = env()->create_label();
+    env()->queue_label(condition_label);
+
+    auto end_label = env()->create_label();
+    auto stop_condition = gen_expression(for_statement->stop_condition());
+    env()->add_quad(OPCode::JMP_NZ, end_label, stop_condition, {});
+
+    gen_block(for_statement->body());
+    gen_expression(for_statement->per_iteration_expression());
+    env()->add_quad(OPCode::JMP, condition_label, {}, {});
+
+    env()->queue_label(end_label);
+}
+
 void Generate::gen_return(const ReturnStatement *return_statement) {
     ASSERT_NOT_REACHED();
 }
-void Generate::gen_for(const For *for_statement) { ASSERT_NOT_REACHED(); }
 
 Operand Generate::gen_expression(const Expression *expression) {
     ASSERT_NOT_REACHED();

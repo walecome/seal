@@ -30,12 +30,15 @@ class IrFunction {
     // Binds the queued labels to the given quad. Also clears the label queue.
     void bind_queued_labels(const Quad *quad);
 
+    // Bind the given label to the given quad
+    void bind_label(const Operand &label, const Quad *quad);
+
    private:
+    void dump_quads() const;
+    const auto &quads() const { return m_quads; }
+
     // Bind the given label id to the given quad
     void bind_label(unsigned label_id, const Quad *quad);
-    void dump_quads() const;
-
-    const auto &quads() const { return m_quads; }
 
     std::vector<ptr_t<Quad>> m_quads {};
     std::map<unsigned, const Quad *> m_labels {};

@@ -60,6 +60,12 @@ void IrFunction::bind_queued_labels(const Quad *quad) {
     m_waiting_labels.clear();
 }
 
+void IrFunction::bind_label(const Operand &label, const Quad *quad) {
+    ASSERT(label.kind() == OperandKind::LABEL);
+
+    bind_label(label.data().label_id, quad);
+}
+
 void IrFunction::bind_label(unsigned label_id, const Quad *quad) {
     ASSERT(m_labels.find(label_id) == std::end(m_labels));
 
