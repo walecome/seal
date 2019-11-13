@@ -71,9 +71,23 @@ void Generate::gen_statement(const Statement *statement) {
 void Generate::gen_if_statement(const IfStatement *if_statement) {
     auto condition = gen_expression(if_statement->condition());
 
-    ASSERT_NOT_REACHED();
+    auto else_label = env()->create_label();
+    env()->add_quad(OPCode::JMP_NZ, else_label, condition, {});
+
+    gen_block(if_statement->if_body());
+
+    if (if_statement->else_body()) {
+        auto end_label = env()->create_label();
+        env()->add_quad(OPCode::JMP, end_label, {}, {});
+        env()->queue_label(else_label);
+        gen_block(if_statement->else_body());
+        env()->queue_label(end_label);
+    } else {
+        env()->queue_label(else_label);
+    }
 }
-void Generate::gen_while(const While *while_statement) { ASSERT_NOT_REACHED(); }
+
+void Generate::gen_while(const While *while_statement) {}
 void Generate::gen_return(const ReturnStatement *return_statement) {
     ASSERT_NOT_REACHED();
 }
@@ -91,47 +105,47 @@ void Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
 
     switch (bin_expr->op()->symbol()) {
         case OperatorSym::ASSIGN:
-            m_ir_function->emplace_quad(OPCode::MOVE, left, right, {});
+            m_ir_function->add_quad(OPCode::MOVE, left, right, {});
             break;
 
         case OperatorSym::PLUS:
-            m_ir_function->emplace_quad(OPCode::ADD, var, left, right);
+            m_ir_function->add_quad(OPCode::ADD, var, left, right);
             break;
 
         case OperatorSym::MINUS:
-            m_ir_function->emplace_quad(OPCode::SUB, var, left, right);
+            m_ir_function->add_quad(OPCode::SUB, var, left, right);
             break;
 
         case OperatorSym::MULT:
-            m_ir_function->emplace_quad(OPCode::MULT, var, left, right);
+            m_ir_function->add_quad(OPCode::MULT, var, left, right);
             break;
 
         case OperatorSym::DIV:
-            m_ir_function->emplace_quad(OPCode::DIV, var, left, right);
+            m_ir_function->add_quad(OPCode::DIV, var, left, right);
             break;
 
         case OperatorSym::EQ:
-            m_ir_function->emplace_quad(OPCode::CMP_EQ, var, left, right);
+            m_ir_function->add_quad(OPCode::CMP_EQ, var, left, right);
             break;
 
         case OperatorSym::GT:
-            m_ir_function->emplace_quad(OPCode::CMP_GT, var, left, right);
+            m_ir_function->add_quad(OPCode::CMP_GT, var, left, right);
             break;
 
         case OperatorSym::GTEQ:
-            m_ir_function->emplace_quad(OPCode::CMP_GTEQ, var, left, right);
+            m_ir_function->add_quad(OPCode::CMP_GTEQ, var, left, right);
             break;
 
         case OperatorSym::LT:
-            m_ir_function->emplace_quad(OPCode::CMP_LT, var, left, right);
+            m_ir_function->add_quad(OPCode::CMP_LT, var, left, right);
             break;
 
         case OperatorSym::LTEQ:
-            m_ir_function->emplace_quad(OPCode::CMP_LTEQ, var, left, right);
+            m_ir_function->add_quad(OPCode::CMP_LTEQ, var, left, right);
             break;
 
         case OperatorSym::NOT_EQ:
-            m_ir_function->emplace_quad(OPCode::CMP_NOTEQ, var, left, right);
+            m_ir_function->add_quad(OPCode::CMP_NOTEQ, var, left, right);
             break;
 
         case OperatorSym::MODULO:

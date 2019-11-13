@@ -21,6 +21,7 @@ class Operand {
 
     OperandKind& kind() { return m_kind; }
     OperandData& data() { return m_data; }
+    const OperandData& data() const { return m_data; }
 
     bool is_immediate() const;
     bool is_label() const;

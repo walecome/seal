@@ -44,6 +44,8 @@ class Generate {
 
     void gen_binary_expression(const BinaryExpression*);
 
+    auto env() const { return m_ir_function.get(); }
+
     // Operands
     Operand create_integer_literal(const IntegerLiteral*);
 

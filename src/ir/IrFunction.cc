@@ -37,9 +37,33 @@ Operand IrFunction::create_variable() {
     return operand;
 }
 
-void IrFunction::emplace_quad(OPCode op_code, Operand dest, Operand src_a,
-                              Operand src_b) {
-    m_quads.emplace_back(std::make_unique<Quad>(op_code, dest, src_a, src_b));
+void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
+                          Operand src_b) {
+    auto quad = std::make_unique<Quad>(op_code, dest, src_a, src_b);
+    bind_queued_labels(quad.get());
+    m_quads.push_back(std::move(quad));
+}
+
+void IrFunction::queue_label(const Operand &label) {
+    ASSERT(label.kind() == OperandKind::LABEL);
+
+    m_waiting_labels.push_back(label.data().label_id);
+}
+
+void IrFunction::bind_queued_labels(const Quad *quad) {
+    if (m_waiting_labels.empty()) return;
+
+    for (auto label_id : m_waiting_labels) {
+        bind_label(label_id, quad);
+    }
+
+    m_waiting_labels.clear();
+}
+
+void IrFunction::bind_label(unsigned label_id, const Quad *quad) {
+    ASSERT(m_labels.find(label_id) == std::end(m_labels));
+
+    m_labels.insert({ label_id, quad });
 }
 
 void IrFunction::dump_quads() const {
