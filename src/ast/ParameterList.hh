@@ -15,10 +15,18 @@ class ParameterList : public Node {
     AST_ANALYZABLE()
 
    public:
-    void add_parameter(ptr_t<VariableDecl> &parameter);
+    void add_parameter(ptr_t<VariableDecl>& parameter);
 
     size_t nr_params() const { return m_parameters.size(); }
     auto parameter_at(unsigned i) const { return m_parameters.at(i).get(); }
+
+    // @TODO: Check why this cannot be in the source file...
+    template <typename Function>
+    void for_each_parameter(Function callback) const {
+        for (auto& argument : m_parameters) {
+            callback(argument.get());
+        }
+    }
 
    private:
     std::vector<ptr_t<VariableDecl>> m_parameters {};

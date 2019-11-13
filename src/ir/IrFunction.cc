@@ -51,7 +51,7 @@ void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
 }
 
 void IrFunction::queue_label(const Operand &label) {
-    ASSERT(label.kind() == OperandKind::LABEL);
+    ASSERT(label.is_label());
 
     m_waiting_labels.push_back(label.data().label_id);
 }
@@ -67,7 +67,7 @@ void IrFunction::bind_queued_labels(const Quad *quad) {
 }
 
 void IrFunction::bind_label(const Operand &label, const Quad *quad) {
-    ASSERT(label.kind() == OperandKind::LABEL);
+    ASSERT(label.is_label());
 
     bind_label(label.data().label_id, quad);
 }
@@ -76,6 +76,13 @@ void IrFunction::bind_label(unsigned label_id, const Quad *quad) {
     ASSERT(m_labels.find(label_id) == std::end(m_labels));
 
     m_labels.insert({ label_id, quad });
+}
+
+void IrFunction::bind_variable(const Operand &variable,
+                               const std::string_view var_name) {
+    ASSERT(variable.is_variable());
+
+    m_variable_ref.insert_or_assign(variable.data().variable_id, var_name);
 }
 
 void IrFunction::dump_quads() const {

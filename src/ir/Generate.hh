@@ -16,6 +16,14 @@ class While;
 class ReturnStatement;
 class For;
 class BinaryExpression;
+class FunctionCall;
+class IndexExpression;
+class Literal;
+class UnaryExpression;
+class VariableExpression;
+class AssignExpression;
+class EqualityExpression;
+class CompareExpression;
 
 class IrFunction;
 class FunctionDecl;
@@ -33,7 +41,6 @@ class Generate {
     // Quads
     void gen_block(const Block*);
     void gen_statement(const Statement*);
-    Operand gen_expression(const Expression*);
     void gen_function_decl(const FunctionDecl*);
 
     void gen_variable_decl(const VariableDecl*);
@@ -42,7 +49,16 @@ class Generate {
     void gen_return(const ReturnStatement*);
     void gen_for(const For*);
 
-    void gen_binary_expression(const BinaryExpression*);
+    Operand gen_function_call(const FunctionCall*);
+    Operand gen_expression(const Expression*);
+    Operand gen_binary_expression(const BinaryExpression*);
+    Operand gen_assign_expression(const AssignExpression*);
+    Operand gen_equality_expression(const EqualityExpression*);
+    Operand gen_compare_expression(const CompareExpression*);
+    Operand gen_variable_expression(const VariableExpression*);
+    Operand gen_index_expression(const IndexExpression*);
+    Operand gen_literal(const Literal*);
+    Operand gen_unary_expression(const UnaryExpression*);
 
     auto env() const { return m_ir_function.get(); }
 

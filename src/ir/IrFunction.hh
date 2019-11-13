@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "Constants.hh"
@@ -35,6 +36,10 @@ class IrFunction {
     // Bind the given label to the given quad
     void bind_label(const Operand &label, const Quad *quad);
 
+    // Bind a source code variable name to an IR variable
+    void bind_variable(const Operand &variable,
+                       const std::string_view var_name);
+
    private:
     void dump_quads() const;
     const auto &quads() const { return m_quads; }
@@ -45,4 +50,5 @@ class IrFunction {
     std::vector<ptr_t<Quad>> m_quads {};
     std::map<unsigned, const Quad *> m_labels {};
     std::vector<unsigned> m_waiting_labels {};
+    std::unordered_map<unsigned, std::string_view> m_variable_ref {};
 };
