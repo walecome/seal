@@ -24,6 +24,8 @@ class IrFunction {
     static Operand create_label();
     static Operand create_variable();
 
+    Operand create_and_queue_label();
+
     // Add a label to waiting labels
     void queue_label(const Operand &label);
 

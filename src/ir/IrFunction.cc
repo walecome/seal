@@ -37,6 +37,12 @@ Operand IrFunction::create_variable() {
     return operand;
 }
 
+Operand IrFunction::create_and_queue_label() {
+    auto label = create_label();
+    queue_label(label);
+    return label;
+}
+
 void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
                           Operand src_b) {
     auto quad = std::make_unique<Quad>(op_code, dest, src_a, src_b);

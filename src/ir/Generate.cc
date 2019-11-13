@@ -36,7 +36,7 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
 }
 
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
-    auto value = gen_expression(variable_decl->value());
+    // auto value = gen_expression(variable_decl->value());
 
     // auto var = Operand::create_variable(
     //     // @FIXME: What is the Type?
@@ -88,8 +88,7 @@ void Generate::gen_if_statement(const IfStatement *if_statement) {
 }
 
 void Generate::gen_while(const While *while_statement) {
-    auto condition_label = env()->create_label();
-    env()->queue_label(condition_label);
+    auto condition_label = env()->create_and_queue_label();
     auto condition = gen_expression(while_statement->condition());
 
     auto end_label = env()->create_label();
@@ -106,11 +105,11 @@ void Generate::gen_while(const While *while_statement) {
 void Generate::gen_for(const For *for_statement) {
     gen_variable_decl(for_statement->initial_expression());
 
-    auto condition_label = env()->create_label();
-    env()->queue_label(condition_label);
+    auto condition_label = env()->create_and_queue_label();
+
+    auto stop_condition = gen_expression(for_statement->stop_condition());
 
     auto end_label = env()->create_label();
-    auto stop_condition = gen_expression(for_statement->stop_condition());
     env()->add_quad(OPCode::JMP_NZ, end_label, stop_condition, {});
 
     gen_block(for_statement->body());
