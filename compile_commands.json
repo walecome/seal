@@ -161,11 +161,6 @@
 },
 {
   "directory": "/home/alexander/projects/compiler/build",
-  "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/Interpreter.cc.o -c /home/alexander/projects/compiler/src/Interpreter.cc",
-  "file": "/home/alexander/projects/compiler/src/Interpreter.cc"
-},
-{
-  "directory": "/home/alexander/projects/compiler/build",
   "command": "/usr/bin/clang++   -I/home/alexander/projects/compiler/. -I/home/alexander/projects/compiler/lib/argparse -I/home/alexander/projects/compiler/src -I/home/alexander/projects/compiler/src/ast -I/home/alexander/projects/compiler/src/parse -I/home/alexander/projects/compiler/src/semantic  -g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -fcolor-diagnostics   -o CMakeFiles/compiler.dir/src/Lexer.cc.o -c /home/alexander/projects/compiler/src/Lexer.cc",
   "file": "/home/alexander/projects/compiler/src/Lexer.cc"
 },

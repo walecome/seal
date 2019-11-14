@@ -39,7 +39,7 @@ set(PROJECT_SOURCES
     src/ir/Quad.cc
 
     src/Error.cc
-    src/Interpreter.cc
+    # src/Interpreter.cc
     src/Lexer.cc
     src/main.cc
 
@@ -106,7 +106,7 @@ set(PROJECT_HEADERS
 
     src/Constants.hh
     src/Error.hh
-    src/Interpreter.hh
+    # src/Interpreter.hh
     src/Lexer.hh
     src/parse/Parser.hh
     src/semantic/Scope.hh

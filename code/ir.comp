@@ -1,0 +1,11 @@
+fn main() -> int {
+
+    a : mut int = 3;
+    b : int = 4;
+
+    if (a < b) {
+        a = b;
+    }
+
+    return 0;
+}

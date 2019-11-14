@@ -1,12 +1,16 @@
 #include "Generate.hh"
 #include "IrFunction.hh"
 #include "OperandType.hh"
+#include "ast/ArrayLiteral.hh"
 #include "ast/AssignExpression.hh"
 #include "ast/BinaryExpression.hh"
 #include "ast/Block.hh"
+#include "ast/BooleanLiteral.hh"
 #include "ast/CompareExpression.hh"
+#include "ast/CompilationUnit.hh"
 #include "ast/EqualityExpression.hh"
 #include "ast/Expression.hh"
+#include "ast/FloatLiteral.hh"
 #include "ast/For.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/FunctionDecl.hh"
@@ -15,16 +19,24 @@
 #include "ast/IntegerLiteral.hh"
 #include "ast/Literal.hh"
 #include "ast/ReturnStatement.hh"
+#include "ast/StringLiteral.hh"
 #include "ast/UnaryExpression.hh"
 #include "ast/VariableDecl.hh"
 #include "ast/VariableExpression.hh"
 #include "ast/While.hh"
+#include "ir/IrProgram.hh"
 
-Generate::Generate(const FunctionDecl *declaration)
-    : m_declaration { declaration },
-      m_ir_function { std::make_unique<IrFunction>() } {}
+ptr_t<IrProgram> Generate::generate() {
+    auto ir_program = std::make_unique<IrProgram>();
 
-void Generate::generate() { gen_function_decl(m_declaration); }
+    m_compilation_unit->for_each_function([&](auto function_decl) {
+        m_current_ir_function = std::make_unique<IrFunction>();
+        gen_function_decl(function_decl);
+        ir_program->add_function(m_current_ir_function);
+    });
+
+    return ir_program;
+}
 
 void Generate::gen_block(const Block *block) {
     block->for_each_node([this](Node *node) {
@@ -128,7 +140,8 @@ void Generate::gen_for(const For *for_statement) {
 }
 
 void Generate::gen_return(const ReturnStatement *return_statement) {
-    ASSERT_NOT_REACHED();
+    auto value = gen_expression(return_statement->return_value());
+    env()->add_quad(OPCode::RET, value, {}, {});
 }
 
 Operand Generate::gen_expression(const Expression *expression) {
@@ -139,7 +152,7 @@ Operand Generate::gen_expression(const Expression *expression) {
     } else if (auto ptr = dynamic_cast<const IndexExpression *>(expression)) {
         return gen_index_expression(ptr);
     } else if (auto ptr = dynamic_cast<const Literal *>(expression)) {
-        return gen_literal(ptr);
+        return create_literal(ptr);
     } else if (auto ptr = dynamic_cast<const UnaryExpression *>(expression)) {
         return gen_unary_expression(ptr);
     } else if (auto ptr =
@@ -150,11 +163,78 @@ Operand Generate::gen_expression(const Expression *expression) {
     }
 }
 
-Operand Generate::gen_function_call(const FunctionCall *) {}
+Operand Generate::gen_function_call(const FunctionCall *) {
+    throw std::runtime_error("Not implemented");
+}
 
-Operand Generate::gen_assign_expression(const AssignExpression *) {}
-Operand Generate::gen_equality_expression(const EqualityExpression *) {}
-Operand Generate::gen_compare_expression(const CompareExpression *) {}
+Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
+    ASSERT(assign_expr->op()->symbol() == OperatorSym::ASSIGN);
+
+    auto var = dynamic_cast<VariableExpression *>(assign_expr->left());
+    ASSERT(var != nullptr);
+
+    auto left = gen_variable_expression(var);
+    auto right = gen_expression(assign_expr->right());
+
+    env()->add_quad(OPCode::MOVE, left, right, {});
+
+    // @FIXME: Return what?
+    return left;
+}
+
+Operand Generate::gen_equality_expression(
+    const EqualityExpression *equality_expr) {
+    auto result = env()->create_variable();
+
+    auto left = gen_expression(equality_expr->left());
+    auto right = gen_expression(equality_expr->right());
+
+    switch (equality_expr->op()->symbol()) {
+        case OperatorSym::EQ:
+            env()->add_quad(OPCode::CMP_EQ, result, left, right);
+            break;
+
+        case OperatorSym::NOT_EQ:
+            env()->add_quad(OPCode::CMP_NOTEQ, result, left, right);
+            break;
+
+        default:
+            ASSERT_NOT_REACHED();
+    }
+
+    return result;
+}
+
+Operand Generate::gen_compare_expression(
+    const CompareExpression *compare_expr) {
+    auto result = env()->create_variable();
+
+    auto left = gen_expression(compare_expr->left());
+    auto right = gen_expression(compare_expr->right());
+
+    switch (compare_expr->op()->symbol()) {
+        case OperatorSym::LT:
+            env()->add_quad(OPCode::CMP_LT, result, left, right);
+            break;
+
+        case OperatorSym::LTEQ:
+            env()->add_quad(OPCode::CMP_LTEQ, result, left, right);
+            break;
+
+        case OperatorSym::GT:
+            env()->add_quad(OPCode::CMP_GT, result, left, right);
+            break;
+
+        case OperatorSym::GTEQ:
+            env()->add_quad(OPCode::CMP_GTEQ, result, left, right);
+            break;
+
+        default:
+            ASSERT_NOT_REACHED();
+    }
+
+    return result;
+}
 
 Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
     if (auto ptr = dynamic_cast<const AssignExpression *>(bin_expr)) {
@@ -168,23 +248,23 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
     auto right = gen_expression(bin_expr->right());
     auto left = gen_expression(bin_expr->left());
 
-    auto var = m_ir_function->create_variable();
+    auto var = env()->create_variable();
 
     switch (bin_expr->op()->symbol()) {
         case OperatorSym::PLUS:
-            m_ir_function->add_quad(OPCode::ADD, var, left, right);
+            env()->add_quad(OPCode::ADD, var, left, right);
             break;
 
         case OperatorSym::MINUS:
-            m_ir_function->add_quad(OPCode::SUB, var, left, right);
+            env()->add_quad(OPCode::SUB, var, left, right);
             break;
 
         case OperatorSym::MULT:
-            m_ir_function->add_quad(OPCode::MULT, var, left, right);
+            env()->add_quad(OPCode::MULT, var, left, right);
             break;
 
         case OperatorSym::DIV:
-            m_ir_function->add_quad(OPCode::DIV, var, left, right);
+            env()->add_quad(OPCode::DIV, var, left, right);
             break;
 
         // @TODO: Handle
@@ -202,16 +282,65 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
         default:
             ASSERT_NOT_REACHED();
     }
+
+    return var;
 }
 
-Operand Generate::gen_index_expression(const IndexExpression *) {}
-Operand Generate::gen_literal(const Literal *) {}
-Operand Generate::gen_unary_expression(const UnaryExpression *) {}
-Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {}
+Operand Generate::gen_index_expression(const IndexExpression *) {
+    throw std::runtime_error("Not implemented");
+}
+
+Operand Generate::create_literal(const Literal *literal) {
+    if (auto ptr = dynamic_cast<const ArrayLiteral *>(literal)) {
+        return create_array_literal(ptr);
+    } else if (auto ptr = dynamic_cast<const BooleanLiteral *>(literal)) {
+        return create_boolean_literal(ptr);
+    } else if (auto ptr = dynamic_cast<const FloatLiteral *>(literal)) {
+        return create_float_literal(ptr);
+    } else if (auto ptr = dynamic_cast<const IntegerLiteral *>(literal)) {
+        return create_integer_literal(ptr);
+    } else if (auto ptr = dynamic_cast<const StringLiteral *>(literal)) {
+        return create_string_literal(ptr);
+    } else {
+        ASSERT_NOT_REACHED();
+    }
+}
+Operand Generate::gen_unary_expression(const UnaryExpression *) {
+    throw std::runtime_error("Not implemented");
+}
+
+Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {
+    auto var = env()->create_variable();
+    env()->bind_variable(var, var_expr->identifier().value);
+    return var;
+}
 
 Operand Generate::create_integer_literal(
     const IntegerLiteral *integer_literal) {
     OperandType type { ValueKind::SIGNED, 4 };
 
     return IrFunction::create_immediate(integer_literal->value());
+}
+
+Operand Generate::create_array_literal(const ArrayLiteral *) {
+    throw std::runtime_error("Not implemented");
+}
+
+Operand Generate::create_boolean_literal(
+    const BooleanLiteral *boolean_literal) {
+    // @TODO: Check if this is correct
+
+    if (boolean_literal->value()) {
+        return env()->create_immediate(1);
+    } else {
+        return env()->create_immediate(0);
+    }
+}
+
+Operand Generate::create_float_literal(const FloatLiteral *) {
+    throw std::runtime_error("Not implemented");
+}
+
+Operand Generate::create_string_literal(const StringLiteral *) {
+    throw std::runtime_error("Not implemented");
 }

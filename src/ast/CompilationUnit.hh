@@ -18,6 +18,14 @@ class CompilationUnit : public Node {
 
     const auto& functions() const { return m_functions; }
 
+    // @TODO: Check why this cannot be in the source file...
+    template <typename Callback>
+    void for_each_function(Callback callback) const {
+        for (auto& argument : m_functions) {
+            callback(argument.get());
+        }
+    }
+
    private:
     std::vector<ptr_t<FunctionDecl>> m_functions {};
 };

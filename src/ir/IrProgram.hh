@@ -11,7 +11,8 @@ class IrProgram {
     MAKE_NONCOPYABLE(IrProgram)
 
    public:
-    void add_function(ptr_t<IrFunction> &&function);
+    void add_function(ptr_t<IrFunction>& function);
+    void dump() const;
 
    private:
     std::vector<ptr_t<IrFunction>> m_functions {};

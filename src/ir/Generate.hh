@@ -24,7 +24,13 @@ class VariableExpression;
 class AssignExpression;
 class EqualityExpression;
 class CompareExpression;
+class ArrayLiteral;
+class BooleanLiteral;
+class FloatLiteral;
+class StringLiteral;
+class CompilationUnit;
 
+class IrProgram;
 class IrFunction;
 class FunctionDecl;
 
@@ -33,9 +39,10 @@ class Generate {
     MAKE_NONCOPYABLE(Generate)
 
    public:
-    Generate(const FunctionDecl* declaration);
+    Generate(const CompilationUnit* compilation_unit)
+        : m_compilation_unit { compilation_unit } {}
 
-    void generate();
+    ptr_t<IrProgram> generate();
 
    private:
     // Quads
@@ -57,14 +64,18 @@ class Generate {
     Operand gen_compare_expression(const CompareExpression*);
     Operand gen_variable_expression(const VariableExpression*);
     Operand gen_index_expression(const IndexExpression*);
-    Operand gen_literal(const Literal*);
     Operand gen_unary_expression(const UnaryExpression*);
 
-    auto env() const { return m_ir_function.get(); }
+    auto env() const { return m_current_ir_function.get(); }
 
-    // Operands
+    // Literals
+    Operand create_literal(const Literal*);
+    Operand create_array_literal(const ArrayLiteral*);
+    Operand create_boolean_literal(const BooleanLiteral*);
+    Operand create_float_literal(const FloatLiteral*);
     Operand create_integer_literal(const IntegerLiteral*);
+    Operand create_string_literal(const StringLiteral*);
 
-    const FunctionDecl* m_declaration;
-    ptr_t<IrFunction> m_ir_function;
+    const CompilationUnit* m_compilation_unit;
+    ptr_t<IrFunction> m_current_ir_function;
 };

@@ -6,13 +6,15 @@
 // #include <variant>
 
 #include "Constants.hh"
-#include "Interpreter.hh"
+// #include "Interpreter.hh"
 #include "Lexer.hh"
 #include "Parser.hh"
 #include "Scope.hh"
 #include "TokenBuffer.hh"
 #include "Util.hh"
 #include "argparse.h"
+#include "ir/Generate.hh"
+#include "ir/IrProgram.hh"
 
 ArgumentParser parse_args(int argc, char **argv) {
     ArgumentParser parser("CLI argument parser");
@@ -89,10 +91,21 @@ int main(int argc, char **argv) {
                   << " milliseconds" << std::endl;
     }
 
-    if (argument_parser.get<bool>("interpret")) {
-        Interpreter interpreter { program_scope.get() };
-        interpreter.interpret_compilation_unit(parser.compilation_unit.get());
+    Generate ir_generator { parser.compilation_unit.get() };
+    ptr_t<IrProgram> ir_program;
+    long ir_duration =
+        measure_time([&] { ir_program = ir_generator.generate(); });
+
+    if (verbose) {
+        std::cout << "IR generation took " << ir_duration << " milliseconds"
+                  << std::endl;
+        ir_program->dump();
     }
+
+    // if (argument_parser.get<bool>("interpret")) {
+    //     Interpreter interpreter { program_scope.get() };
+    //     interpreter.interpret_compilation_unit(parser.compilation_unit.get());
+    // }
 
     return 0;
 }

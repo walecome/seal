@@ -40,8 +40,9 @@ class IrFunction {
     void bind_variable(const Operand &variable,
                        const std::string_view var_name);
 
-   private:
     void dump_quads() const;
+
+   private:
     const auto &quads() const { return m_quads; }
 
     // Bind the given label id to the given quad
