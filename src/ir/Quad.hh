@@ -17,7 +17,14 @@ class Quad {
 
     std::string to_string() const;
 
+    unsigned label_id() const { return m_label_id; }
+    bool has_label() const { return m_has_label; }
+    void set_label(unsigned label_id);
+
    private:
+    unsigned m_label_id { 0 };
+    bool m_has_label { false };
+
     OPCode m_op_code;
     Operand m_dest;
     Operand m_src_a;

@@ -12,6 +12,16 @@ std::string util::indent(unsigned steps) {
     return oss.str();
 }
 
+std::string util::indent_spaces(unsigned nr_spaces) {
+    std::ostringstream oss {};
+
+    for (unsigned i = 0; i < nr_spaces; ++i) {
+        oss << " ";
+    }
+
+    return oss.str();
+}
+
 std::shared_ptr<std::string> util::read_source(const std::string &filename) {
     std::ifstream t(filename);
     return std::make_shared<std::string>((std::istreambuf_iterator<char>(t)),

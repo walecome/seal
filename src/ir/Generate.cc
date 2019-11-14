@@ -319,7 +319,7 @@ Operand Generate::create_integer_literal(
     const IntegerLiteral *integer_literal) {
     OperandType type { ValueKind::SIGNED, 4 };
 
-    return IrFunction::create_immediate(integer_literal->value());
+    return env()->create_immediate(integer_literal->value());
 }
 
 Operand Generate::create_array_literal(const ArrayLiteral *) {

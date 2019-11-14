@@ -14,25 +14,34 @@ unsigned new_variable_id() {
 }
 
 Operand IrFunction::create_immediate(unsigned long value) {
-    Operand operand {};
-    operand.kind() = OperandKind::IMMEDIATE;
-    operand.data().immediate_value = value;
+    OperandData data;
+    data.immediate_value = value;
+
+    Operand operand { OperandKind::IMMEDIATE, data };
+
+    operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_label() {
-    Operand operand {};
-    operand.kind() = OperandKind::LABEL;
-    operand.data().variable_id = new_label_id();
+    OperandData data;
+    data.label_id = new_label_id();
+
+    Operand operand { OperandKind::LABEL, data };
+
+    operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_variable() {
-    Operand operand {};
-    operand.kind() = OperandKind::VARIABLE;
-    operand.data().variable_id = new_variable_id();
+    OperandData data;
+    data.variable_id = new_variable_id();
+
+    Operand operand { OperandKind::VARIABLE, data };
+
+    operand.set_env(this);
 
     return operand;
 }
@@ -56,7 +65,7 @@ void IrFunction::queue_label(const Operand &label) {
     m_waiting_labels.push_back(label.data().label_id);
 }
 
-void IrFunction::bind_queued_labels(const Quad *quad) {
+void IrFunction::bind_queued_labels(Quad *quad) {
     if (m_waiting_labels.empty()) return;
 
     for (auto label_id : m_waiting_labels) {
@@ -66,14 +75,16 @@ void IrFunction::bind_queued_labels(const Quad *quad) {
     m_waiting_labels.clear();
 }
 
-void IrFunction::bind_label(const Operand &label, const Quad *quad) {
+void IrFunction::bind_label(const Operand &label, Quad *quad) {
     ASSERT(label.is_label());
 
     bind_label(label.data().label_id, quad);
 }
 
-void IrFunction::bind_label(unsigned label_id, const Quad *quad) {
+void IrFunction::bind_label(unsigned label_id, Quad *quad) {
     ASSERT(m_labels.find(label_id) == std::end(m_labels));
+
+    quad->set_label(label_id);
 
     m_labels.insert({ label_id, quad });
 }
@@ -89,4 +100,16 @@ void IrFunction::dump_quads() const {
     for (auto &quad : m_quads) {
         std::cout << quad->to_string() << std::endl;
     }
+}
+
+std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {
+    auto it = m_variable_ref.find(variable_id);
+
+    if (it != std::end(m_variable_ref)) {
+        return it->second;
+    }
+
+    std::ostringstream oss {};
+    oss << "tmp#" << variable_id;
+    return oss.str();
 }
