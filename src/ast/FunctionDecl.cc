@@ -1,5 +1,10 @@
 #include "FunctionDecl.hh"
 
+int new_function_id() {
+    static int function_id = 0;
+    return function_id++;
+}
+
 void FunctionDecl::analyze(Scope *scope) {
     if (!scope->is_top_level()) {
         scope->add_function(this);
@@ -13,7 +18,8 @@ void FunctionDecl::analyze(Scope *scope) {
 std::string FunctionDecl::dump(unsigned indent) const {
     std::ostringstream oss {};
 
-    oss << util::indent(indent) << name() << "(" << std::endl;
+    oss << util::indent(indent) << name() << " (id=" << m_id << ") "
+        << "(" << std::endl;
     oss << util::indent(indent + 1) << "\"" << m_identifier.value << "\""
         << std::endl;
     if (m_parameter_list)

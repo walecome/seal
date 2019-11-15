@@ -20,6 +20,7 @@ void FunctionCall::analyze(Scope *scope) {
 
     auto decl = scope->get_function(m_identifier.value);
 
+    m_decl = decl;
     m_type = decl->type();
 
     if (decl->parameter_list()->nr_params() != m_argument_list->nr_args()) {

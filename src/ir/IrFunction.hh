@@ -10,20 +10,23 @@
 class FunctionDecl;
 
 class IrFunction {
-    MAKE_DEFAULT_CONSTRUCTABLE(IrFunction)
     MAKE_NONCOPYABLE(IrFunction)
     MAKE_NONMOVABLE(IrFunction)
 
    public:
-    // Construct a quad with the given opcode and operands, placing it in the
-    // m_quads vector. Also binds any queued lables to the quad and clears the
-    // label queue.
+    IrFunction(const FunctionDecl *decl) : m_decl { decl } {}
+
+    // Construct a quad with the given opcode and operands, placing it in
+    // the m_quads vector. Also binds any queued lables to the quad and
+    // clears the label queue.
     // @FIXME: Should not take by value
     void add_quad(OPCode op_code, Operand dest, Operand src_a, Operand src_b);
 
-    Operand create_immediate(unsigned long value);
-    Operand create_label();
-    Operand create_variable();
+    Operand create_immediate(unsigned long value) const;
+    Operand create_label() const;
+    Operand create_variable() const;
+
+    Operand get_variable(std::string_view identifier) const;
 
     Operand create_and_queue_label();
 
@@ -46,14 +49,23 @@ class IrFunction {
     // tmp#<variable_id>.
     std::string_view resolve_variable_name(unsigned variable_id) const;
 
+    auto declaration() const { return m_decl; }
+
+    void __dump_variables() const;
+
    private:
+    Operand create_variable_from_id(unsigned id) const;
+
     const auto &quads() const { return m_quads; }
 
     // Bind the given label id to the given quad
     void bind_label(unsigned label_id, Quad *quad);
 
+    const FunctionDecl *m_decl;
+
     std::vector<ptr_t<Quad>> m_quads {};
     std::map<unsigned, Quad *> m_labels {};
     std::vector<unsigned> m_waiting_labels {};
     std::unordered_map<unsigned, std::string_view> m_variable_ref {};
+    std::unordered_map<std::string_view, unsigned> m_varname_to_id {};
 };

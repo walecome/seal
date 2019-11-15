@@ -9,3 +9,36 @@ fn main() -> int {
 
     return 0;
 }
+
+fn assigns() -> void {
+    a : mut int = 10;
+    a = 5;
+    a = a;
+}
+
+
+fn asd() -> int {
+    a : int = 1337;
+
+    return a + 3;
+}
+
+fn lol() -> int {
+    return 10;
+}
+
+fn hejsan() -> int {
+    init : mut int = 100;
+
+    var : mut int = 2;
+
+    while (init > 10) {
+
+        var = var + 10;
+        init = init - 1;
+    }
+
+    init = 1337;
+
+    return var;
+}

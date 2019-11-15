@@ -4,6 +4,7 @@
 
 #include "ArgumentList.hh"
 #include "Expression.hh"
+#include "FunctionDecl.hh"
 #include "Token.hh"
 
 class FunctionCall : public Expression {
@@ -22,7 +23,14 @@ class FunctionCall : public Expression {
     const auto& identifier() const { return m_identifier; }
     auto argument_list() const { return m_argument_list.get(); }
 
+    auto declaration() const {
+        ASSERT(m_decl != nullptr);
+        return m_decl;
+    }
+
    private:
     const Token m_identifier;
     ptr_t<ArgumentList> m_argument_list;
+
+    FunctionDecl* m_decl { nullptr };
 };

@@ -7,12 +7,14 @@ enum class OperandKind {
     IMMEDIATE,
     VARIABLE,
     LABEL,
+    FUNCTION,
 };
 
 union OperandData {
     unsigned long immediate_value;
     int label_id;
     int variable_id;
+    int function_id;
 };
 
 class IrFunction;
@@ -37,7 +39,7 @@ class Operand {
     bool is_used() const { return m_used; }
 
     auto env() const { return m_env; }
-    void set_env(IrFunction* env) { m_env = env; }
+    void set_env(const IrFunction* env) { m_env = env; }
 
     std::string to_string() const;
 
@@ -45,7 +47,7 @@ class Operand {
     OperandKind m_kind;
     OperandData m_data;
 
-    IrFunction* m_env { nullptr };
+    const IrFunction* m_env { nullptr };
 
     bool m_used;
 };

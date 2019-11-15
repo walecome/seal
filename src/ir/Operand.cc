@@ -10,7 +10,7 @@ std::string Operand::to_string() const {
 
     switch (m_kind) {
         case OperandKind::IMMEDIATE:
-            oss << "Immediate " << m_data.immediate_value;
+            oss << "#" << m_data.immediate_value;
             return oss.str();
 
         case OperandKind::LABEL:
@@ -18,7 +18,8 @@ std::string Operand::to_string() const {
             return oss.str();
 
         case OperandKind::VARIABLE:
-            oss << env()->resolve_variable_name(m_data.variable_id);
+            oss << env()->resolve_variable_name(m_data.variable_id) << " ("
+                << m_data.variable_id << ")";
             return oss.str();
 
         default:

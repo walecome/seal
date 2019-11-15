@@ -13,7 +13,7 @@ unsigned new_variable_id() {
     return label_id++;
 }
 
-Operand IrFunction::create_immediate(unsigned long value) {
+Operand IrFunction::create_immediate(unsigned long value) const {
     OperandData data;
     data.immediate_value = value;
 
@@ -24,7 +24,7 @@ Operand IrFunction::create_immediate(unsigned long value) {
     return operand;
 }
 
-Operand IrFunction::create_label() {
+Operand IrFunction::create_label() const {
     OperandData data;
     data.label_id = new_label_id();
 
@@ -35,15 +35,27 @@ Operand IrFunction::create_label() {
     return operand;
 }
 
-Operand IrFunction::create_variable() {
+Operand IrFunction::create_variable_from_id(unsigned id) const {
     OperandData data;
-    data.variable_id = new_variable_id();
+    data.variable_id = id;
 
     Operand operand { OperandKind::VARIABLE, data };
 
     operand.set_env(this);
 
     return operand;
+}
+
+Operand IrFunction::create_variable() const {
+    return create_variable_from_id(new_variable_id());
+}
+
+Operand IrFunction::get_variable(std::string_view identifier) const {
+    auto it = m_varname_to_id.find(identifier);
+
+    ASSERT(it != std::end(m_varname_to_id));
+
+    return create_variable_from_id(it->second);
 }
 
 Operand IrFunction::create_and_queue_label() {
@@ -93,6 +105,7 @@ void IrFunction::bind_variable(const Operand &variable,
                                const std::string_view var_name) {
     ASSERT(variable.is_variable());
 
+    m_varname_to_id.insert_or_assign(var_name, variable.data().variable_id);
     m_variable_ref.insert_or_assign(variable.data().variable_id, var_name);
 }
 
@@ -112,4 +125,10 @@ std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {
     std::ostringstream oss {};
     oss << "tmp#" << variable_id;
     return oss.str();
+}
+
+void IrFunction::__dump_variables() const {
+    for (auto &x : m_variable_ref) {
+        std::cout << x.first << "=" << x.second << std::endl;
+    }
 }

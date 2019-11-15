@@ -30,7 +30,7 @@ ptr_t<IrProgram> Generate::generate() {
     auto ir_program = std::make_unique<IrProgram>();
 
     m_compilation_unit->for_each_function([&](auto function_decl) {
-        m_current_ir_function = std::make_unique<IrFunction>();
+        m_current_ir_function = std::make_unique<IrFunction>(function_decl);
         gen_function_decl(function_decl);
         ir_program->add_function(m_current_ir_function);
     });
@@ -163,8 +163,13 @@ Operand Generate::gen_expression(const Expression *expression) {
     }
 }
 
-Operand Generate::gen_function_call(const FunctionCall *) {
+Operand Generate::gen_function_call(const FunctionCall *func_call) {
     throw std::runtime_error("Not implemented");
+
+    func_call->argument_list()->for_each_argument([this](auto arg) {
+        auto arg_operand = gen_expression(arg);
+        env()->add_quad(OPCode::PUSH_ARG, arg_operand, {}, {});
+    });
 }
 
 Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
@@ -173,8 +178,9 @@ Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
     auto var = dynamic_cast<VariableExpression *>(assign_expr->left());
     ASSERT(var != nullptr);
 
-    auto left = gen_variable_expression(var);
+    // Order important as gen_variable_expression will generate a new id
     auto right = gen_expression(assign_expr->right());
+    auto left = gen_variable_expression(var, true);
 
     env()->add_quad(OPCode::MOVE, left, right, {});
 
@@ -309,7 +315,12 @@ Operand Generate::gen_unary_expression(const UnaryExpression *) {
     throw std::runtime_error("Not implemented");
 }
 
-Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {
+Operand Generate::gen_variable_expression(const VariableExpression *var_expr,
+                                          bool give_new_id) {
+    if (!give_new_id) {
+        return env()->get_variable(var_expr->identifier().value);
+    }
+
     auto var = env()->create_variable();
     env()->bind_variable(var, var_expr->identifier().value);
     return var;
