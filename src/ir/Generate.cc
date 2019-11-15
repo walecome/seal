@@ -164,12 +164,19 @@ Operand Generate::gen_expression(const Expression *expression) {
 }
 
 Operand Generate::gen_function_call(const FunctionCall *func_call) {
-    throw std::runtime_error("Not implemented");
-
     func_call->argument_list()->for_each_argument([this](auto arg) {
         auto arg_operand = gen_expression(arg);
         env()->add_quad(OPCode::PUSH_ARG, arg_operand, {}, {});
     });
+
+    // @TODO: Handle if there is not return value
+    auto return_value = env()->create_variable();
+    auto function_id = func_call->declaration()->function_id();
+
+    env()->add_quad(OPCode::CALL, return_value,
+                    env()->create_function_from_id(function_id), {});
+
+    return return_value;
 }
 
 Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {

@@ -16,8 +16,8 @@ void IrProgram::dump() const {
                   << std::endl;
         ir_function->dump_quads();
 
-        std::cout << "Function variables: " << std::endl;
-        ir_function->__dump_variables();
+        // std::cout << "Function variables: " << std::endl;
+        // ir_function->__dump_variables();
 
         std::cout << std::endl;
     }

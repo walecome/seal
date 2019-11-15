@@ -9,6 +9,10 @@ std::string Operand::to_string() const {
     std::ostringstream oss {};
 
     switch (m_kind) {
+        case OperandKind::FUNCTION:
+            oss << "function#" << m_data.function_id;
+            return oss.str();
+
         case OperandKind::IMMEDIATE:
             oss << "#" << m_data.immediate_value;
             return oss.str();

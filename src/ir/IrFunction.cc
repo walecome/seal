@@ -58,6 +58,17 @@ Operand IrFunction::get_variable(std::string_view identifier) const {
     return create_variable_from_id(it->second);
 }
 
+Operand IrFunction::create_function_from_id(unsigned function_id) const {
+    OperandData data;
+    data.function_id = function_id;
+
+    Operand operand { OperandKind::FUNCTION, data };
+
+    operand.set_env(this);
+
+    return operand;
+}
+
 Operand IrFunction::create_and_queue_label() {
     auto label = create_label();
     queue_label(label);

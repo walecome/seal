@@ -25,6 +25,7 @@ class IrFunction {
     Operand create_immediate(unsigned long value) const;
     Operand create_label() const;
     Operand create_variable() const;
+    Operand create_function_from_id(unsigned function_id) const;
 
     Operand get_variable(std::string_view identifier) const;
 

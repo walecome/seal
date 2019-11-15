@@ -13,6 +13,7 @@
 #include "TokenBuffer.hh"
 #include "Util.hh"
 #include "argparse.h"
+#include "ast/FunctionDecl.hh"
 #include "ir/Generate.hh"
 #include "ir/IrProgram.hh"
 
@@ -90,6 +91,7 @@ int main(int argc, char **argv) {
         std::cout << "Semantic analysis took " << semantic_duration
                   << " milliseconds" << std::endl;
     }
+
 
     Generate ir_generator { parser.compilation_unit.get() };
     ptr_t<IrProgram> ir_program;
