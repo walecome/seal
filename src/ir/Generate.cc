@@ -300,7 +300,7 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
 }
 
 Operand Generate::gen_index_expression(const IndexExpression *) {
-    throw std::runtime_error("Not implemented");
+    ASSERT_NOT_REACHED();
 }
 
 Operand Generate::create_literal(const Literal *literal) {
@@ -319,7 +319,7 @@ Operand Generate::create_literal(const Literal *literal) {
     }
 }
 Operand Generate::gen_unary_expression(const UnaryExpression *) {
-    throw std::runtime_error("Not implemented");
+    ASSERT_NOT_REACHED();
 }
 
 Operand Generate::gen_variable_expression(const VariableExpression *var_expr,
@@ -341,7 +341,7 @@ Operand Generate::create_integer_literal(
 }
 
 Operand Generate::create_array_literal(const ArrayLiteral *) {
-    throw std::runtime_error("Not implemented");
+    ASSERT_NOT_REACHED();
 }
 
 Operand Generate::create_boolean_literal(
@@ -356,9 +356,9 @@ Operand Generate::create_boolean_literal(
 }
 
 Operand Generate::create_float_literal(const FloatLiteral *) {
-    throw std::runtime_error("Not implemented");
+    ASSERT_NOT_REACHED();
 }
 
 Operand Generate::create_string_literal(const StringLiteral *) {
-    throw std::runtime_error("Not implemented");
+    ASSERT_NOT_REACHED();
 }

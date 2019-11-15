@@ -3,6 +3,8 @@ SOURCES=(
     code/main.comp
     code/expression.comp
     code/function.comp
+    code/weird_unary.comp
+    code/recursion.comp
 )
 
 ERROR_SOURCES=(
@@ -27,7 +29,8 @@ function run_and_print() {
    for i in "${arr[@]}";
       do
         printf "${LIGHT_GREY}$ build/compiler --source $i${NC}\n"
-        ret="$(build/compiler --source $i)"
+
+        ret="$(build/compiler --source $i) " 
         status=$?
         if [ "$status" == "$expected" ]
         then
