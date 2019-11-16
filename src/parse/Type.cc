@@ -1,14 +1,15 @@
 #include "Parser.hh"
 
 Type Parser::parse_type(TokenBuffer& tokens) {
-    if (tokens.eat(TYPE)) {
-        return Type { tokens.previous().value, Kind::PRIMITIVE };
+    // Try parsing the array type before the other as it will give better error
+    // messages
+    if (tokens.eat(LBRACKET)) {
+        tokens.expect(TYPE);
+        auto type = Type { tokens.previous().value, Kind::ARRAY };
+        tokens.expect(RBRACKET);
+
+        return type;
     }
-
-    tokens.expect(LBRACKET);
     tokens.expect(TYPE);
-    auto type = Type { tokens.previous().value, Kind::ARRAY };
-    tokens.expect(RBRACKET);
-
-    return type;
+    return Type { tokens.previous().value, Kind::PRIMITIVE };
 }

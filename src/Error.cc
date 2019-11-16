@@ -3,6 +3,8 @@
 #include "Error.hh"
 #include "ast/Type.hh"
 
+void error::syntax_error(const std::string_view err) { report_error(err); }
+
 void error::syntax(TokenType expected, Token got) {
     std::ostringstream oss {};
     oss << "Invalid syntax, expected " << token_names[expected];
@@ -16,8 +18,8 @@ void error::syntax(const std::string &s, TokenBuffer &tokens) {
     report_error(oss.str());
 }
 
-void error::report_error(const std::string &error, bool quit) {
-    std::cout << Color::Modifier(Color::FG_RED) << error
+void error::report_error(const std::string_view err, bool quit) {
+    std::cout << Color::Modifier(Color::FG_RED) << err
               << Color::Modifier(Color::FG_DEFAULT) << std::endl;
 
     if (quit) exit(EXIT_FAILURE);

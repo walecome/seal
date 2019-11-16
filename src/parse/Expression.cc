@@ -209,9 +209,10 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
     } else if (current.type == LBRACKET) {
         primary = parse_array_literal(tokens);
     } else {
-        // @TODO: Throw parse error
-        throw std::runtime_error("Unexpected primary expression" +
-                                 current.to_string());
+        // @TODO: Improve this error
+        tokens.dump_current_row("Error parsing expression, expected primary");
+        // @FIXME: This should not be here
+        exit(EXIT_FAILURE);
     }
 
     auto end = tokens.top_iterator();

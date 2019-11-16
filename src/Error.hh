@@ -34,9 +34,10 @@ class Type;
 
 namespace error {
 static std::vector<std::string> semantic_errors {};
+void syntax_error(std::string_view err);
 void syntax(TokenType expected, Token got);
 void syntax(const std::string& s, TokenBuffer& tokens);
-void report_error(const std::string& error, bool quit = true);
+void report_error(const std::string_view error, bool quit = true);
 void rpn(Token got);
 
 void mismatched_type(const Type& a, const Type& b, SourceRef source_ref);

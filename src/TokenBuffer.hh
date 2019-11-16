@@ -40,6 +40,12 @@ class TokenBuffer {
 
     static TokenBuffer source_tokens(SourceRef source_ref);
 
+    // Prints the row of the token that is currently pointed to, as well as a
+    // column indication. If error_message is provided this will be printed
+    // after the source row.
+    // @TODO: Consider if this should be moved somewhere else.
+    void dump_current_row(const std::string_view error_message = "") const;
+
     std::string as_source() const;
 
    private:

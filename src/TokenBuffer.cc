@@ -49,18 +49,10 @@ bool TokenBuffer::accept(TokenType token_type) const {
     return top().type == token_type;
 }
 
-void print_col_indication(int col) {
-    for (int i = 0; i < col; ++i) {
-        std::cout << "~";
-    }
-
-    std::cout << "^" << std::endl;
-}
-
 void TokenBuffer::expect(TokenType token_type) {
     if (top().type != token_type) {
         std::cout << reconstruct_row(top().row) << std::endl;
-        print_col_indication(top().col);
+        util::print_col_indication(top().col);
         error::syntax(token_type, top());
     }
     eat(token_type);
@@ -156,4 +148,13 @@ TokenBuffer TokenBuffer::source_tokens(SourceRef source_ref) {
     }
 
     return source_tokens;
+}
+
+void TokenBuffer::dump_current_row(const std::string_view error_message) const {
+    auto reference_token = previous();
+    std::cout << reconstruct_row(reference_token.row) << std::endl;
+    util::print_col_indication(reference_token.col);
+    if (error_message != "") {
+        std::cout << error_message << std::endl;
+    }
 }

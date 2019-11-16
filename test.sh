@@ -5,11 +5,15 @@ SOURCES=(
     code/function.comp
     code/weird_unary.comp
     code/recursion.comp
+    code/simple.comp
 )
 
 ERROR_SOURCES=(
     code/illformed_types.comp
     code/error.comp
+    code/parse_missing_return_type.comp
+    code/parse_missing_fn_arrow.comp
+    code/parse_missing_fn_keyword.comp
 )
 
 RED='\033[1;31m'
