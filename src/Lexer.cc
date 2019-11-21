@@ -1,14 +1,21 @@
 #include "Lexer.hh"
 
 bool is_string(const char c) { return c == '"' || c == '\''; }
+bool is_comment(const char first, const char next) {
+    return first == '/' && next == '/';
+}
 
 void Lexer::read_all() {
     read_whitespace();
     while (current_index < source.size()) {
         Token token = read_one();
-        tokens.add_token(token);
+        if (token.type != TokenType::UNKNOWN) {
+            tokens.add_token(token);
+        }
         read_whitespace();
     }
+
+    tokens.add_token({ row, col, TokenType::EOF_TOKEN });
 }
 
 Token Lexer::read_one() {
@@ -22,6 +29,8 @@ Token Lexer::read_one() {
         read_number(token);
     } else if (is_string(c)) {
         read_string(token, c);
+    } else if (is_comment(c, source[current_index + 1])) {
+        read_comment();
     } else {
         read_symbol(token);
     }
@@ -36,13 +45,35 @@ void Lexer::read_whitespace() {
     while (isspace(c)) {
         if (c == '\n') {
             ++row;
-            col = 0;
+            col = 1;
         } else {
             ++col;
         }
 
         c = source[++current_index];
     }
+}
+
+void Lexer::read_comment() {
+    std::cout << "READ COMMENT" << std::endl;
+    // Checked 2 // in caller
+    current_index += 2;
+    char c = source[current_index];
+    while (c != '\n') {
+        std::cout << c;
+        if (current_index >= source.size()) {
+            break;
+        }
+        c = source[++current_index];
+    }
+
+    std::cout << "<--- read comment" << std::endl;
+
+    col = 1;
+    ++row;
+    ++current_index;
+
+    read_whitespace();
 }
 
 void Lexer::read_alpha(Token &token) {
@@ -121,6 +152,7 @@ Lexer::find_longest_matching_token() {
     --current_index;
 
     if (longest_symbol == UNEXPECTED) {
+        throw 1;
         report_error(cut(start_index, current_index + 1));
     };
 

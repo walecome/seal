@@ -7,6 +7,8 @@ void Parser::parse(TokenBuffer &tokens) {
         std::make_unique<CompilationUnit>();
 
     while (!tokens.empty()) {
+        if (tokens.eat(EOF_TOKEN)) break;
+
         ptr_t<FunctionDecl> function_decl = parse_function_decl(tokens);
 
         if (!function_decl) {

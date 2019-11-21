@@ -9,6 +9,8 @@
 #include "ast/Type.hh"
 
 #define ENUMERATE_TOKENS()          \
+    __ENUMERATE_TOKEN(UNKNOWN)      \
+    __ENUMERATE_TOKEN(EOF_TOKEN)    \
     __ENUMERATE_TOKEN(LPARENS)      \
     __ENUMERATE_TOKEN(RPARENS)      \
     __ENUMERATE_TOKEN(LARGPARENS)   \
@@ -102,15 +104,18 @@ static std::unordered_map<std::string_view, TokenType> keyword_map {
 
 struct Token {
     Token() : row { 0 }, col { 0 } {}
-    Token(unsigned row, unsigned col) : row { row }, col { col } {}
-
-    TokenType type {};
-    std::string_view value {};
+    Token(unsigned row, unsigned col)
+        : type { TokenType::UNKNOWN }, row { row }, col { col } {}
+    Token(unsigned row, unsigned col, TokenType token_type)
+        : type { token_type }, row { row }, col { col } {}
 
     std::string to_string() const;
 
+    TokenType type;
     unsigned row;
     unsigned col;
+
+    std::string_view value {};
 };
 
 TokenType string_to_token(const std::string_view s);
