@@ -47,18 +47,27 @@ fn assigns() -> void {
 }
 
 fn func_calls() -> int{
-    b : int = asd();
+    b : int = asd(23);
 
     return b + lol() * hejsan();
 }
 
 
-fn asd() -> int {
-    a : int = 1337;
+fn asd(x : int) -> int {
+    a : int = 1337 - x;
 
     return a + 3;
 }
 
 fn lol() -> int {
     return 10;
+}
+
+fn add_with_same() -> int {
+
+    x : int = 123;
+    y : int = x + x;
+
+    return y;
+
 }
