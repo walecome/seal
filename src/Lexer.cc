@@ -55,19 +55,15 @@ void Lexer::read_whitespace() {
 }
 
 void Lexer::read_comment() {
-    std::cout << "READ COMMENT" << std::endl;
     // Checked 2 // in caller
     current_index += 2;
     char c = source[current_index];
     while (c != '\n') {
-        std::cout << c;
         if (current_index >= source.size()) {
             break;
         }
         c = source[++current_index];
     }
-
-    std::cout << "<--- read comment" << std::endl;
 
     col = 1;
     ++row;
