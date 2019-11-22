@@ -12,10 +12,11 @@ class VariableExpression : public Expression {
     AST_DUMPABLE()
 
    public:
-    VariableExpression(const Token identifier) : m_identifier { identifier } {}
+    VariableExpression(const std::string_view identifier)
+        : m_identifier { identifier } {}
 
-    const auto& identifier() const { return m_identifier; }
+    auto identifier() const { return m_identifier; }
 
    private:
-    const Token m_identifier;
+    const std::string_view m_identifier;
 };

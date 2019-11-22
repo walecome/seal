@@ -20,7 +20,7 @@ void VariableDecl::analyze(Scope *scope) {
 std::string VariableDecl::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << name() << " (" << std::endl;
-    oss << util::indent(indent + 1) << "\"" << m_identifier.value << "\" : ";
+    oss << util::indent(indent + 1) << "\"" << m_identifier << "\" : ";
     oss << m_type.dump(0) << std::endl;
 
     if (m_value) oss << m_value->dump(indent + 1) << std::endl;

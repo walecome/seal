@@ -61,7 +61,7 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
 
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
     auto var = env()->create_variable();
-    env()->bind_variable(var, variable_decl->identifier().value);
+    env()->bind_variable(var, variable_decl->identifier());
 
     if (variable_decl->value()) {
         auto value = gen_expression(variable_decl->value());
@@ -166,7 +166,7 @@ Operand Generate::gen_expression(const Expression *expression) {
 
 Operand Generate::gen_function_call(const FunctionCall *func_call) {
     // TODO: Fix
-    if (BuiltIn::is_builtin(func_call->identifier().value)) {
+    if (BuiltIn::is_builtin(func_call->identifier())) {
         throw std::runtime_error("Built-in function call not implemented");
     }
 
@@ -306,7 +306,8 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
 }
 
 Operand Generate::gen_index_expression(const IndexExpression *) {
-    ASSERT_NOT_REACHED();
+    throw std::runtime_error(
+        "IR generation of index expression not implemented");
 }
 
 Operand Generate::create_literal(const Literal *literal) {
@@ -326,17 +327,18 @@ Operand Generate::create_literal(const Literal *literal) {
 }
 
 Operand Generate::gen_unary_expression(const UnaryExpression *) {
-    ASSERT_NOT_REACHED();
+    throw std::runtime_error(
+        "IR generation of unary expression not implemented");
 }
 
 Operand Generate::gen_variable_expression(const VariableExpression *var_expr,
                                           bool give_new_id) {
     if (!give_new_id) {
-        return env()->get_variable(var_expr->identifier().value);
+        return env()->get_variable(var_expr->identifier());
     }
 
     auto var = env()->create_variable();
-    env()->bind_variable(var, var_expr->identifier().value);
+    env()->bind_variable(var, var_expr->identifier());
     return var;
 }
 
@@ -346,7 +348,7 @@ Operand Generate::create_integer_literal(
 }
 
 Operand Generate::create_array_literal(const ArrayLiteral *) {
-    ASSERT_NOT_REACHED();
+    throw std::runtime_error("IR generation of array literal not implemented");
 }
 
 Operand Generate::create_boolean_literal(

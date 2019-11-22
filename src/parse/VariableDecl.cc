@@ -11,7 +11,7 @@ ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer& tokens) {
 
     // @REFACTOR: The API for can_pop can be improved, we shouldn't need to eat
     // the tokens after checking
-    Token identifier = tokens.top();
+    std::string_view identifier = tokens.top().value;
     tokens.expect(IDENTIFIER);
     tokens.expect(COLON);
 

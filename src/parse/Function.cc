@@ -10,7 +10,7 @@ ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
         return nullptr;
     }
 
-    Token identifier = tokens.top();
+    std::string_view identifier = tokens.top().value;
     tokens.expect(IDENTIFIER);
 
     ptr_t<ParameterList> parameters = parse_parameter_list(tokens);
@@ -57,8 +57,8 @@ ptr_t<ParameterList> Parser::parse_parameter_list(TokenBuffer &tokens) {
 
 ptr_t<VariableDecl> Parser::parse_parameter(TokenBuffer &tokens) {
     auto begin = tokens.top_iterator();
-    Token identifier = tokens.top();
-    if (identifier.type != IDENTIFIER) return nullptr;
+    Token token = tokens.top();
+    if (token.type != IDENTIFIER) return nullptr;
     tokens.eat(IDENTIFIER);
 
     tokens.expect(COLON);
@@ -66,7 +66,7 @@ ptr_t<VariableDecl> Parser::parse_parameter(TokenBuffer &tokens) {
     Type type = parse_type(tokens);
 
     auto end = tokens.top_iterator();
-    auto parameter = std::make_unique<VariableDecl>(identifier, type);
+    auto parameter = std::make_unique<VariableDecl>(token.value, type);
 
     parameter->source_ref.begin = begin;
     parameter->source_ref.end = end;

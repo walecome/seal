@@ -22,7 +22,7 @@ void AssignExpression::analyze(Scope* scope) {
     }
 
     if (check_decl) {
-        auto decl = scope->get_variable(variable_expr->identifier().value);
+        auto decl = scope->get_variable(variable_expr->identifier());
 
         if (!decl->is_mutable()) {
             error::add_semantic_error("Assign to non-mutable variable",

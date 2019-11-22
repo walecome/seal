@@ -2,18 +2,17 @@
 #include "VariableDecl.hh"
 
 void VariableExpression::analyze(Scope *scope) {
-    if (!scope->has_variable(m_identifier.value, true)) {
+    if (!scope->has_variable(m_identifier, true)) {
         // @TODO: Sematic error instead
         error::add_semantic_error("Use of undeclared variable", source_ref);
         m_type = Type { Primitive::VOID };
     } else {
-        m_type = scope->get_variable(m_identifier.value)->type();
+        m_type = scope->get_variable(m_identifier)->type();
     }
 }
 
 std::string VariableExpression::dump(unsigned indent) const {
     std::ostringstream oss {};
-    oss << util::indent(indent) << "{" << name() << ", " << m_identifier.value
-        << "}";
+    oss << util::indent(indent) << "{" << name() << ", " << m_identifier << "}";
     return oss.str();
 }

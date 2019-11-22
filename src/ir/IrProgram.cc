@@ -11,7 +11,7 @@ void IrProgram::add_function(ptr_t<IrFunction>& function) {
 void IrProgram::dump() const {
     for (auto& ir_function : m_functions) {
         std::cout << "Dumping IR for function "
-                  << std::quoted(ir_function->declaration()->function_name())
+                  << std::quoted(ir_function->declaration()->identifier())
                   << " with id " << ir_function->declaration()->function_id()
                   << std::endl;
         ir_function->dump_quads();

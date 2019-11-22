@@ -16,11 +16,12 @@ class FunctionCall : public Expression {
     AST_ANALYZABLE()
 
    public:
-    FunctionCall(const Token identfier, ptr_t<ArgumentList>& argument_list)
-        : m_identifier { identfier },
+    FunctionCall(const std::string_view identifier,
+                 ptr_t<ArgumentList>& argument_list)
+        : m_identifier { identifier },
           m_argument_list { std::move(argument_list) } {}
 
-    const auto& identifier() const { return m_identifier; }
+    auto identifier() const { return m_identifier; }
     auto argument_list() const { return m_argument_list.get(); }
 
     auto declaration() const {
@@ -29,7 +30,7 @@ class FunctionCall : public Expression {
     }
 
    private:
-    const Token m_identifier;
+    const std::string_view m_identifier;
     ptr_t<ArgumentList> m_argument_list;
 
     FunctionDecl* m_decl { nullptr };

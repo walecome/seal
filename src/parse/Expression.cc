@@ -204,7 +204,7 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
         primary = std::make_unique<BooleanLiteral>(value);
     } else if (current.type == IDENTIFIER) {
         if (!(primary = parse_function_call(tokens))) {
-            primary = std::make_unique<VariableExpression>(current);
+            primary = std::make_unique<VariableExpression>(current.value);
         }
     } else if (current.type == LBRACKET) {
         primary = parse_array_literal(tokens);
@@ -226,7 +226,8 @@ ptr_t<FunctionCall> Parser::parse_function_call(TokenBuffer& tokens) {
     // Need the identifier aswell
     auto begin = tokens.top_iterator() - 1;
 
-    Token identifier = tokens.previous();
+    std::string_view identifier = tokens.previous().value;
+
     // Identifier already eaten
     if (tokens.top().type != LPARENS) return nullptr;
 

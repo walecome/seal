@@ -4,21 +4,21 @@
 #include "builtin/BuiltIn.hh"
 
 void FunctionCall::analyze(Scope *scope) {
-    if (BuiltIn::is_builtin(m_identifier.value)) {
-        if (BuiltIn::is_typechecked(m_identifier.value)) {
+    if (BuiltIn::is_builtin(identifier())) {
+        if (BuiltIn::is_typechecked(identifier())) {
             // @TODO: Handle typechecking for built in
         }
         return;
     }
 
-    if (!scope->has_function(m_identifier.value, true)) {
+    if (!scope->has_function(identifier(), true)) {
         throw 1;
         error::add_semantic_error("Call to undeclared function", source_ref);
         m_type = Type { Primitive::VOID };
         return;
     }
 
-    auto decl = scope->get_function(m_identifier.value);
+    auto decl = scope->get_function(identifier());
 
     m_decl = decl;
     m_type = decl->type();
@@ -47,7 +47,7 @@ std::string FunctionCall::dump(unsigned indent) const {
     std::ostringstream oss {};
 
     oss << util::indent(indent) << name() << " (" << std::endl;
-    oss << util::indent(indent + 1) << "\"" << m_identifier.value << "\""
+    oss << util::indent(indent + 1) << "\"" << identifier() << "\""
         << std::endl;
     oss << m_argument_list->dump(indent + 1);
 

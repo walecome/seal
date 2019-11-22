@@ -20,7 +20,7 @@ std::string FunctionDecl::dump(unsigned indent) const {
 
     oss << util::indent(indent) << name() << " (id=" << m_id << ") "
         << "(" << std::endl;
-    oss << util::indent(indent + 1) << "\"" << m_identifier.value << "\""
+    oss << util::indent(indent + 1) << "\"" << m_identifier << "\""
         << std::endl;
     if (m_parameter_list)
         oss << m_parameter_list->dump(indent + 1) << std::endl;
