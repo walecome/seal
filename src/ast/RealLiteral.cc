@@ -1,6 +1,6 @@
-#include "FloatLiteral.hh"
+#include "RealLiteral.hh"
 
-std::string FloatLiteral::dump(unsigned indent) const {
+std::string RealLiteral::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << "{" << name() << ", " << m_value << "}";
     return oss.str();

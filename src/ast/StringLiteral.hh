@@ -14,9 +14,8 @@ class StringLiteral : public Literal {
     StringLiteral(std::string_view value)
         : Literal(Primitive::STRING), m_value { value } {}
 
-    const auto& value() const { return m_value; }
+    auto value() const { return m_value; }
 
    private:
-    // @TODO: This should be string_view but creates weird bugs...
-    std::string m_value;
+    std::string_view m_value;
 };

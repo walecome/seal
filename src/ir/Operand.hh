@@ -4,14 +4,18 @@
 #include "OperandType.hh"
 
 enum class OperandKind {
-    IMMEDIATE,
+    IMMEDIATE_INT,
+    IMMEDIATE_REAL,
+    IMMEDIATE_STRING,
     VARIABLE,
     LABEL,
     FUNCTION,
 };
 
 union OperandData {
-    unsigned long immediate_value;
+    unsigned long immediate_int;
+    double immediate_real;
+    std::string_view immediate_string {};
     int label_id;
     int variable_id;
     int function_id;
@@ -32,7 +36,9 @@ class Operand {
     const OperandData& data() const { return m_data; }
     const OperandKind& kind() const { return m_kind; }
 
-    bool is_immediate() const;
+    bool is_immediate_int() const;
+    bool is_immediate_real() const;
+    bool is_immediate_string() const;
     bool is_label() const;
     bool is_variable() const;
 

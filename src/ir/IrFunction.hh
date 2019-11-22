@@ -22,7 +22,10 @@ class IrFunction {
     // @FIXME: Should not take by value
     void add_quad(OPCode op_code, Operand dest, Operand src_a, Operand src_b);
 
-    Operand create_immediate(unsigned long value) const;
+    Operand create_immediate_int(unsigned long value) const;
+    Operand create_immediate_string(std::string_view value) const;
+    Operand create_immediate_real(double value) const;
+
     Operand create_label() const;
     Operand create_variable() const;
     Operand create_function_from_id(unsigned function_id) const;

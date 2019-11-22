@@ -26,7 +26,7 @@ class EqualityExpression;
 class CompareExpression;
 class ArrayLiteral;
 class BooleanLiteral;
-class FloatLiteral;
+class RealLiteral;
 class StringLiteral;
 class CompilationUnit;
 
@@ -73,7 +73,7 @@ class Generate {
     Operand create_literal(const Literal*);
     Operand create_array_literal(const ArrayLiteral*);
     Operand create_boolean_literal(const BooleanLiteral*);
-    Operand create_float_literal(const FloatLiteral*);
+    Operand create_float_literal(const RealLiteral*);
     Operand create_integer_literal(const IntegerLiteral*);
     Operand create_string_literal(const StringLiteral*);
 

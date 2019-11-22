@@ -10,7 +10,6 @@
 #include "ast/CompilationUnit.hh"
 #include "ast/EqualityExpression.hh"
 #include "ast/Expression.hh"
-#include "ast/FloatLiteral.hh"
 #include "ast/For.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/FunctionDecl.hh"
@@ -18,6 +17,7 @@
 #include "ast/IndexExpression.hh"
 #include "ast/IntegerLiteral.hh"
 #include "ast/Literal.hh"
+#include "ast/RealLiteral.hh"
 #include "ast/ReturnStatement.hh"
 #include "ast/StringLiteral.hh"
 #include "ast/UnaryExpression.hh"
@@ -308,7 +308,7 @@ Operand Generate::create_literal(const Literal *literal) {
         return create_array_literal(ptr);
     } else if (auto ptr = dynamic_cast<const BooleanLiteral *>(literal)) {
         return create_boolean_literal(ptr);
-    } else if (auto ptr = dynamic_cast<const FloatLiteral *>(literal)) {
+    } else if (auto ptr = dynamic_cast<const RealLiteral *>(literal)) {
         return create_float_literal(ptr);
     } else if (auto ptr = dynamic_cast<const IntegerLiteral *>(literal)) {
         return create_integer_literal(ptr);
@@ -318,6 +318,7 @@ Operand Generate::create_literal(const Literal *literal) {
         ASSERT_NOT_REACHED();
     }
 }
+
 Operand Generate::gen_unary_expression(const UnaryExpression *) {
     ASSERT_NOT_REACHED();
 }
@@ -335,9 +336,7 @@ Operand Generate::gen_variable_expression(const VariableExpression *var_expr,
 
 Operand Generate::create_integer_literal(
     const IntegerLiteral *integer_literal) {
-    OperandType type { ValueKind::SIGNED, 4 };
-
-    return env()->create_immediate(integer_literal->value());
+    return env()->create_immediate_int(integer_literal->value());
 }
 
 Operand Generate::create_array_literal(const ArrayLiteral *) {
@@ -349,16 +348,16 @@ Operand Generate::create_boolean_literal(
     // @TODO: Check if this is correct
 
     if (boolean_literal->value()) {
-        return env()->create_immediate(1);
+        return env()->create_immediate_int(1);
     } else {
-        return env()->create_immediate(0);
+        return env()->create_immediate_int(0);
     }
 }
 
-Operand Generate::create_float_literal(const FloatLiteral *) {
-    ASSERT_NOT_REACHED();
+Operand Generate::create_float_literal(const RealLiteral *real_literal) {
+    return env()->create_immediate_real(real_literal->value());
 }
 
-Operand Generate::create_string_literal(const StringLiteral *) {
-    ASSERT_NOT_REACHED();
+Operand Generate::create_string_literal(const StringLiteral *string_literal) {
+    return env()->create_immediate_string(string_literal->value());
 }

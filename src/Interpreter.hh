@@ -22,7 +22,7 @@
 #include "ast/CompareExpression.hh"
 #include "ast/CompilationUnit.hh"
 #include "ast/EqualityExpression.hh"
-#include "ast/FloatLiteral.hh"
+#include "ast/RealLiteral.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/FunctionDecl.hh"
 #include "ast/IfStatement.hh"

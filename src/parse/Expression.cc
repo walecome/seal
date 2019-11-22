@@ -6,11 +6,11 @@
 #include "ast/BooleanLiteral.hh"
 #include "ast/CompareExpression.hh"
 #include "ast/EqualityExpression.hh"
-#include "ast/FloatLiteral.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/IndexExpression.hh"
 #include "ast/IntegerLiteral.hh"
 #include "ast/Operator.hh"
+#include "ast/RealLiteral.hh"
 #include "ast/StringLiteral.hh"
 #include "ast/UnaryExpression.hh"
 #include "ast/VariableExpression.hh"
@@ -175,7 +175,7 @@ ptr_t<Expression> parse_number(TokenBuffer& tokens) {
 
     if (tokens.eat(DOT)) {
         oss << "." << tokens.pop().value;
-        return std::make_unique<FloatLiteral>(std::stof(oss.str()));
+        return std::make_unique<RealLiteral>(std::stod(oss.str()));
     }
 
     return std::make_unique<IntegerLiteral>(std::stoi(oss.str()));
@@ -195,7 +195,7 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
         quotes_removed.remove_prefix(1);
         quotes_removed.remove_suffix(1);
 
-        primary = std::make_unique<StringLiteral>(std::string(quotes_removed));
+        primary = std::make_unique<StringLiteral>(quotes_removed);
     } else if (current.type == LPARENS) {
         primary = parse_expression(tokens);
         tokens.expect(RPARENS);

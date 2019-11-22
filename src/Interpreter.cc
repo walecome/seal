@@ -275,7 +275,7 @@ expr_value_t Interpreter::interpret_literal(Literal* literal) {
     if (auto ptr = dynamic_cast<IntegerLiteral*>(literal)) {
         return ptr->value();
     }
-    if (auto ptr = dynamic_cast<FloatLiteral*>(literal)) {
+    if (auto ptr = dynamic_cast<RealLiteral*>(literal)) {
         return ptr->value();
     }
     if (auto ptr = dynamic_cast<ArrayLiteral*>(literal)) {

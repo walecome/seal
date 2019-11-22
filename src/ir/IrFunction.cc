@@ -13,11 +13,33 @@ unsigned new_variable_id() {
     return label_id++;
 }
 
-Operand IrFunction::create_immediate(unsigned long value) const {
+Operand IrFunction::create_immediate_int(unsigned long value) const {
     OperandData data;
-    data.immediate_value = value;
+    data.immediate_int = value;
 
-    Operand operand { OperandKind::IMMEDIATE, data };
+    Operand operand { OperandKind::IMMEDIATE_INT, data };
+
+    operand.set_env(this);
+
+    return operand;
+}
+
+Operand IrFunction::create_immediate_string(std::string_view value) const {
+    OperandData data;
+    data.immediate_string = value;
+
+    Operand operand { OperandKind::IMMEDIATE_STRING, data };
+
+    operand.set_env(this);
+
+    return operand;
+}
+
+Operand IrFunction::create_immediate_real(double value) const {
+    OperandData data;
+    data.immediate_real = value;
+
+    Operand operand { OperandKind::IMMEDIATE_REAL, data };
 
     operand.set_env(this);
 

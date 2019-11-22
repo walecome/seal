@@ -12,7 +12,7 @@ set(PROJECT_SOURCES
     src/ast/BooleanLiteral.cc
     src/ast/CompilationUnit.cc
     src/ast/Expression.cc
-    src/ast/FloatLiteral.cc
+    src/ast/RealLiteral.cc
     src/ast/FunctionCall.cc
     src/ast/FunctionDecl.cc
     src/ast/IfStatement.cc
@@ -74,7 +74,7 @@ set(PROJECT_HEADERS
     src/ast/Decl.hh                
     src/ast/EqualityExpression.hh  
     src/ast/Expression.hh
-    src/ast/FloatLiteral.hh
+    src/ast/RealLiteral.hh
     src/ast/FunctionCall.hh
     src/ast/FunctionDecl.hh
     src/ast/IfStatement.hh

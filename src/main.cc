@@ -92,7 +92,6 @@ int main(int argc, char **argv) {
                   << " milliseconds" << std::endl;
     }
 
-
     Generate ir_generator { parser.compilation_unit.get() };
     ptr_t<IrProgram> ir_program;
     long ir_duration =
