@@ -24,6 +24,7 @@
 #include "ast/VariableDecl.hh"
 #include "ast/VariableExpression.hh"
 #include "ast/While.hh"
+#include "builtin/BuiltIn.hh"
 #include "ir/IrProgram.hh"
 
 ptr_t<IrProgram> Generate::generate() {
@@ -164,6 +165,11 @@ Operand Generate::gen_expression(const Expression *expression) {
 }
 
 Operand Generate::gen_function_call(const FunctionCall *func_call) {
+    // TODO: Fix
+    if (BuiltIn::is_builtin(func_call->identifier().value)) {
+        throw std::runtime_error("Built-in function call not implemented");
+    }
+
     func_call->argument_list()->for_each_argument([this](auto arg) {
         auto arg_operand = gen_expression(arg);
         env()->add_quad(OPCode::PUSH_ARG, arg_operand, {}, {});
