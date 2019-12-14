@@ -6,7 +6,7 @@
 
 #include "Util.hh"
 
-enum class Primitive { STRING, INT, FLOAT, VOID, BOOL, DONT_CARE };
+enum class Primitive { STRING, INT, FLOAT, VOID, BOOL, DONT_CARE, INFERRED };
 enum class Kind { PRIMITIVE, ARRAY, STRUCT, NONE };
 
 class Operator;

@@ -31,10 +31,11 @@ class VariableDecl : public Decl {
     auto type() const { return m_type; }
     auto identifier() const { return m_identifier; }
     auto value() const { return m_value.get(); }
+    bool has_value() const { return m_value != nullptr; }
 
    private:
     const std::string_view m_identifier;
-    const Type m_type;
+    Type m_type;
     ptr_t<Expression> m_value;
     bool m_is_mutable;
 };

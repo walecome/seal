@@ -17,7 +17,7 @@ bool Type::operator!=(const Type &other) const {
 }
 
 void Type::change_kind(const Kind new_kind) {
-    // @TODO: We should be about to assert this when we add support for more
+    // @TODO: We should be able to assert this when we add support for more
     //        complex types
     // ASSERT(m_kind == Kind::NONE);
     m_kind = new_kind;
@@ -31,7 +31,9 @@ void Type::change_primitive(const Primitive new_primitive) {
 std::string Type::dump(unsigned) const {
     std::ostringstream oss {};
     oss << "{Type, ";
+    if (m_kind == Kind::ARRAY) oss << "[";
     oss << to_string();
+    if (m_kind == Kind::ARRAY) oss << "]";
     oss << "}";
     return oss.str();
 }
@@ -41,6 +43,10 @@ std::string Type::to_string() const {
         if (x.second == m_primitive) {
             return std::string(x.first);
         }
+    }
+
+    if (m_primitive == Primitive::INFERRED) {
+        return "INFERRED";
     }
 
     ASSERT_NOT_REACHED();

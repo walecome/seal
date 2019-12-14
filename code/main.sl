@@ -25,6 +25,13 @@ fn main() -> int {
     return 0;
 }
 
+fn stupid() -> int {
+
+    x : int = 3;
+    x = 3;
+
+}
+
 fn top_level_func() -> int {
 
     fn nested_func(val : int) -> int {

@@ -10,6 +10,12 @@ Type Parser::parse_type(TokenBuffer& tokens) {
 
         return type;
     }
+
+    if (tokens.top().type == ASSIGN) {
+        return { Primitive::INFERRED };
+    }
+
     tokens.expect(TYPE);
-    return Type { tokens.previous().value, Kind::PRIMITIVE };
+
+    return { tokens.previous().value, Kind::PRIMITIVE };
 }

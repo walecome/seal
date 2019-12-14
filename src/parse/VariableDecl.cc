@@ -18,17 +18,26 @@ ptr_t<VariableDecl> Parser::parse_variable_decl(TokenBuffer& tokens) {
     bool is_mutable = tokens.eat(MUTABLE);
 
     Type type = parse_type(tokens);
+
+    if (tokens.eat(SEMICOLON)) {
+        auto var_decl = std::make_unique<VariableDecl>(identifier, type);
+        auto end = tokens.top_iterator();
+        var_decl->source_ref.begin = begin;
+        var_decl->source_ref.end = end;
+
+        return var_decl;
+    }
+
     tokens.expect(ASSIGN);
 
     ptr_t<Expression> value = parse_expression(tokens);
 
     tokens.expect(SEMICOLON);
 
-    auto end = tokens.top_iterator();
-
     auto var_decl =
         std::make_unique<VariableDecl>(identifier, type, value, is_mutable);
 
+    auto end = tokens.top_iterator();
     var_decl->source_ref.begin = begin;
     var_decl->source_ref.end = end;
 

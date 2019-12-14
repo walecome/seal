@@ -90,6 +90,8 @@ int main(int argc, char **argv) {
     if (verbose) {
         std::cout << "Semantic analysis took " << semantic_duration
                   << " milliseconds" << std::endl;
+        std::cout << "AST after semantic analysis:" << std::endl;
+        std::cout << parser.compilation_unit->dump() << std::endl;
     }
 
     Generate ir_generator { parser.compilation_unit.get() };
