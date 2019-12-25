@@ -1,3 +1,4 @@
 .ccls*
 editor/
 build/
+.vscode
