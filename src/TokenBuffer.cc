@@ -1,4 +1,7 @@
 #include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <string>
 
 #include "Error.hh"
 #include "SourceRef.hh"
@@ -55,6 +58,7 @@ void TokenBuffer::expect(TokenType token_type) {
         util::print_col_indication(top().col);
         error::syntax(token_type, top());
     }
+
     eat(token_type);
 }
 
@@ -77,6 +81,8 @@ std::string TokenBuffer::reconstruct_row(unsigned row) const {
     std::ostringstream oss {};
 
     Token previous_token = tokens.at(current_index);
+
+    oss << util::indent_spaces(previous_token.col - 1);
     oss << previous_token.value;
 
     while (1) {

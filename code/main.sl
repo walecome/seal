@@ -27,9 +27,8 @@ fn main() -> int {
 
 fn stupid() -> int {
 
-    x : int = 3;
+    x : mut int = 3;
     x = 3;
-
 }
 
 fn top_level_func() -> int {

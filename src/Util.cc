@@ -31,7 +31,7 @@ std::shared_ptr<std::string> read_source(const std::string &filename) {
 }
 
 void print_col_indication(int col) {
-    for (int i = 0; i < col; ++i) {
+    for (int i = 1; i < col; ++i) {
         std::cout << "~";
     }
 
