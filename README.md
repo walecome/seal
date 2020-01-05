@@ -19,6 +19,15 @@ To be implemented:
 - Register or stack based interpreter
 - LLVM integration for generating machine code
 
+### Building:
+
+```
+git clone https://github.com/walecome/seal
+cd seal && mkdir build && cd build
+cmake ..
+make
+```
+
 #### Fibonacci:
 
 ```
