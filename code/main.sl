@@ -6,9 +6,11 @@ fn main() -> int {
 
     x = x * 10.0;
     
-    z = 1 -(-- 3);
+    asd : int = 4;
 
-    println(x);
+    z : int = 1 -(--asd);
+
+    // println(x);
 
     return 0;
 }
@@ -31,6 +33,6 @@ fn top_level_func() -> int {
 
 fn assert(value : bool, desc : string) -> void {
     if (value == false) {
-        println("Assertion failed for: " + desc);
+        // println("Assertion failed for: " + desc);
     }
 }
