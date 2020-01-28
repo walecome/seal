@@ -3,7 +3,6 @@
 
 void VariableExpression::analyze(Scope *scope) {
     if (!scope->has_variable(m_identifier, true)) {
-        // @TODO: Sematic error instead
         error::add_semantic_error("Use of undeclared variable", source_ref);
         m_type = Type { Primitive::VOID };
     } else {

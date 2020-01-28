@@ -2,22 +2,10 @@ fn main() -> int {
 
     x : mut float = 0.1337 * 100.0;
 
-    y : mut [int] = [0];
-
-    for (i : mut int = 0; i < 10; ++i) {
-        println("Hello world!");
-    }
-
     x = 3.0;
 
     x = x * 10.0;
-
-    y[0] = 3;
-
-    z : mut int = y[1 * 123];
-
-    z = y[0];
-
+    
     z = 1 -(-- 3);
 
     println(x);

@@ -22,11 +22,16 @@ void AssignExpression::analyze(Scope* scope) {
     }
 
     if (check_decl) {
-        auto decl = scope->get_variable(variable_expr->identifier());
-
-        if (!decl->is_mutable()) {
-            error::add_semantic_error("Assign to non-mutable variable",
+        if (!scope->has_variable(variable_expr->identifier(), true)) {
+            error::add_semantic_error("Assign to undeclared variable",
                                       source_ref);
+        } else {
+            auto decl = scope->get_variable(variable_expr->identifier());
+
+            if (!decl->is_mutable()) {
+                error::add_semantic_error("Assign to non-mutable variable",
+                                          source_ref);
+            }
         }
     }
 
