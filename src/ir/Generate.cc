@@ -326,9 +326,35 @@ Operand Generate::create_literal(const Literal *literal) {
     }
 }
 
-Operand Generate::gen_unary_expression(const UnaryExpression *) {
-    throw std::runtime_error(
-        "IR generation of unary expression not implemented");
+Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
+    auto target_operand = gen_expression(unary_expr->expression());
+    auto sym = unary_expr->op()->symbol();
+
+    if (sym == OperatorSym::MINUS) {
+        auto result_operand = env()->create_variable();
+        env()->add_quad(OPCode::SUB, result_operand,
+                        env()->create_immediate_int(0), target_operand);
+        return result_operand;
+    }
+
+    auto var_expr =
+        dynamic_cast<VariableExpression *>(unary_expr->expression());
+    ASSERT(var_expr != nullptr);
+
+    Operand result_operand;
+    if (sym == OperatorSym::INC) {
+        result_operand = gen_variable_expression(var_expr, true);
+        env()->add_quad(OPCode::ADD, result_operand, target_operand,
+                        env()->create_immediate_int(1));
+    } else if (sym == OperatorSym::DEC) {
+        result_operand = gen_variable_expression(var_expr, true);
+        env()->add_quad(OPCode::SUB, result_operand, target_operand,
+                        env()->create_immediate_int(1));
+    } else {
+        ASSERT_NOT_REACHED();
+    }
+
+    return result_operand;
 }
 
 Operand Generate::gen_variable_expression(const VariableExpression *var_expr,

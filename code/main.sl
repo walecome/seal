@@ -21,6 +21,14 @@ fn stupid() -> int {
     x = 3;
 }
 
+fn unary_test() -> int {
+    x: mut int = 0;
+
+    ++x;
+    --x;
+    x = -x;
+}
+
 fn top_level_func() -> int {
 
     fn nested_func(val : int) -> int {
