@@ -39,7 +39,8 @@ set(PROJECT_SOURCES
     src/ir/Quad.cc
 
     src/Error.cc
-    # src/Interpreter.cc
+    src/interpreter/Interpreter.cc
+    # src/TreeWalker.cc
     src/Lexer.cc
     src/main.cc
 
@@ -106,7 +107,8 @@ set(PROJECT_HEADERS
 
     src/Constants.hh
     src/Error.hh
-    # src/Interpreter.hh
+    src/interpreter/Interpreter.hh
+    # src/TreeWalker.hh
     src/Lexer.hh
     src/parse/Parser.hh
     src/semantic/Scope.hh
@@ -122,8 +124,11 @@ include_directories(src)
 include_directories(src/ast)
 include_directories(src/parse)
 include_directories(src/semantic)
+include_directories(src/interpreter)
 
 set(CMAKE_CXX_FLAGS "-g -std=c++17 -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
+
+
 
 ## Force colored output (mostly needed for Ninja build)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -133,6 +138,10 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif ()
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS})
+
+# FMT
+add_subdirectory(lib/fmt EXCLUDE_FROM_ALL)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 
 
 # target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
