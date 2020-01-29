@@ -165,19 +165,21 @@ Operand Generate::gen_expression(const Expression *expression) {
 }
 
 Operand Generate::gen_function_call(const FunctionCall *func_call) {
-    // TODO: Fix
-    if (BuiltIn::is_builtin(func_call->identifier())) {
-        throw std::runtime_error("Built-in function call not implemented");
-    }
-
+    // Push arguments
     func_call->argument_list()->for_each_argument([this](auto arg) {
         auto arg_operand = gen_expression(arg);
         env()->add_quad(OPCode::PUSH_ARG, arg_operand, {}, {});
     });
 
+    bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
+
     // @TODO: Handle if there is not return value
     auto return_value = env()->create_variable();
-    auto function_id = func_call->declaration()->function_id();
+
+    auto function_id =
+        is_builtin
+            ? BuiltIn::function_id_from_identifier(func_call->identifier())
+            : func_call->declaration()->function_id();
 
     env()->add_quad(OPCode::CALL, return_value,
                     env()->create_function_from_id(function_id), {});

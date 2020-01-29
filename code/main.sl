@@ -10,9 +10,14 @@ fn main() -> int {
 
     z : int = 1 -(--asd);
 
-    // println(x);
+    println(x);
 
     return 0;
+}
+
+fn prints() -> void {
+    print("hejsan");
+    println("hejsan");
 }
 
 fn stupid() -> int {

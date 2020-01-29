@@ -1,7 +1,8 @@
 #include "FunctionDecl.hh"
+#include "builtin/BuiltIn.hh"
 
 int new_function_id() {
-    static int function_id = 0;
+    static int function_id = BuiltIn::number_of_builtins();
     return function_id++;
 }
 

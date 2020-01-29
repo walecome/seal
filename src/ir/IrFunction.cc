@@ -9,8 +9,8 @@ unsigned new_label_id() {
 }
 
 unsigned new_variable_id() {
-    static unsigned label_id = 0;
-    return label_id++;
+    static unsigned variable_id = 0;
+    return variable_id++;
 }
 
 Operand IrFunction::create_immediate_int(unsigned long value) const {
