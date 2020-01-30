@@ -57,10 +57,10 @@ class IrFunction {
 
     void __dump_variables() const;
 
+    const auto &quads() const { return m_quads; }
+
    private:
     Operand create_variable_from_id(unsigned id) const;
-
-    const auto &quads() const { return m_quads; }
 
     // Bind the given label id to the given quad
     void bind_label(unsigned label_id, Quad *quad);
