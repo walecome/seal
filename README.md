@@ -22,7 +22,7 @@ To be implemented:
 ### Building:
 
 ```
-git clone https://github.com/walecome/seal
+git clone --recursive https://github.com/walecome/seal
 cd seal && mkdir build && cd build
 cmake ..
 make
