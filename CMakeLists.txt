@@ -144,7 +144,7 @@ add_subdirectory(lib/fmt EXCLUDE_FROM_ALL)
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 
 
-# target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 ## Move compile_commands.json to project directory after make
 add_custom_command(
