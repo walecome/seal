@@ -2,6 +2,7 @@
 
 #include <string>
 
+// All OPCodes are defined here
 #define ENUMERATE_OPCODES()       \
     __ENUMERATE_OPCODE(ADD)       \
     __ENUMERATE_OPCODE(SUB)       \

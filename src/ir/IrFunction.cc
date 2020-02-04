@@ -160,6 +160,16 @@ std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {
     return oss.str();
 }
 
+std::vector<const Quad *> IrFunction::quads_as_pointers() const {
+    std::vector<const Quad *> quad_ptrs {};
+
+    for (auto &unique_quad_ptr : m_quads) {
+        quad_ptrs.push_back(unique_quad_ptr.get());
+    }
+
+    return quad_ptrs;
+}
+
 void IrFunction::__dump_variables() const {
     for (auto &x : m_variable_ref) {
         std::cout << x.first << "=" << x.second << std::endl;

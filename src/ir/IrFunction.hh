@@ -59,6 +59,8 @@ class IrFunction {
 
     const auto &quads() const { return m_quads; }
 
+    std::vector<const Quad *> quads_as_pointers() const;
+
    private:
     Operand create_variable_from_id(unsigned id) const;
 

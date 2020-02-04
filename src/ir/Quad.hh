@@ -20,6 +20,10 @@ class Quad {
     unsigned label_id() const { return m_label_id; }
     bool has_label() const { return m_has_label; }
     void set_label(unsigned label_id);
+    OPCode opcode() const { return m_op_code; };
+    Operand dest() const { return m_dest; }
+    Operand src_a() const { return m_src_a; }
+    Operand src_b() const { return m_src_b; }
 
    private:
     unsigned m_label_id { 0 };
