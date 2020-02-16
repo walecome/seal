@@ -15,7 +15,7 @@ unsigned new_variable_id() {
 
 Operand IrFunction::create_immediate_int(unsigned long value) const {
     OperandData data;
-    data.immediate_int = value;
+    data.value.integer = value;
 
     Operand operand { OperandKind::IMMEDIATE_INT, data };
 
@@ -26,7 +26,7 @@ Operand IrFunction::create_immediate_int(unsigned long value) const {
 
 Operand IrFunction::create_immediate_string(std::string_view value) const {
     OperandData data;
-    data.immediate_string = value;
+    data.value.str = value;
 
     Operand operand { OperandKind::IMMEDIATE_STRING, data };
 
@@ -37,7 +37,7 @@ Operand IrFunction::create_immediate_string(std::string_view value) const {
 
 Operand IrFunction::create_immediate_real(double value) const {
     OperandData data;
-    data.immediate_real = value;
+    data.value.real = value;
 
     Operand operand { OperandKind::IMMEDIATE_REAL, data };
 

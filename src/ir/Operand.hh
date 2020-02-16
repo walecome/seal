@@ -1,5 +1,7 @@
 #pragma once
 
+#include <variant>
+
 #include "Constants.hh"
 #include "OperandType.hh"
 
@@ -10,12 +12,17 @@ enum class OperandKind {
     VARIABLE,
     LABEL,
     FUNCTION,
+    UNUSED,
+};
+
+union OperandValue {
+    unsigned long integer;
+    double real;
+    std::string_view str {};
 };
 
 union OperandData {
-    unsigned long immediate_int;
-    double immediate_real;
-    std::string_view immediate_string {};
+    OperandValue value {};
     int label_id;
     int variable_id;
     int function_id;
@@ -25,10 +32,10 @@ class IrFunction;
 
 class Operand {
    public:
-    Operand() : m_kind {}, m_data {}, m_used { false } {}
+    Operand() : m_kind { OperandKind::UNUSED }, m_data {} {}
 
     Operand(OperandKind kind, OperandData data)
-        : m_kind { kind }, m_data { data }, m_used { true } {}
+        : m_kind { kind }, m_data { data } {}
 
     OperandKind& kind() { return m_kind; }
     OperandData& data() { return m_data; }
@@ -36,13 +43,16 @@ class Operand {
     const OperandData& data() const { return m_data; }
     const OperandKind& kind() const { return m_kind; }
 
-    bool is_immediate_int() const;
-    bool is_immediate_real() const;
-    bool is_immediate_string() const;
+    bool is_number() const;
+    bool is_integer() const;
+    bool is_real() const;
+    bool is_string() const;
     bool is_label() const;
     bool is_variable() const;
 
-    bool is_used() const { return m_used; }
+    bool is_used() const { return m_kind != OperandKind::UNUSED; }
+
+    std::string_view variable_name() const;
 
     auto env() const { return m_env; }
     void set_env(const IrFunction* env) { m_env = env; }
@@ -54,6 +64,4 @@ class Operand {
     OperandData m_data;
 
     const IrFunction* m_env { nullptr };
-
-    bool m_used;
 };
