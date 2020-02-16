@@ -3,13 +3,31 @@
 #include <map>
 #include <stack>
 
+#include "ir/Operand.hh"
+
 class IrProgram;
 class IrFunction;
 class Quad;
 
 class StackFrame {
    public:
+    StackFrame();
+    StackFrame(StackFrame* parent) : m_parent { parent } {}
+
+    void set_variable(const std::string_view identifier, const Operand value);
+    Operand get_variable(const std::string_view identifier);
+
    private:
+    // Assign a value to an existing variable.
+    void assign_variable(const std::string_view identifier,
+                         const Operand value);
+
+    // Return the inner most stack frame that holds the variable with name
+    // identifier.
+    StackFrame* get_variable_frame(std::string_view identifier);
+
+    StackFrame* m_parent { nullptr };
+    std::map<std::string_view, Operand> m_variables {};
 };
 
 class Interpreter {

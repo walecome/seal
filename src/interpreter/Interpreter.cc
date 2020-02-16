@@ -4,6 +4,49 @@
 #include "ir/IrFunction.hh"
 #include "ir/IrProgram.hh"
 
+void StackFrame::set_variable(const std::string_view identifier,
+                              const Operand value) {
+    auto target_frame = get_variable_frame(identifier);
+
+    if (target_frame) {
+        target_frame->assign_variable(identifier, value);
+    } else {
+        // No frame had the variable previously set
+        m_variables[identifier] = value;
+    }
+}
+
+void StackFrame::assign_variable(const std::string_view identifier,
+                                 const Operand value) {
+    ASSERT(m_variables.count(identifier) == 1);
+
+    m_variables[identifier] = value;
+}
+
+Operand StackFrame::get_variable(const std::string_view identifier) {
+    auto it = m_variables.find(identifier);
+
+    if (it == std::end(m_variables)) {
+        return m_parent->get_variable(identifier);
+    }
+
+    return it->second;
+}
+
+StackFrame* StackFrame::get_variable_frame(std::string_view identifier) {
+    auto it = m_variables.find(identifier);
+
+    if (it == std::end(m_variables)) {
+        if (!m_parent) {
+            return nullptr;
+        }
+
+        return m_parent->get_variable_frame(identifier);
+    }
+
+    return this;
+}
+
 void Interpreter::interpret() {
     interpret_function(
         m_ir_program->get_function_from_id(m_ir_program->main_function_id()));
@@ -56,7 +99,11 @@ void Interpreter::interpret_function(const IrFunction* function) {
     }
 }
 
-void Interpreter::add(const Quad* quad) {}
+void Interpreter::add(const Quad* quad) {
+    ASSERT(quad->opcode() == OPCode::ADD);
+    ASSERT(quad->dest().is_variable());
+}
+
 void Interpreter::sub(const Quad* quad) {}
 void Interpreter::mult(const Quad* quad) {}
 void Interpreter::div(const Quad* quad) {}
