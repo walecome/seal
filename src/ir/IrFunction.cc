@@ -14,55 +14,35 @@ unsigned new_variable_id() {
 }
 
 Operand IrFunction::create_immediate_int(unsigned long value) const {
-    OperandData data;
-    data.value.integer = value;
-
-    Operand operand { OperandKind::IMMEDIATE_INT, data };
-
+    Operand operand { OperandKind::IMMEDIATE_INT, IntOperand { value } };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_immediate_string(std::string_view value) const {
-    OperandData data;
-    data.value.str = value;
-
-    Operand operand { OperandKind::IMMEDIATE_STRING, data };
-
+    Operand operand { OperandKind::IMMEDIATE_STRING, StringOperand { value } };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_immediate_real(double value) const {
-    OperandData data;
-    data.value.real = value;
-
-    Operand operand { OperandKind::IMMEDIATE_REAL, data };
-
+    Operand operand { OperandKind::IMMEDIATE_REAL, RealOperand { value } };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_label() const {
-    OperandData data;
-    data.label_id = new_label_id();
-
-    Operand operand { OperandKind::LABEL, data };
-
+    Operand operand { OperandKind::LABEL, LabelOperand { new_label_id() } };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_variable_from_id(unsigned id) const {
-    OperandData data;
-    data.variable_id = id;
-
-    Operand operand { OperandKind::VARIABLE, data };
-
+    Operand operand { OperandKind::VARIABLE, VariableOperand { id } };
     operand.set_env(this);
 
     return operand;
@@ -81,11 +61,7 @@ Operand IrFunction::get_variable(std::string_view identifier) const {
 }
 
 Operand IrFunction::create_function_from_id(unsigned function_id) const {
-    OperandData data;
-    data.function_id = function_id;
-
-    Operand operand { OperandKind::FUNCTION, data };
-
+    Operand operand { OperandKind::FUNCTION, FunctionOperand { function_id } };
     operand.set_env(this);
 
     return operand;
@@ -106,8 +82,7 @@ void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
 
 void IrFunction::queue_label(const Operand &label) {
     ASSERT(label.is_label());
-
-    m_waiting_labels.push_back(label.data().label_id);
+    m_waiting_labels.push_back(std::get<LabelOperand>(label.data()));
 }
 
 void IrFunction::bind_queued_labels(Quad *quad) {
@@ -122,24 +97,25 @@ void IrFunction::bind_queued_labels(Quad *quad) {
 
 void IrFunction::bind_label(const Operand &label, Quad *quad) {
     ASSERT(label.is_label());
-
-    bind_label(label.data().label_id, quad);
+    bind_label(std::get<LabelOperand>(label.data()), quad);
 }
 
-void IrFunction::bind_label(unsigned label_id, Quad *quad) {
-    ASSERT(m_labels.find(label_id) == std::end(m_labels));
+void IrFunction::bind_label(LabelOperand label, Quad *quad) {
+    ASSERT(m_labels.find(label) == std::end(m_labels));
 
-    quad->set_label(label_id);
+    quad->set_label(label);
 
-    m_labels.insert({ label_id, quad });
+    m_labels.insert({ label, quad });
 }
 
 void IrFunction::bind_variable(const Operand &variable,
                                const std::string_view var_name) {
     ASSERT(variable.is_variable());
 
-    m_varname_to_id.insert_or_assign(var_name, variable.data().variable_id);
-    m_variable_ref.insert_or_assign(variable.data().variable_id, var_name);
+    VariableOperand var_raw = std::get<VariableOperand>(variable.data());
+
+    m_varname_to_id.insert_or_assign(var_name, var_raw);
+    m_variable_ref.insert_or_assign(var_raw, var_name);
 }
 
 void IrFunction::dump_quads() const {

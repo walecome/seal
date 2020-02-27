@@ -1,5 +1,7 @@
 fn main() -> int {
 
+    print("hej");
+
     x : mut float = 0.1337 * 100.0;
 
     x = 3.0;
