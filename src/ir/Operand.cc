@@ -23,41 +23,28 @@ std::string_view Operand::variable_name() const {
     return env()->resolve_variable_name(std::get<VariableOperand>(m_data));
 }
 
-std::string Operand::to_string() const {
+struct OperandPrinter {
+    const Operand* context;
     std::ostringstream oss {};
 
-    // TODO: All of this can be changed to a std::visit instead
-
-    switch (m_kind) {
-        case OperandKind::FUNCTION:
-            oss << "function#" << std::get<FunctionOperand>(m_data);
-            return oss.str();
-
-        case OperandKind::IMMEDIATE_INT:
-            oss << std::get<IntOperand>(m_data);
-            return oss.str();
-
-        case OperandKind::IMMEDIATE_REAL:
-            oss << std::get<RealOperand>(m_data);
-            return oss.str();
-
-        case OperandKind::IMMEDIATE_STRING:
-            oss << (std::string_view)std::get<StringOperand>(m_data);
-            return oss.str();
-
-        case OperandKind::LABEL:
-            oss << std::get<LabelOperand>(m_data);
-            return oss.str();
-
-        case OperandKind::VARIABLE: {
-            auto var_id = std::get<VariableOperand>(m_data);
-
-            oss << env()->resolve_variable_name(var_id) << " (" << var_id
-                << ")";
-            return oss.str();
-        }
-
-        default:
-            ASSERT_NOT_REACHED();
+    template <typename T>
+    std::string operator()(T value) {
+        oss << value;
+        return oss.str();
     }
+
+    std::string operator()(FunctionOperand function_id) {
+        oss << "function#" << function_id;
+        return oss.str();
+    }
+
+    std::string operator()(VariableOperand var_id) {
+        oss << context->env()->resolve_variable_name(var_id) << " (" << var_id
+            << ")";
+        return oss.str();
+    }
+};
+
+std::string Operand::to_string() const {
+    return std::visit(OperandPrinter { this }, m_data);
 }

@@ -16,11 +16,15 @@ enum class OperandKind {
 };
 // This defines a struct with the identifier name. In addition it adds a member
 // named value of the given type, as well as an overload for that type.
-#define ADD_LANGUAGE_TYPE(name, type)           \
-    struct name {                               \
-        name() = default;                       \
-        type value {};                          \
-        operator type() const { return value; } \
+#define ADD_LANGUAGE_TYPE(NAME, TYPE)                                        \
+    struct NAME {                                                            \
+        NAME() = default;                                                    \
+        TYPE value {};                                                       \
+        operator TYPE() const { return value; }                              \
+        friend std::ostream& operator<<(std::ostream& os, const NAME& cls) { \
+            os << cls.value;                                                 \
+            return os;                                                       \
+        }                                                                    \
     };
 
 // For immediate operands
@@ -36,6 +40,8 @@ ADD_LANGUAGE_TYPE(FunctionOperand, unsigned)
 using operand_type_t =
     std::variant<IntOperand, RealOperand, StringOperand, LabelOperand,
                  VariableOperand, FunctionOperand>;
+
+using value_operand_t = std::variant<IntOperand, RealOperand, StringOperand>;
 
 class IrFunction;
 

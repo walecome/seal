@@ -14,6 +14,8 @@ fn main() -> int {
 
     println(x);
 
+    lol := "hejsan";
+
     return 0;
 }
 

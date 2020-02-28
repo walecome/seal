@@ -99,6 +99,15 @@ void Interpreter::interpret_function(const IrFunction* function) {
     }
 }
 
+// Given an operand, resolve it and return a value operand.
+// Variable operand -> value operand
+// Value operand -> value operand (itself)
+value_operand_t resolve_operand(Operand& operand) {
+    // value_operand_t w =
+    //     std::visit([](auto&& arg) -> value_operand_t { return arg + arg; },
+    //                operand.data());
+}
+
 void Interpreter::add(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::ADD);
     ASSERT(quad->dest().is_variable());
