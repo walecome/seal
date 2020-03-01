@@ -2,6 +2,7 @@
 
 #include <map>
 #include <stack>
+#include <vector>
 
 #include "ir/Operand.hh"
 
@@ -20,6 +21,10 @@ class StackFrame {
     // Decays an Operand to ValueOperand
     ValueOperand resolve_operand(Operand operand) const;
 
+    void push_argument(ValueOperand value);
+    void clear_arguments();
+    const std::vector<ValueOperand>& get_arguments() const;
+
    private:
     // Assign a value to an existing variable.
     void assign_variable(VariableOperand var, ValueOperand value);
@@ -30,6 +35,7 @@ class StackFrame {
 
     StackFrame* m_parent { nullptr };
     std::map<VariableOperand, ValueOperand> m_variables {};
+    std::vector<ValueOperand> m_arguments {};
 };
 
 class Interpreter {

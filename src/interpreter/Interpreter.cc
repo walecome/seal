@@ -1,6 +1,7 @@
 #include <fmt/format.h>
 
 #include "Interpreter.hh"
+#include "builtin/BuiltIn.hh"
 #include "ir/IrFunction.hh"
 #include "ir/IrProgram.hh"
 
@@ -56,6 +57,16 @@ ValueOperand StackFrame::resolve_operand(Operand operand) const {
     return std::visit(OperandResolver { this }, operand.data());
 }
 
+void StackFrame::push_argument(ValueOperand value) {
+    m_arguments.push_back(std::move(value));
+}
+
+void StackFrame::clear_arguments() { m_arguments.clear(); }
+
+const std::vector<ValueOperand>& StackFrame::get_arguments() const {
+    return m_arguments;
+}
+
 StackFrame* StackFrame::get_variable_frame(VariableOperand var) {
     auto it = m_variables.find(var);
 
@@ -109,8 +120,10 @@ void Interpreter::interpret_function(const IrFunction* function) {
             case OPCode::JMP_NZ:
                 break;
             case OPCode::PUSH_ARG:
+                push_arg(quad);
                 break;
             case OPCode::CALL:
+                call(quad);
                 break;
             case OPCode::RET:
                 break;
@@ -186,8 +199,27 @@ void Interpreter::cmp_noteq(const Quad*) {}
 void Interpreter::jmp(const Quad*) {}
 void Interpreter::jmp_z(const Quad*) {}
 void Interpreter::jmp_nz(const Quad*) {}
-void Interpreter::push_arg(const Quad*) {}
-void Interpreter::call(const Quad*) {}
+
+void Interpreter::push_arg(const Quad* quad) {
+    current_frame()->push_argument(
+        current_frame()->resolve_operand(quad->src_a()));
+}
+
+void Interpreter::call(const Quad* quad) {
+    ASSERT(quad->opcode() == OPCode::CALL);
+    ASSERT(quad->src_a().is_function());
+
+    FunctionOperand func = std::get<FunctionOperand>(quad->src_a().data());
+
+    if (BuiltIn::is_builtin(func)) {
+        BuiltIn::call_builtin_function(func, current_frame()->get_arguments());
+    } else {
+        ASSERT_NOT_REACHED();
+    };
+
+    current_frame()->clear_arguments();
+}
+
 void Interpreter::ret(const Quad*) {}
 void Interpreter::move(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::MOVE);

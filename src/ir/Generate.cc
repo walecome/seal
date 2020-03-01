@@ -168,7 +168,7 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
     // Push arguments
     func_call->argument_list()->for_each_argument([this](auto arg) {
         auto arg_operand = gen_expression(arg);
-        env()->add_quad(OPCode::PUSH_ARG, arg_operand, {}, {});
+        env()->add_quad(OPCode::PUSH_ARG, {}, arg_operand, {});
     });
 
     bool is_builtin = BuiltIn::is_builtin(func_call->identifier());

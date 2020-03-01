@@ -69,6 +69,7 @@ class Operand {
     bool is_string() const;
     bool is_label() const;
     bool is_variable() const;
+    bool is_function() const;
 
     bool is_used() const { return m_kind != OperandKind::UNUSED; }
 
@@ -87,3 +88,4 @@ class Operand {
 };
 
 void print_value_operand(value_operand_t);
+std::string value_operand_to_string(ValueOperand);

@@ -1,30 +1,22 @@
+#include <fmt/format.h>
+
 #include "BuiltIn.hh"
 #include "ast/ArgumentList.hh"
 
 namespace BuiltIn {
 
-void print(param_type_t args) {
-    // @TODO: Maybe allow additional arguments later
-    ASSERT(args.size() == 1);
+void print(const std::vector<ValueOperand> &args) {
+    std::vector<std::string> stringified_args {};
 
-    auto value = args.at(0);
+    for (auto &arg : args) {
+        stringified_args.push_back(value_operand_to_string(arg));
+    }
 
-    if (std::holds_alternative<bool>(value))
-        std::cout << std::boolalpha << std::get<bool>(value);
-    else if (std::holds_alternative<std::string>(value))
-        std::cout << std::get<std::string>(value);
-    else if (std::holds_alternative<int>(value))
-        std::cout << std::get<int>(value);
-    else if (std::holds_alternative<float>(value))
-        std::cout << std::get<float>(value);
-    else
-        ASSERT_NOT_REACHED();
-
-    std::cout << std::flush;
+    fmt::print("{}", fmt::join(stringified_args, ""));
 }
 
-void println(param_type_t args) {
+void println(const std::vector<ValueOperand> &args) {
     print(args);
-    std::cout << std::endl;
+    fmt::print("\n");
 }
 }  // namespace BuiltIn

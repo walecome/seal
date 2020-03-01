@@ -5,7 +5,7 @@
 
 namespace BuiltIn {
 
-using builtin_func_t = std::function<void(param_type_t)>;
+using builtin_func_t = std::function<void(const std::vector<ValueOperand>&)>;
 
 class FuncInfo {
    public:
@@ -18,10 +18,7 @@ class FuncInfo {
 
     bool typechecked() const { return m_is_typechecked; }
 
-    template <typename... Args>
-    void call(Args&&... args) const {
-        m_func(std::forward<Args>(args)...);
-    }
+    void call(const std::vector<ValueOperand>& args) const { m_func(args); }
 
     unsigned id() const { return m_id; }
 
@@ -52,9 +49,26 @@ static const std::map<std::string, FuncInfo, std::less<>> builtin_functions {
     BUILTIN_ENTRY(print, false), BUILTIN_ENTRY(println, false)
 };
 
+std::vector<FuncInfo> map_id_to_func() {
+    std::vector<FuncInfo> ret {};
+
+    for (auto it = builtin_functions.begin(); it != builtin_functions.end();
+         ++it) {
+        ret.push_back(it->second);
+    }
+
+    return ret;
+}
+
+static const std::vector<FuncInfo> id_to_builtin = map_id_to_func();
+
 bool is_builtin(const std::string_view identifier) {
     return builtin_functions.find(std::string(identifier)) !=
            std::end(builtin_functions);
+}
+
+bool is_builtin(unsigned function_id) {
+    return function_id < number_of_builtins();
 }
 
 bool is_typechecked(const std::string_view identifier) {
@@ -69,10 +83,9 @@ unsigned function_id_from_identifier(std::string_view identifier) {
     return builtin_functions.find(identifier)->second.id();
 }
 
-void dispatch_builtin_function(const std::string_view identifier,
-                               param_type_t args) {
-    ASSERT(is_builtin(identifier));
-    builtin_functions.find(identifier)->second.call(args);
+void call_builtin_function(unsigned function_id,
+                           const std::vector<ValueOperand>& args) {
+    id_to_builtin.at(function_id).call(args);
 }
 
 }  // namespace BuiltIn

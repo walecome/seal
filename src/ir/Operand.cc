@@ -19,6 +19,7 @@ bool Operand::is_string() const {
 
 bool Operand::is_label() const { return m_kind == OperandKind::LABEL; }
 bool Operand::is_variable() const { return m_kind == OperandKind::VARIABLE; }
+bool Operand::is_function() const { return m_kind == OperandKind::FUNCTION; }
 
 std::string_view Operand::variable_name() const {
     ASSERT(m_kind == OperandKind::VARIABLE);
@@ -66,4 +67,8 @@ std::string Operand::to_string() const {
 
 void print_value_operand(value_operand_t value) {
     fmt::print("{}\n", std::visit(ValueOperandPrinter {}, value));
+}
+
+std::string value_operand_to_string(ValueOperand value) {
+    return std::visit(ValueOperandPrinter {}, value.value);
 }
