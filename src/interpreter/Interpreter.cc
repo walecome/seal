@@ -183,8 +183,6 @@ void binop_helper(StackFrame* context, const Quad* quad) {
         std::visit(BinOpVisitor<Operator> {}, lhs.value, rhs.value);
 
     context->set_variable(quad->dest(), ValueOperand { result });
-
-    print_value_operand(result);
 }
 
 void Interpreter::add(const Quad* quad) {
