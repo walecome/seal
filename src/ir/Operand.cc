@@ -1,5 +1,7 @@
 #include <iomanip>
 
+#include <fmt/format.h>
+
 #include "ir/IrFunction.hh"
 #include "ir/Operand.hh"
 
@@ -60,4 +62,8 @@ struct OperandPrinter {
 
 std::string Operand::to_string() const {
     return std::visit(OperandPrinter { this }, m_data);
+}
+
+void print_value_operand(value_operand_t value) {
+    fmt::print("{}\n", std::visit(ValueOperandPrinter {}, value));
 }

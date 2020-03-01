@@ -4,44 +4,67 @@
 #include "ir/IrFunction.hh"
 #include "ir/IrProgram.hh"
 
-void StackFrame::set_variable(const std::string_view identifier,
-                              const Operand value) {
-    auto target_frame = get_variable_frame(identifier);
+void StackFrame::set_variable(Operand var, ValueOperand value) {
+    ASSERT(var.is_variable());
+
+    VariableOperand var_raw = std::get<VariableOperand>(var.data());
+
+    auto target_frame = get_variable_frame(var_raw);
 
     if (target_frame) {
-        target_frame->assign_variable(identifier, value);
+        target_frame->assign_variable(var_raw, value);
     } else {
         // No frame had the variable previously set
-        m_variables[identifier] = value;
+        m_variables[var_raw] = value;
     }
 }
 
-void StackFrame::assign_variable(const std::string_view identifier,
-                                 const Operand value) {
-    ASSERT(m_variables.count(identifier) == 1);
+void StackFrame::assign_variable(VariableOperand var, ValueOperand value) {
+    ASSERT(m_variables.count(var) == 1);
 
-    m_variables[identifier] = value;
+    m_variables[var] = value;
 }
 
-Operand StackFrame::get_variable(const std::string_view identifier) {
-    auto it = m_variables.find(identifier);
+ValueOperand StackFrame::get_variable(VariableOperand var) const {
+    auto it = m_variables.find(var);
 
     if (it == std::end(m_variables)) {
-        return m_parent->get_variable(identifier);
+        return m_parent->get_variable(var);
     }
 
     return it->second;
 }
 
-StackFrame* StackFrame::get_variable_frame(std::string_view identifier) {
-    auto it = m_variables.find(identifier);
+struct OperandResolver {
+    const StackFrame* env;
+
+    ValueOperand operator()(ValueOperand value_operand) {
+        return value_operand;
+    }
+
+    ValueOperand operator()(VariableOperand var) {
+        return env->get_variable(var);
+    }
+
+    template <class T>
+    ValueOperand operator()(T) {
+        ASSERT_NOT_REACHED();
+    }
+};
+
+ValueOperand StackFrame::resolve_operand(Operand operand) const {
+    return std::visit(OperandResolver { this }, operand.data());
+}
+
+StackFrame* StackFrame::get_variable_frame(VariableOperand var) {
+    auto it = m_variables.find(var);
 
     if (it == std::end(m_variables)) {
         if (!m_parent) {
             return nullptr;
         }
 
-        return m_parent->get_variable_frame(identifier);
+        return m_parent->get_variable_frame(var);
     }
 
     return this;
@@ -59,10 +82,13 @@ void Interpreter::interpret_function(const IrFunction* function) {
                 add(quad);
                 break;
             case OPCode::SUB:
+                sub(quad);
                 break;
             case OPCode::MULT:
+                mult(quad);
                 break;
             case OPCode::DIV:
+                div(quad);
                 break;
             case OPCode::CMP_EQ:
                 break;
@@ -89,6 +115,7 @@ void Interpreter::interpret_function(const IrFunction* function) {
             case OPCode::RET:
                 break;
             case OPCode::MOVE:
+                move(quad);
                 break;
             case OPCode::INDEX_MOVE:
                 break;
@@ -99,56 +126,55 @@ void Interpreter::interpret_function(const IrFunction* function) {
     }
 }
 
-template <class Operator>
+template <class BinaryOperator>
 struct BinOpVisitor {
     template <typename T, typename U>
-    operand_type_t operator()(T, U) {
+    value_operand_t operator()(T, U) {
         ASSERT_NOT_REACHED();
     }
 
-    operand_type_t operator()(StringOperand, StringOperand) {
+    value_operand_t operator()(StringOperand, StringOperand) {
         ASSERT_NOT_REACHED();
     }
 
     template <typename T>
-    operand_type_t operator()(T a, T b) {
-        return T { Operator {}(a, b) };
+    value_operand_t operator()(T a, T b) {
+        return T { BinaryOperator {}(a, b) };
     }
 };
 
-void Interpreter::add(const Quad* quad) {
-    ASSERT(quad->opcode() == OPCode::ADD);
+template <class Operator>
+void binop_helper(StackFrame* context, const Quad* quad) {
     ASSERT(quad->dest().is_variable());
 
-    // operand_type_t result =
-    //     std::visit(BinOpVisitor<std::plus<>> {}, quad->src_a().data(),
-    //                quad->src_b().data());
+    ValueOperand lhs = context->resolve_operand(quad->src_a());
+    ValueOperand rhs = context->resolve_operand(quad->src_b());
+
+    value_operand_t result =
+        std::visit(BinOpVisitor<Operator> {}, lhs.value, rhs.value);
+
+    context->set_variable(quad->dest(), ValueOperand { result });
+
+    print_value_operand(result);
+}
+
+void Interpreter::add(const Quad* quad) {
+    ASSERT(quad->opcode() == OPCode::ADD);
+    binop_helper<std::plus<>>(current_frame(), quad);
 }
 
 void Interpreter::sub(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::SUB);
-    ASSERT(quad->dest().is_variable());
-
-    // operand_type_t result =
-    //     std::visit(BinOpVisitor<std::minus<>> {}, quad->src_a().data(),
-    //                quad->src_b().data());
+    binop_helper<std::minus<>>(current_frame(), quad);
 }
 void Interpreter::mult(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::MULT);
-    ASSERT(quad->dest().is_variable());
-
-    // operand_type_t result =
-    //     std::visit(BinOpVisitor<std::multiplies<>> {}, quad->src_a().data(),
-    //                quad->src_b().data());
+    binop_helper<std::multiplies<>>(current_frame(), quad);
 }
 
 void Interpreter::div(const Quad* quad) {
-    ASSERT(quad->opcode() == OPCode::MULT);
-    ASSERT(quad->dest().is_variable());
-
-    // operand_type_t result =
-    //     std::visit(BinOpVisitor<std::divides<>> {}, quad->src_a().data(),
-    //                quad->src_b().data());
+    ASSERT(quad->opcode() == OPCode::DIV);
+    binop_helper<std::divides<>>(current_frame(), quad);
 }
 
 void Interpreter::cmp_eq(const Quad*) {}
@@ -163,5 +189,9 @@ void Interpreter::jmp_nz(const Quad*) {}
 void Interpreter::push_arg(const Quad*) {}
 void Interpreter::call(const Quad*) {}
 void Interpreter::ret(const Quad*) {}
-void Interpreter::move(const Quad*) {}
+void Interpreter::move(const Quad* quad) {
+    ASSERT(quad->opcode() == OPCode::MOVE);
+    current_frame()->set_variable(
+        quad->dest(), current_frame()->resolve_operand(quad->src_a()));
+}
 void Interpreter::index_move(const Quad*) {}
