@@ -120,48 +120,48 @@ void Interpreter::add(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::ADD);
     ASSERT(quad->dest().is_variable());
 
-    operand_type_t result =
-        std::visit(BinOpVisitor<std::plus<>> {}, quad->src_a().data(),
-                   quad->src_b().data());
+    // operand_type_t result =
+    //     std::visit(BinOpVisitor<std::plus<>> {}, quad->src_a().data(),
+    //                quad->src_b().data());
 }
 
 void Interpreter::sub(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::SUB);
     ASSERT(quad->dest().is_variable());
 
-    operand_type_t result =
-        std::visit(BinOpVisitor<std::minus<>> {}, quad->src_a().data(),
-                   quad->src_b().data());
+    // operand_type_t result =
+    //     std::visit(BinOpVisitor<std::minus<>> {}, quad->src_a().data(),
+    //                quad->src_b().data());
 }
 void Interpreter::mult(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::MULT);
     ASSERT(quad->dest().is_variable());
 
-    operand_type_t result =
-        std::visit(BinOpVisitor<std::multiplies<>> {}, quad->src_a().data(),
-                   quad->src_b().data());
+    // operand_type_t result =
+    //     std::visit(BinOpVisitor<std::multiplies<>> {}, quad->src_a().data(),
+    //                quad->src_b().data());
 }
 
 void Interpreter::div(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::MULT);
     ASSERT(quad->dest().is_variable());
 
-    operand_type_t result =
-        std::visit(BinOpVisitor<std::divides<>> {}, quad->src_a().data(),
-                   quad->src_b().data());
+    // operand_type_t result =
+    //     std::visit(BinOpVisitor<std::divides<>> {}, quad->src_a().data(),
+    //                quad->src_b().data());
 }
 
-void Interpreter::cmp_eq(const Quad* quad) {}
-void Interpreter::cmp_gt(const Quad* quad) {}
-void Interpreter::cmp_lt(const Quad* quad) {}
-void Interpreter::cmp_gteq(const Quad* quad) {}
-void Interpreter::cmp_lteq(const Quad* quad) {}
-void Interpreter::cmp_noteq(const Quad* quad) {}
-void Interpreter::jmp(const Quad* quad) {}
-void Interpreter::jmp_z(const Quad* quad) {}
-void Interpreter::jmp_nz(const Quad* quad) {}
-void Interpreter::push_arg(const Quad* quad) {}
-void Interpreter::call(const Quad* quad) {}
-void Interpreter::ret(const Quad* quad) {}
-void Interpreter::move(const Quad* quad) {}
-void Interpreter::index_move(const Quad* quad) {}
+void Interpreter::cmp_eq(const Quad*) {}
+void Interpreter::cmp_gt(const Quad*) {}
+void Interpreter::cmp_lt(const Quad*) {}
+void Interpreter::cmp_gteq(const Quad*) {}
+void Interpreter::cmp_lteq(const Quad*) {}
+void Interpreter::cmp_noteq(const Quad*) {}
+void Interpreter::jmp(const Quad*) {}
+void Interpreter::jmp_z(const Quad*) {}
+void Interpreter::jmp_nz(const Quad*) {}
+void Interpreter::push_arg(const Quad*) {}
+void Interpreter::call(const Quad*) {}
+void Interpreter::ret(const Quad*) {}
+void Interpreter::move(const Quad*) {}
+void Interpreter::index_move(const Quad*) {}

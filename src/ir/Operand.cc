@@ -23,14 +23,22 @@ std::string_view Operand::variable_name() const {
     return env()->resolve_variable_name(std::get<VariableOperand>(m_data));
 }
 
-struct OperandPrinter {
-    const Operand* context;
+struct ValueOperandPrinter {
     std::ostringstream oss {};
 
     template <typename T>
     std::string operator()(T value) {
         oss << value;
         return oss.str();
+    }
+};
+
+struct OperandPrinter {
+    const Operand* context;
+    std::ostringstream oss {};
+
+    std::string operator()(ValueOperand value) {
+        return std::visit(ValueOperandPrinter {}, value.value);
     }
 
     std::string operator()(FunctionOperand function_id) {
@@ -41,6 +49,11 @@ struct OperandPrinter {
     std::string operator()(VariableOperand var_id) {
         oss << context->env()->resolve_variable_name(var_id) << " (" << var_id
             << ")";
+        return oss.str();
+    }
+
+    std::string operator()(LabelOperand label_id) {
+        oss << "L#" << label_id;
         return oss.str();
     }
 };

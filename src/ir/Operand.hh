@@ -32,14 +32,17 @@ ADD_OPERAND_TYPE(IntOperand, unsigned long)
 ADD_OPERAND_TYPE(RealOperand, double)
 ADD_OPERAND_TYPE(StringOperand, std::string_view)
 
+struct ValueOperand {
+    std::variant<IntOperand, RealOperand, StringOperand> value {};
+};
+
 // For named operands (label, variable, function)
 ADD_OPERAND_TYPE(LabelOperand, unsigned)
 ADD_OPERAND_TYPE(VariableOperand, unsigned)
 ADD_OPERAND_TYPE(FunctionOperand, unsigned)
 
 using operand_type_t =
-    std::variant<IntOperand, RealOperand, StringOperand, LabelOperand,
-                 VariableOperand, FunctionOperand>;
+    std::variant<ValueOperand, LabelOperand, VariableOperand, FunctionOperand>;
 
 using value_operand_t = std::variant<IntOperand, RealOperand, StringOperand>;
 

@@ -13,22 +13,30 @@ unsigned new_variable_id() {
     return variable_id++;
 }
 
+template <class ValueType, class T = decltype(ValueType().value)>
+ValueOperand create_value_operand(T value) {
+    return ValueOperand { ValueType { value } };
+}
+
 Operand IrFunction::create_immediate_int(unsigned long value) const {
-    Operand operand { OperandKind::IMMEDIATE_INT, IntOperand { value } };
+    Operand operand { OperandKind::IMMEDIATE_INT,
+                      create_value_operand<IntOperand>(value) };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_immediate_string(std::string_view value) const {
-    Operand operand { OperandKind::IMMEDIATE_STRING, StringOperand { value } };
+    Operand operand { OperandKind::IMMEDIATE_STRING,
+                      create_value_operand<StringOperand>(value) };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_immediate_real(double value) const {
-    Operand operand { OperandKind::IMMEDIATE_REAL, RealOperand { value } };
+    Operand operand { OperandKind::IMMEDIATE_REAL,
+                      create_value_operand<RealOperand>(value) };
     operand.set_env(this);
 
     return operand;
