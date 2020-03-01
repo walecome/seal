@@ -1,26 +1,21 @@
 fn main() -> int {
-    println("hej");
+    println("hej" < "hejsan");
+
+    a := 3;
+    b := 2;
+
+    println("eq: ", a == b);
+    println("gt: ", a > b);
+    println("gteq: ", a >= b);
+    println("lt: ", a < b);
+    println("lteq: ", a <= b);
+    println("nteq: ", a != b);
+
+
     12.1 + 6.23;
     12.1 - 6.23;
     12.1 * 6.23;
     asd := 12.1 / 6.23;
 
     println("asd=", asd);
-
-    a:= 3;
-    b:= a + 1;
-    c:= b + 1;
-    d:= c + 1;
-    d + 5;
-
-
-    func_with_args(function_returning_int(), b);
-}
-
-fn func_with_args(a: int, b: int) -> void {
-
-}
-
-fn function_returning_int() -> int {
-    return 123;
 }

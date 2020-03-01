@@ -159,3 +159,5 @@ void IrFunction::__dump_variables() const {
         std::cout << x.first << "=" << x.second << std::endl;
     }
 }
+
+unsigned IrFunction::id() const { return declaration()->function_id(); }

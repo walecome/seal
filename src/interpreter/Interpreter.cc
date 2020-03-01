@@ -87,31 +87,47 @@ void Interpreter::interpret() {
 }
 
 void Interpreter::interpret_function(const IrFunction* function) {
+    fmt::print("Interpreting function with id {}\n", function->id());
     for (const Quad* quad : function->quads_as_pointers()) {
         switch (quad->opcode()) {
             case OPCode::ADD:
                 add(quad);
                 break;
+
             case OPCode::SUB:
                 sub(quad);
                 break;
+
             case OPCode::MULT:
                 mult(quad);
                 break;
+
             case OPCode::DIV:
                 div(quad);
                 break;
+
             case OPCode::CMP_EQ:
+                cmp_eq(quad);
                 break;
+
             case OPCode::CMP_GT:
+                cmp_gt(quad);
                 break;
+
             case OPCode::CMP_LT:
+                cmp_lt(quad);
                 break;
+
             case OPCode::CMP_GTEQ:
+                cmp_gteq(quad);
                 break;
+
             case OPCode::CMP_LTEQ:
+                cmp_lteq(quad);
                 break;
+
             case OPCode::CMP_NOTEQ:
+                cmp_noteq(quad);
                 break;
             case OPCode::JMP:
                 break;
@@ -190,12 +206,53 @@ void Interpreter::div(const Quad* quad) {
     binop_helper<std::divides<>>(current_frame(), quad);
 }
 
-void Interpreter::cmp_eq(const Quad*) {}
-void Interpreter::cmp_gt(const Quad*) {}
-void Interpreter::cmp_lt(const Quad*) {}
-void Interpreter::cmp_gteq(const Quad*) {}
-void Interpreter::cmp_lteq(const Quad*) {}
-void Interpreter::cmp_noteq(const Quad*) {}
+template <class Operator>
+struct CmpVisitor {
+    template <typename T, typename U>
+    bool operator()(T, U) {
+        ASSERT_NOT_REACHED();
+    }
+
+    template <typename T>
+    bool operator()(T a, T b) {
+        return Operator {}(a.value, b.value);
+    }
+};
+
+template <class Operator>
+void cmp_helper(StackFrame* context, const Quad* quad) {
+    ValueOperand lhs = context->resolve_operand(quad->src_a());
+    ValueOperand rhs = context->resolve_operand(quad->src_b());
+
+    bool result = std::visit(CmpVisitor<Operator> {}, lhs.value, rhs.value);
+
+    value_operand_t ret = IntOperand { result };
+    context->set_variable(quad->dest(), ValueOperand { ret });
+}
+
+void Interpreter::cmp_eq(const Quad* quad) {
+    cmp_helper<std::equal_to<>>(current_frame(), quad);
+}
+
+void Interpreter::cmp_gt(const Quad* quad) {
+    cmp_helper<std::greater<>>(current_frame(), quad);
+}
+
+void Interpreter::cmp_lt(const Quad* quad) {
+    cmp_helper<std::less<>>(current_frame(), quad);
+}
+
+void Interpreter::cmp_gteq(const Quad* quad) {
+    cmp_helper<std::greater_equal<>>(current_frame(), quad);
+}
+
+void Interpreter::cmp_lteq(const Quad* quad) {
+    cmp_helper<std::less_equal<>>(current_frame(), quad);
+}
+
+void Interpreter::cmp_noteq(const Quad* quad) {
+    cmp_helper<std::not_equal_to<>>(current_frame(), quad);
+}
 void Interpreter::jmp(const Quad*) {}
 void Interpreter::jmp_z(const Quad*) {}
 void Interpreter::jmp_nz(const Quad*) {}
