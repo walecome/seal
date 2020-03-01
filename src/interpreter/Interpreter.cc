@@ -56,7 +56,7 @@ void Interpreter::interpret_function(const IrFunction* function) {
     for (const Quad* quad : function->quads_as_pointers()) {
         switch (quad->opcode()) {
             case OPCode::ADD:
-
+                add(quad);
                 break;
             case OPCode::SUB:
                 break;
@@ -99,23 +99,58 @@ void Interpreter::interpret_function(const IrFunction* function) {
     }
 }
 
-// Given an operand, resolve it and return a value operand.
-// Variable operand -> value operand
-// Value operand -> value operand (itself)
-value_operand_t resolve_operand(Operand& operand) {
-    // value_operand_t w =
-    //     std::visit([](auto&& arg) -> value_operand_t { return arg + arg; },
-    //                operand.data());
-}
+template <class Operator>
+struct BinOpVisitor {
+    template <typename T, typename U>
+    operand_type_t operator()(T, U) {
+        ASSERT_NOT_REACHED();
+    }
+
+    operand_type_t operator()(StringOperand, StringOperand) {
+        ASSERT_NOT_REACHED();
+    }
+
+    template <typename T>
+    operand_type_t operator()(T a, T b) {
+        return T { Operator {}(a, b) };
+    }
+};
 
 void Interpreter::add(const Quad* quad) {
     ASSERT(quad->opcode() == OPCode::ADD);
     ASSERT(quad->dest().is_variable());
+
+    operand_type_t result =
+        std::visit(BinOpVisitor<std::plus<>> {}, quad->src_a().data(),
+                   quad->src_b().data());
 }
 
-void Interpreter::sub(const Quad* quad) {}
-void Interpreter::mult(const Quad* quad) {}
-void Interpreter::div(const Quad* quad) {}
+void Interpreter::sub(const Quad* quad) {
+    ASSERT(quad->opcode() == OPCode::SUB);
+    ASSERT(quad->dest().is_variable());
+
+    operand_type_t result =
+        std::visit(BinOpVisitor<std::minus<>> {}, quad->src_a().data(),
+                   quad->src_b().data());
+}
+void Interpreter::mult(const Quad* quad) {
+    ASSERT(quad->opcode() == OPCode::MULT);
+    ASSERT(quad->dest().is_variable());
+
+    operand_type_t result =
+        std::visit(BinOpVisitor<std::multiplies<>> {}, quad->src_a().data(),
+                   quad->src_b().data());
+}
+
+void Interpreter::div(const Quad* quad) {
+    ASSERT(quad->opcode() == OPCode::MULT);
+    ASSERT(quad->dest().is_variable());
+
+    operand_type_t result =
+        std::visit(BinOpVisitor<std::divides<>> {}, quad->src_a().data(),
+                   quad->src_b().data());
+}
+
 void Interpreter::cmp_eq(const Quad* quad) {}
 void Interpreter::cmp_gt(const Quad* quad) {}
 void Interpreter::cmp_lt(const Quad* quad) {}

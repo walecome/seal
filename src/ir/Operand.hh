@@ -16,7 +16,7 @@ enum class OperandKind {
 };
 // This defines a struct with the identifier name. In addition it adds a member
 // named value of the given type, as well as an overload for that type.
-#define ADD_LANGUAGE_TYPE(NAME, TYPE)                                        \
+#define ADD_OPERAND_TYPE(NAME, TYPE)                                         \
     struct NAME {                                                            \
         NAME() = default;                                                    \
         TYPE value {};                                                       \
@@ -28,14 +28,14 @@ enum class OperandKind {
     };
 
 // For immediate operands
-ADD_LANGUAGE_TYPE(IntOperand, unsigned long)
-ADD_LANGUAGE_TYPE(RealOperand, double)
-ADD_LANGUAGE_TYPE(StringOperand, std::string_view)
+ADD_OPERAND_TYPE(IntOperand, unsigned long)
+ADD_OPERAND_TYPE(RealOperand, double)
+ADD_OPERAND_TYPE(StringOperand, std::string_view)
 
 // For named operands (label, variable, function)
-ADD_LANGUAGE_TYPE(LabelOperand, unsigned)
-ADD_LANGUAGE_TYPE(VariableOperand, unsigned)
-ADD_LANGUAGE_TYPE(FunctionOperand, unsigned)
+ADD_OPERAND_TYPE(LabelOperand, unsigned)
+ADD_OPERAND_TYPE(VariableOperand, unsigned)
+ADD_OPERAND_TYPE(FunctionOperand, unsigned)
 
 using operand_type_t =
     std::variant<IntOperand, RealOperand, StringOperand, LabelOperand,
@@ -44,6 +44,8 @@ using operand_type_t =
 using value_operand_t = std::variant<IntOperand, RealOperand, StringOperand>;
 
 class IrFunction;
+
+struct OperandPrinter;
 
 class Operand {
    public:
