@@ -60,6 +60,9 @@ class IrFunction {
 
     unsigned id() const;
 
+    // Return the index of the quad bound to label
+    size_t quad_idx(const LabelOperand label) const;
+
    private:
     Operand create_variable_from_id(unsigned id) const;
 

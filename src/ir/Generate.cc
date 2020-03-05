@@ -93,7 +93,7 @@ void Generate::gen_if_statement(const IfStatement *if_statement) {
     auto condition = gen_expression(if_statement->condition());
 
     auto else_label = env()->create_label();
-    env()->add_quad(OPCode::JMP_NZ, else_label, condition, {});
+    env()->add_quad(OPCode::JMP_Z, else_label, condition, {});
 
     gen_block(if_statement->if_body());
 
@@ -113,7 +113,7 @@ void Generate::gen_while(const While *while_statement) {
     auto condition = gen_expression(while_statement->condition());
 
     auto end_label = env()->create_label();
-    env()->add_quad(OPCode::JMP_NZ, end_label, condition, {});
+    env()->add_quad(OPCode::JMP_Z, end_label, condition, {});
 
     gen_block(while_statement->body());
 

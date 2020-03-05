@@ -82,13 +82,25 @@ StackFrame* StackFrame::get_variable_frame(VariableOperand var) {
 }
 
 void Interpreter::interpret() {
-    interpret_function(
-        m_ir_program->get_function_from_id(m_ir_program->main_function_id()));
+    auto main_func =
+        m_ir_program->get_function_from_id(m_ir_program->main_function_id());
+
+    interpret_function(main_func);
 }
 
 void Interpreter::interpret_function(const IrFunction* function) {
     fmt::print("Interpreting function with id {}\n", function->id());
-    for (const Quad* quad : function->quads_as_pointers()) {
+
+    m_call_stack.push(function);
+
+    m_current_quad_idx = 0;
+
+    auto quad_ptrs = function->quads_as_pointers();
+
+    while (m_current_quad_idx < quad_ptrs.size()) {
+        const Quad* quad = quad_ptrs[m_current_quad_idx];
+        m_jump_performed = false;
+
         switch (quad->opcode()) {
             case OPCode::ADD:
                 add(quad);
@@ -130,10 +142,13 @@ void Interpreter::interpret_function(const IrFunction* function) {
                 cmp_noteq(quad);
                 break;
             case OPCode::JMP:
+                jmp(quad);
                 break;
             case OPCode::JMP_Z:
+                jmp_z(quad);
                 break;
             case OPCode::JMP_NZ:
+                jmp_nz(quad);
                 break;
             case OPCode::PUSH_ARG:
                 push_arg(quad);
@@ -151,6 +166,10 @@ void Interpreter::interpret_function(const IrFunction* function) {
 
             default:
                 ASSERT_NOT_REACHED();
+        }
+
+        if (!m_jump_performed) {
+            ++m_current_quad_idx;
         }
     }
 }
@@ -251,9 +270,30 @@ void Interpreter::cmp_lteq(const Quad* quad) {
 void Interpreter::cmp_noteq(const Quad* quad) {
     cmp_helper<std::not_equal_to<>>(current_frame(), quad);
 }
-void Interpreter::jmp(const Quad*) {}
-void Interpreter::jmp_z(const Quad*) {}
-void Interpreter::jmp_nz(const Quad*) {}
+void Interpreter::jmp(const Quad* quad) {
+    ASSERT(quad->dest().is_label());
+
+    m_jump_performed = true;
+
+    // REFACTOR: These types of call chains can be shortened with API
+    // improvements
+    m_current_quad_idx = m_call_stack.top()->quad_idx(
+        std::get<LabelOperand>(quad->dest().data()));
+}
+
+void Interpreter::jmp_z(const Quad* quad) {
+    ValueOperand condition = current_frame()->resolve_operand(quad->src_a());
+    if (std::get<IntOperand>(condition.value) == 0) {
+        jmp(quad);
+    }
+}
+
+void Interpreter::jmp_nz(const Quad* quad) {
+    ValueOperand condition = current_frame()->resolve_operand(quad->src_a());
+    if (std::get<IntOperand>(condition.value) != 0) {
+        jmp(quad);
+    }
+}
 
 void Interpreter::push_arg(const Quad* quad) {
     current_frame()->push_argument(

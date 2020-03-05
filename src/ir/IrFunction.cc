@@ -156,3 +156,7 @@ void IrFunction::__dump_variables() const {
 }
 
 unsigned IrFunction::id() const { return declaration()->function_id(); }
+
+size_t IrFunction::quad_idx(const LabelOperand label) const {
+    return m_labels.at(label);
+}

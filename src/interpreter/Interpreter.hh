@@ -76,4 +76,9 @@ class Interpreter {
 
     const IrProgram* m_ir_program;
     std::stack<StackFrame> m_stack_frames {};
+    std::stack<const IrFunction*> m_call_stack {};
+
+    bool m_jump_performed { false };
+
+    size_t m_current_quad_idx;
 };
