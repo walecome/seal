@@ -84,8 +84,8 @@ Operand IrFunction::create_and_queue_label() {
 void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
                           Operand src_b) {
     auto quad = std::make_unique<Quad>(op_code, dest, src_a, src_b);
-    bind_queued_labels(quad.get());
     m_quads.push_back(std::move(quad));
+    bind_queued_labels(m_quads.size() - 1);
 }
 
 void IrFunction::queue_label(const Operand &label) {
@@ -93,27 +93,22 @@ void IrFunction::queue_label(const Operand &label) {
     m_waiting_labels.push_back(std::get<LabelOperand>(label.data()));
 }
 
-void IrFunction::bind_queued_labels(Quad *quad) {
+void IrFunction::bind_queued_labels(size_t quad_idx) {
     if (m_waiting_labels.empty()) return;
 
     for (auto label_id : m_waiting_labels) {
-        bind_label(label_id, quad);
+        bind_label(label_id, quad_idx);
     }
 
     m_waiting_labels.clear();
 }
 
-void IrFunction::bind_label(const Operand &label, Quad *quad) {
-    ASSERT(label.is_label());
-    bind_label(std::get<LabelOperand>(label.data()), quad);
-}
-
-void IrFunction::bind_label(LabelOperand label, Quad *quad) {
+void IrFunction::bind_label(LabelOperand label, size_t quad_idx) {
     ASSERT(m_labels.find(label) == std::end(m_labels));
 
-    quad->set_label(label);
+    quads().at(quad_idx)->set_label(label);
 
-    m_labels.insert({ label, quad });
+    m_labels.insert({ label, quad_idx });
 }
 
 void IrFunction::bind_variable(const Operand &variable,

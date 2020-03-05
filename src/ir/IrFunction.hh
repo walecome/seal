@@ -38,10 +38,7 @@ class IrFunction {
     void queue_label(const Operand &label);
 
     // Binds the queued labels to the given quad. Also clears the label queue.
-    void bind_queued_labels(Quad *quad);
-
-    // Bind the given label to the given quad
-    void bind_label(const Operand &label, Quad *quad);
+    void bind_queued_labels(size_t quad_idx);
 
     // Bind a source code variable name to an IR variable
     void bind_variable(const Operand &variable,
@@ -67,12 +64,12 @@ class IrFunction {
     Operand create_variable_from_id(unsigned id) const;
 
     // Bind the given label id to the given quad
-    void bind_label(LabelOperand label, Quad *quad);
+    void bind_label(LabelOperand label, size_t quad_idx);
 
     const FunctionDecl *m_decl;
 
     std::vector<ptr_t<Quad>> m_quads {};
-    std::map<LabelOperand, Quad *> m_labels {};
+    std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
     std::unordered_map<unsigned, std::string_view> m_variable_ref {};
     std::unordered_map<std::string_view, unsigned> m_varname_to_id {};
