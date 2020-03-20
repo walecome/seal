@@ -24,10 +24,18 @@ unsigned nr_chars(unsigned number) {
     return count;
 }
 
-std::string Quad::to_string() const {
+std::string Quad::to_string(bool is_basic_block_entry) const {
     std::ostringstream oss {};
 
     unsigned indent_steps = 8;
+
+    if (is_basic_block_entry) {
+        oss << "BBE ";
+    } else {
+        oss << "    ";
+    }
+
+    indent_steps -= 4;
 
     if (has_label()) {
         oss << "L" << label_id() << ": ";

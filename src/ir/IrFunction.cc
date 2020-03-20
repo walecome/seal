@@ -1,7 +1,23 @@
-#include <iostream>
+#include <fmt/format.h>
 
 #include "IrFunction.hh"
 #include "ast/FunctionDecl.hh"
+
+void BasicBlock::add_quad(Quad quad) { m_quads.push_back(quad); }
+void BasicBlock::add_child(BasicBlock *block) { m_children.push_back(block); }
+void BasicBlock::print_quads() const {
+    bool first = true;
+    for (auto &quad : m_quads) {
+        if (first) {
+            first = false;
+            fmt::print("{}\n", quad.to_string(true));
+        } else {
+            fmt::print("{}\n", quad.to_string());
+        }
+    }
+}
+
+void IrFunction::new_basic_block() { m_basic_blocks.emplace_back(); }
 
 unsigned new_label_id() {
     static unsigned label_id = 0;
@@ -81,11 +97,12 @@ Operand IrFunction::create_and_queue_label() {
     return label;
 }
 
-void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
-                          Operand src_b) {
-    auto quad = std::make_unique<Quad>(op_code, dest, src_a, src_b);
-    m_quads.push_back(std::move(quad));
-    bind_queued_labels(m_quads.size() - 1);
+void IrFunction::construct_quad(OPCode op_code, Operand dest, Operand src_a,
+                                Operand src_b) {
+    current_block().add_quad({ Quad { op_code, dest, src_a, src_b } });
+
+    // TODO: How?
+    bind_queued_labels(m_basic_blocks.size() - 1);
 }
 
 void IrFunction::queue_label(const Operand &label) {
@@ -93,22 +110,21 @@ void IrFunction::queue_label(const Operand &label) {
     m_waiting_labels.push_back(std::get<LabelOperand>(label.data()));
 }
 
-void IrFunction::bind_queued_labels(size_t quad_idx) {
+void IrFunction::bind_queued_labels(size_t block_idx) {
     if (m_waiting_labels.empty()) return;
 
     for (auto label_id : m_waiting_labels) {
-        bind_label(label_id, quad_idx);
+        bind_label(label_id, block_idx);
     }
 
     m_waiting_labels.clear();
 }
 
-void IrFunction::bind_label(LabelOperand label, size_t quad_idx) {
+void IrFunction::bind_label(LabelOperand label, size_t block_idx) {
     ASSERT(m_labels.find(label) == std::end(m_labels));
 
-    quads().at(quad_idx)->set_label(label);
-
-    m_labels.insert({ label, quad_idx });
+    m_basic_blocks.at(block_idx).back().set_label(label);
+    m_labels.insert({ label, block_idx });
 }
 
 void IrFunction::bind_variable(const Operand &variable,
@@ -121,9 +137,9 @@ void IrFunction::bind_variable(const Operand &variable,
     m_variable_ref.insert_or_assign(var_raw, var_name);
 }
 
-void IrFunction::dump_quads() const {
-    for (auto &quad : m_quads) {
-        std::cout << quad->to_string() << std::endl;
+void IrFunction::print_blocks() const {
+    for (auto &block : m_basic_blocks) {
+        block.print_quads();
     }
 }
 
@@ -137,22 +153,6 @@ std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {
     std::ostringstream oss {};
     oss << "tmp#" << variable_id;
     return oss.str();
-}
-
-std::vector<const Quad *> IrFunction::quads_as_pointers() const {
-    std::vector<const Quad *> quad_ptrs {};
-
-    for (auto &unique_quad_ptr : m_quads) {
-        quad_ptrs.push_back(unique_quad_ptr.get());
-    }
-
-    return quad_ptrs;
-}
-
-void IrFunction::__dump_variables() const {
-    for (auto &x : m_variable_ref) {
-        std::cout << x.first << "=" << x.second << std::endl;
-    }
 }
 
 unsigned IrFunction::id() const { return declaration()->function_id(); }

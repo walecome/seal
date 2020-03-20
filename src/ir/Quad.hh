@@ -5,8 +5,6 @@
 
 class Quad {
     MAKE_DEFAULT_CONSTRUCTABLE(Quad)
-    MAKE_NONCOPYABLE(Quad)
-    MAKE_DEFAULT_MOVABLE(Quad)
 
    public:
     Quad(OPCode op_code, Operand dest, Operand src_a, Operand src_b)
@@ -15,7 +13,7 @@ class Quad {
           m_src_a { src_a },
           m_src_b { src_b } {}
 
-    std::string to_string() const;
+    std::string to_string(bool is_basic_block_entry = false) const;
 
     unsigned label_id() const { return m_label_id; }
     bool has_label() const { return m_has_label; }

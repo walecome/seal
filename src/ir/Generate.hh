@@ -4,35 +4,12 @@
 
 #include "Constants.hh"
 #include "Operand.hh"
-
-// AST nodes
-class IntegerLiteral;
-class Block;
-class Statement;
-class Expression;
-class VariableDecl;
-class IfStatement;
-class While;
-class ReturnStatement;
-class For;
-class BinaryExpression;
-class FunctionCall;
-class IndexExpression;
-class Literal;
-class UnaryExpression;
-class VariableExpression;
-class AssignExpression;
-class EqualityExpression;
-class CompareExpression;
-class ArrayLiteral;
-class BooleanLiteral;
-class RealLiteral;
-class StringLiteral;
-class CompilationUnit;
+#include "ast/AstFwd.hh"
 
 class IrProgram;
 class IrFunction;
 class FunctionDecl;
+class BasicBlock;
 
 class Generate {
     MAKE_NONMOVABLE(Generate)
@@ -67,7 +44,7 @@ class Generate {
     Operand gen_index_expression(const IndexExpression*);
     Operand gen_unary_expression(const UnaryExpression*);
 
-    auto env() const { return m_current_ir_function.get(); }
+    IrFunction& current_func();
 
     // Literals
     Operand create_literal(const Literal*);
@@ -78,5 +55,6 @@ class Generate {
     Operand create_string_literal(const StringLiteral*);
 
     const CompilationUnit* m_compilation_unit;
-    ptr_t<IrFunction> m_current_ir_function;
+
+    IrProgram* m_program;
 };
