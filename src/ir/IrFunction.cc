@@ -10,9 +10,9 @@ void BasicBlock::print_quads() const {
     for (auto &quad : m_quads) {
         if (first) {
             first = false;
-            fmt::print("{}\n", quad.to_string(true));
+            fmt::print("|{}|\n", quad.to_string(true));
         } else {
-            fmt::print("{}\n", quad.to_string());
+            fmt::print("|{}|\n", quad.to_string());
         }
     }
 }
@@ -138,9 +138,19 @@ void IrFunction::bind_variable(const Operand &variable,
 }
 
 void IrFunction::print_blocks() const {
+    std::string header = fmt::format("{:<10}{:<10}|{:>16}|{:>16}|{:>16}", "",
+                                     "OPCODE", "DEST", "SRC_A", "SRC_B");
+
+    int header_width = header.size();
+
+    fmt::print("|{:-<{}}|\n", "", header_width);
+    fmt::print("|{}|\n", header);
+
     for (auto &block : m_basic_blocks) {
+        fmt::print("|{:-<{}}|\n", "", header_width);
         block.print_quads();
     }
+    fmt::print("|{:-<{}}|\n", "", header_width);
 }
 
 std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {

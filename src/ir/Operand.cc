@@ -53,8 +53,8 @@ struct OperandPrinter {
 
     std::string operator()(VariableOperand var_id) {
         return fmt::format(
-            "{}({})",
-            std::string(context->env()->resolve_variable_name(var_id)), var_id);
+            "{}${}", std::string(context->env()->resolve_variable_name(var_id)),
+            var_id);
     }
 
     std::string operator()(LabelOperand label_id) {
