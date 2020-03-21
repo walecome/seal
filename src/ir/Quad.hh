@@ -3,6 +3,8 @@
 #include "OPCode.hh"
 #include "Operand.hh"
 
+class BasicBlock;
+
 class Quad {
     MAKE_DEFAULT_CONSTRUCTABLE(Quad)
 
@@ -13,7 +15,7 @@ class Quad {
           m_src_a { src_a },
           m_src_b { src_b } {}
 
-    std::string to_string(bool is_basic_block_entry = false) const;
+    std::string to_string(const BasicBlock*) const;
 
     unsigned label_id() const { return m_label_id; }
     bool has_label() const { return m_has_label; }

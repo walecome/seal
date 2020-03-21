@@ -52,6 +52,12 @@ struct OperandPrinter {
     }
 
     std::string operator()(VariableOperand var_id) {
+        if (context->variable_name().substr(0, 3) == "tmp") {
+            return fmt::format(
+                "{}",
+                std::string(context->env()->resolve_variable_name(var_id)));
+        }
+
         return fmt::format(
             "{}${}", std::string(context->env()->resolve_variable_name(var_id)),
             var_id);
