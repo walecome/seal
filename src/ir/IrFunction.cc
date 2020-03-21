@@ -3,21 +3,51 @@
 #include "IrFunction.hh"
 #include "ast/FunctionDecl.hh"
 
+unsigned new_basic_block_id() {
+    static unsigned id = 0;
+    return id++;
+}
+
+BasicBlock::BasicBlock() : m_id { new_basic_block_id() } {}
+
 void BasicBlock::add_quad(Quad quad) { m_quads.push_back(quad); }
-void BasicBlock::add_child(BasicBlock *block) { m_children.push_back(block); }
+
+void BasicBlock::add_parent(BasicBlock *block) { m_parents.push_back(block); }
+
 void BasicBlock::print_quads() const {
     bool first = true;
     for (auto &quad : m_quads) {
         if (first) {
             first = false;
-            fmt::print("|{}|\n", quad.to_string(true));
+            fmt::print("|{}|\n", quad.to_string(this));
         } else {
-            fmt::print("|{}|\n", quad.to_string());
+            fmt::print("|{}|\n", quad.to_string(nullptr));
         }
     }
 }
 
-void IrFunction::new_basic_block() { m_basic_blocks.emplace_back(); }
+std::string BasicBlock::name() const { return fmt::format("BB#{}", m_id); }
+
+std::vector<BasicBlock *> BasicBlock::parents() const { return m_parents; }
+
+BasicBlock *IrFunction::new_basic_block(BasicBlock *parent) {
+    m_basic_blocks.push_back(std::make_unique<BasicBlock>());
+    if (parent) {
+        current_block()->add_parent(parent);
+    }
+
+    return current_block();
+}
+
+BasicBlock *IrFunction::new_basic_block(std::vector<BasicBlock *> &parents) {
+    m_basic_blocks.push_back(std::make_unique<BasicBlock>());
+
+    for (BasicBlock *parent : parents) {
+        current_block()->add_parent(parent);
+    }
+
+    return current_block();
+}
 
 unsigned new_label_id() {
     static unsigned label_id = 0;
@@ -99,7 +129,7 @@ Operand IrFunction::create_and_queue_label() {
 
 void IrFunction::construct_quad(OPCode op_code, Operand dest, Operand src_a,
                                 Operand src_b) {
-    current_block().add_quad({ Quad { op_code, dest, src_a, src_b } });
+    current_block()->add_quad({ Quad { op_code, dest, src_a, src_b } });
 
     // TODO: How?
     bind_queued_labels(m_basic_blocks.size() - 1);
@@ -123,7 +153,7 @@ void IrFunction::bind_queued_labels(size_t block_idx) {
 void IrFunction::bind_label(LabelOperand label, size_t block_idx) {
     ASSERT(m_labels.find(label) == std::end(m_labels));
 
-    m_basic_blocks.at(block_idx).back().set_label(label);
+    m_basic_blocks.at(block_idx)->back().set_label(label);
     m_labels.insert({ label, block_idx });
 }
 
@@ -138,7 +168,7 @@ void IrFunction::bind_variable(const Operand &variable,
 }
 
 void IrFunction::print_blocks() const {
-    std::string header = fmt::format("{:<10}{:<10}|{:>16}|{:>16}|{:>16}", "",
+    std::string header = fmt::format("{:<12}{:<10}|{:>16}|{:>16}|{:>16}", "",
                                      "OPCODE", "DEST", "SRC_A", "SRC_B");
 
     int header_width = header.size();
@@ -148,9 +178,19 @@ void IrFunction::print_blocks() const {
 
     for (auto &block : m_basic_blocks) {
         fmt::print("|{:-<{}}|\n", "", header_width);
-        block.print_quads();
+        block->print_quads();
     }
     fmt::print("|{:-<{}}|\n", "", header_width);
+
+    fmt::print("Basic block relations:\n");
+    for (auto &block : m_basic_blocks) {
+        fmt::print("Basic block {} has parents: ", block->name());
+        for (auto child_block : block->parents()) {
+            fmt::print("{}, ", child_block->name());
+        }
+
+        fmt::print("\n");
+    }
 }
 
 std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {

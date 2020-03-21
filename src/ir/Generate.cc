@@ -41,7 +41,6 @@ ptr_t<IrProgram> Generate::generate() {
 }
 
 void Generate::gen_block(const Block *block) {
-    current_func().new_basic_block();
     block->for_each_node([this](Node *node) {
         if (auto x = dynamic_cast<Statement *>(node))
             gen_statement(x);
@@ -58,6 +57,7 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
     function_decl->parameter_list()->for_each_parameter(
         [this](auto param) { gen_variable_decl(param); });
 
+    current_func().new_basic_block();
     gen_block(function_decl->body());
 }
 
@@ -98,17 +98,29 @@ void Generate::gen_if_statement(const IfStatement *if_statement) {
 
     current_func().construct_quad(OPCode::JMP_Z, else_label, condition, {});
 
+    BasicBlock *parent_block = current_func().current_block();
+
+    std::vector<BasicBlock *> parents {};
+
+    // Basic block for if body
+    parents.push_back(current_func().new_basic_block(parent_block));
+
     gen_block(if_statement->if_body());
 
     if (if_statement->else_body()) {
         auto end_label = current_func().create_label();
         current_func().construct_quad(OPCode::JMP, end_label, {}, {});
         current_func().queue_label(else_label);
+        // Basic block for else body
+        parents.push_back(current_func().new_basic_block(parent_block));
         gen_block(if_statement->else_body());
         current_func().queue_label(end_label);
     } else {
         current_func().queue_label(else_label);
     }
+
+    // Basic block for the next bit of code
+    current_func().new_basic_block(parents);
 }
 
 void Generate::gen_while(const While *while_statement) {

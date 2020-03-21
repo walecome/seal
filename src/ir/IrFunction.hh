@@ -11,17 +11,20 @@ class FunctionDecl;
 
 class BasicBlock {
    public:
-    BasicBlock() = default;
+    BasicBlock();
 
     void add_quad(Quad);
-    void add_child(BasicBlock *);
+    void add_parent(BasicBlock *);
 
     void print_quads() const;
+    std::string name() const;
+    std::vector<BasicBlock *> parents() const;
 
     Quad &back() { return m_quads.back(); }
 
    private:
-    std::vector<BasicBlock *> m_children {};
+    unsigned m_id;
+    std::vector<BasicBlock *> m_parents {};
     std::vector<Quad> m_quads {};
 };
 
@@ -68,9 +71,10 @@ class IrFunction {
     // Return the index of the quad bound to label
     size_t quad_idx(const LabelOperand) const;
 
-    BasicBlock &current_block() { return m_basic_blocks.back(); }
+    BasicBlock *current_block() { return m_basic_blocks.back().get(); }
 
-    void new_basic_block();
+    BasicBlock *new_basic_block(BasicBlock * = nullptr);
+    BasicBlock *new_basic_block(std::vector<BasicBlock *> &);
 
    private:
     Operand create_variable_from_id(unsigned) const;
@@ -79,7 +83,7 @@ class IrFunction {
 
     const FunctionDecl *m_decl;
 
-    std::vector<BasicBlock> m_basic_blocks {};
+    std::vector<ptr_t<BasicBlock>> m_basic_blocks {};
     std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
     std::unordered_map<unsigned, std::string_view> m_variable_ref {};
