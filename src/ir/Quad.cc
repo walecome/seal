@@ -1,3 +1,5 @@
+#include <fmt/format.h>
+
 #include "Quad.hh"
 #include "Util.hh"
 
@@ -25,43 +27,13 @@ unsigned nr_chars(unsigned number) {
 }
 
 std::string Quad::to_string(bool is_basic_block_entry) const {
-    std::ostringstream oss {};
+    std::string bbe_str = is_basic_block_entry ? "BBE" : "";
+    std::string label_str = has_label() ? fmt::format("L{}:", label_id()) : "";
+    std::string opcode_str = opcode_to_string(m_op_code);
+    std::string dest_str = m_dest.to_string();
+    std::string src_a_str = m_src_a.is_used() ? m_src_a.to_string() : "_";
+    std::string src_b_str = m_src_b.is_used() ? m_src_b.to_string() : "_";
 
-    unsigned indent_steps = 8;
-
-    if (is_basic_block_entry) {
-        oss << "BBE ";
-    } else {
-        oss << "    ";
-    }
-
-    indent_steps -= 4;
-
-    if (has_label()) {
-        oss << "L" << label_id() << ": ";
-        indent_steps -= (nr_chars(label_id()) + 3);
-    }
-
-    ASSERT(indent_steps <= 8);
-
-    oss << util::indent_spaces(indent_steps) << "("
-        << opcode_to_string(m_op_code) << ", " << m_dest.to_string() << ", ";
-
-    if (m_src_a.is_used()) {
-        oss << m_src_a.to_string();
-    } else {
-        oss << "_";
-    }
-
-    oss << ", ";
-
-    if (m_src_b.is_used()) {
-        oss << m_src_b.to_string();
-    } else {
-        oss << "_";
-    }
-
-    oss << ")";
-
-    return oss.str();
+    return fmt::format("{:<4} {:<4} {:<10}{:>16}{:>16}{:>16}", bbe_str,
+                       label_str, opcode_str, dest_str, src_a_str, src_b_str);
 }

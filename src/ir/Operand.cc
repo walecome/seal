@@ -27,37 +27,38 @@ std::string_view Operand::variable_name() const {
 }
 
 struct ValueOperandPrinter {
-    std::ostringstream oss {};
+    std::string operator()(IntOperand value) {
+        return fmt::format("{}", value);
+    }
 
-    template <typename T>
-    std::string operator()(T value) {
-        oss << value;
-        return oss.str();
+    std::string operator()(RealOperand value) {
+        return fmt::format("{:f}", value);
+    }
+
+    std::string operator()(StringOperand value) {
+        return fmt::format("\"{}\"", value);
     }
 };
 
 struct OperandPrinter {
     const Operand* context;
-    std::ostringstream oss {};
 
     std::string operator()(ValueOperand value) {
         return std::visit(ValueOperandPrinter {}, value.value);
     }
 
     std::string operator()(FunctionOperand function_id) {
-        oss << "function#" << function_id;
-        return oss.str();
+        return fmt::format("function#{}", function_id);
     }
 
     std::string operator()(VariableOperand var_id) {
-        oss << context->env()->resolve_variable_name(var_id) << " (" << var_id
-            << ")";
-        return oss.str();
+        return fmt::format(
+            "{}({})",
+            std::string(context->env()->resolve_variable_name(var_id)), var_id);
     }
 
     std::string operator()(LabelOperand label_id) {
-        oss << "L#" << label_id;
-        return oss.str();
+        return fmt::format("L#{}", label_id);
     }
 };
 
