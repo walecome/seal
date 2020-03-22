@@ -50,6 +50,6 @@ fn top_level_func() -> int {
 
 fn assert(value : bool, desc : string) -> void {
     if (value == false) {
-        // println("Assertion failed for: " + desc);
+        println("Assertion failed for: " + desc);
     }
 }

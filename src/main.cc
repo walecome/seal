@@ -16,7 +16,7 @@
 #include "Util.hh"
 #include "argparse.h"
 #include "ast/FunctionDecl.hh"
-#include "interpreter/Interpreter.hh"
+// #include "interpreter/Interpreter.hh"
 #include "ir/Generate.hh"
 #include "ir/IrProgram.hh"
 
@@ -108,8 +108,8 @@ int main(int argc, char **argv) {
         ir_program->dump();
     }
 
-    Interpreter interpreter { ir_program.get() };
-    interpreter.interpret();
+    // Interpreter interpreter { ir_program.get() };
+    // interpreter.interpret();
 
     return 0;
 }

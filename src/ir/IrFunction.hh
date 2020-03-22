@@ -18,14 +18,20 @@ class BasicBlock {
 
     void print_quads() const;
     std::string name() const;
-    std::vector<BasicBlock *> parents() const;
+    const std::vector<BasicBlock *> &parents() const;
 
     Quad &back() { return m_quads.back(); }
+
+    void assign_variable(VariableOperand, std::string_view);
+
+    unsigned get_variable(std::string_view) const;
 
    private:
     unsigned m_id;
     std::vector<BasicBlock *> m_parents {};
     std::vector<Quad> m_quads {};
+
+    std::unordered_map<std::string_view, unsigned> m_varname_to_id {};
 };
 
 class IrFunction {
@@ -48,30 +54,17 @@ class IrFunction {
     Operand create_and_queue_label();
 
     void construct_quad(OPCode, Operand, Operand, Operand);
-
-    // Add a label to waiting labels
     void queue_label(const Operand &);
-
-    // Binds the queued labels to the given quad. Also clears the label queue.
     void bind_queued_labels(size_t);
-
-    // Bind a source code variable name to an IR variable
     void bind_variable(const Operand &, const std::string_view);
-
     void print_blocks() const;
-
-    // Returns the name bound to variable_id if present, otherwise
-    // tmp#<variable_id>.
     std::string_view resolve_variable_name(unsigned) const;
-
     auto declaration() const { return m_decl; }
-
     unsigned id() const;
-
-    // Return the index of the quad bound to label
     size_t quad_idx(const LabelOperand) const;
 
     BasicBlock *current_block() { return m_basic_blocks.back().get(); }
+    BasicBlock *current_block() const { return m_basic_blocks.back().get(); }
 
     BasicBlock *new_basic_block(BasicBlock * = nullptr);
     BasicBlock *new_basic_block(std::vector<BasicBlock *> &);
@@ -87,5 +80,7 @@ class IrFunction {
     std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
     std::unordered_map<unsigned, std::string_view> m_variable_ref {};
-    std::unordered_map<std::string_view, unsigned> m_varname_to_id {};
+
+    std::unordered_map<std::string_view, std::vector<BasicBlock *>>
+        m_var_to_blocks {};
 };

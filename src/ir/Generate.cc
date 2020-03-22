@@ -117,6 +117,7 @@ void Generate::gen_if_statement(const IfStatement *if_statement) {
         current_func().queue_label(end_label);
     } else {
         current_func().queue_label(else_label);
+        parents.push_back(parent_block);
     }
 
     // Basic block for the next bit of code

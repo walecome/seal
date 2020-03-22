@@ -47,27 +47,27 @@ class Interpreter {
     void interpret();
 
    private:
-    void interpret_function(const IrFunction* function);
+    void interpret_function(const IrFunction&);
 
     // Interpret function for different opcodes
-    void add(const Quad* quad);
-    void sub(const Quad* quad);
-    void mult(const Quad* quad);
-    void div(const Quad* quad);
-    void cmp_eq(const Quad* quad);
-    void cmp_gt(const Quad* quad);
-    void cmp_lt(const Quad* quad);
-    void cmp_gteq(const Quad* quad);
-    void cmp_lteq(const Quad* quad);
-    void cmp_noteq(const Quad* quad);
-    void jmp(const Quad* quad);
-    void jmp_z(const Quad* quad);
-    void jmp_nz(const Quad* quad);
-    void push_arg(const Quad* quad);
-    void call(const Quad* quad);
-    void ret(const Quad* quad);
-    void move(const Quad* quad);
-    void index_move(const Quad* quad);
+    void add(const Quad&);
+    void sub(const Quad&);
+    void mult(const Quad&);
+    void div(const Quad&);
+    void cmp_eq(const Quad&);
+    void cmp_gt(const Quad&);
+    void cmp_lt(const Quad&);
+    void cmp_gteq(const Quad&);
+    void cmp_lteq(const Quad&);
+    void cmp_noteq(const Quad&);
+    void jmp(const Quad&);
+    void jmp_z(const Quad&);
+    void jmp_nz(const Quad&);
+    void push_arg(const Quad&);
+    void call(const Quad&);
+    void ret(const Quad&);
+    void move(const Quad&);
+    void index_move(const Quad&);
 
     StackFrame* current_frame() { return &m_stack_frames.top(); }
     void enter_new_frame() {

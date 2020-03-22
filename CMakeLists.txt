@@ -39,7 +39,7 @@ set(PROJECT_SOURCES
     src/ir/Quad.cc
 
     src/Error.cc
-    src/interpreter/Interpreter.cc
+    # src/interpreter/Interpreter.cc
     # src/TreeWalker.cc
     src/Lexer.cc
     src/main.cc
@@ -94,7 +94,10 @@ set(PROJECT_HEADERS
     src/ast/VariableExpression.hh
     src/ast/While.hh
     src/ast/For.hh
+
+    src/ast/AstFwd.hh
     
+
     src/builtin/BuiltIn.hh
 
     src/ir/Generate.hh
@@ -107,7 +110,7 @@ set(PROJECT_HEADERS
 
     src/Constants.hh
     src/Error.hh
-    src/interpreter/Interpreter.hh
+    # src/interpreter/Interpreter.hh
     # src/TreeWalker.hh
     src/Lexer.hh
     src/parse/Parser.hh

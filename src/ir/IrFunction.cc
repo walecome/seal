@@ -28,7 +28,14 @@ void BasicBlock::print_quads() const {
 
 std::string BasicBlock::name() const { return fmt::format("BB#{}", m_id); }
 
-std::vector<BasicBlock *> BasicBlock::parents() const { return m_parents; }
+const std::vector<BasicBlock *> &BasicBlock::parents() const {
+    return m_parents;
+}
+
+void BasicBlock::assign_variable(VariableOperand var,
+                                 std::string_view identifier) {
+    m_varname_to_id.insert_or_assign(identifier, var);
+}
 
 BasicBlock *IrFunction::new_basic_block(BasicBlock *parent) {
     m_basic_blocks.push_back(std::make_unique<BasicBlock>());
@@ -37,6 +44,13 @@ BasicBlock *IrFunction::new_basic_block(BasicBlock *parent) {
     }
 
     return current_block();
+}
+
+unsigned BasicBlock::get_variable(std::string_view identifier) const {
+    auto it = m_varname_to_id.find(identifier);
+    ASSERT(it != m_varname_to_id.end());
+
+    return it->second;
 }
 
 BasicBlock *IrFunction::new_basic_block(std::vector<BasicBlock *> &parents) {
@@ -106,12 +120,39 @@ Operand IrFunction::create_variable() const {
     return create_variable_from_id(new_variable_id());
 }
 
+/*
+
+                    a0
+        a1                      a2
+    a3      a4           a5         a6
+        a7 = phi(a3, a4)    a8 = phi(a5, a6)
+                    a9 = phi(a7, a8)
+*/
+
 Operand IrFunction::get_variable(std::string_view identifier) const {
-    auto it = m_varname_to_id.find(identifier);
+    auto it = m_var_to_blocks.find(identifier);
+    ASSERT(it != std::end(m_var_to_blocks));
 
-    ASSERT(it != std::end(m_varname_to_id));
+    const std::vector<BasicBlock *> candidate_blocks = it->second;
 
-    return create_variable_from_id(it->second);
+    if (candidate_blocks.size() == 1) {
+        return create_variable_from_id(
+            candidate_blocks[0]->get_variable(identifier));
+    }
+
+    for (const BasicBlock *block : candidate_blocks) {
+        // If the variable exists in the current block, use it
+        if (block == current_block()) {
+            return create_variable_from_id(block->get_variable(identifier));
+        }
+    }
+
+    // FOR TESTING: Return from the latest basic block
+    return create_variable_from_id(
+        candidate_blocks.back()->get_variable(identifier));
+
+    // TODO
+    ASSERT_NOT_REACHED();
 }
 
 Operand IrFunction::create_function_from_id(unsigned function_id) const {
@@ -135,11 +176,13 @@ void IrFunction::construct_quad(OPCode op_code, Operand dest, Operand src_a,
     bind_queued_labels(m_basic_blocks.size() - 1);
 }
 
+// Add a label to waiting labels
 void IrFunction::queue_label(const Operand &label) {
     ASSERT(label.is_label());
     m_waiting_labels.push_back(std::get<LabelOperand>(label.data()));
 }
 
+// Binds the queued labels to the given quad. Also clears the label queue.
 void IrFunction::bind_queued_labels(size_t block_idx) {
     if (m_waiting_labels.empty()) return;
 
@@ -157,13 +200,19 @@ void IrFunction::bind_label(LabelOperand label, size_t block_idx) {
     m_labels.insert({ label, block_idx });
 }
 
+// Bind a source code variable name to an IR variable
 void IrFunction::bind_variable(const Operand &variable,
                                const std::string_view var_name) {
     ASSERT(variable.is_variable());
 
     VariableOperand var_raw = std::get<VariableOperand>(variable.data());
+    current_block()->assign_variable(var_raw, var_name);
 
-    m_varname_to_id.insert_or_assign(var_name, var_raw);
+    if (!m_var_to_blocks.count(var_name)) {
+        m_var_to_blocks.insert({ var_name, {} });
+    }
+
+    m_var_to_blocks.at(var_name).push_back(current_block());
     m_variable_ref.insert_or_assign(var_raw, var_name);
 }
 
@@ -193,6 +242,9 @@ void IrFunction::print_blocks() const {
     }
 }
 
+// Return the name bound to variable_id if present, otherwise
+// tmp#<variable_id>. This function is used for printing quads, so performance
+// is not critical.
 std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {
     auto it = m_variable_ref.find(variable_id);
 
@@ -207,6 +259,7 @@ std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {
 
 unsigned IrFunction::id() const { return declaration()->function_id(); }
 
+// Return the index of the quad bound to label
 size_t IrFunction::quad_idx(const LabelOperand label) const {
     return m_labels.at(label);
 }
