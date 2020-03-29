@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -68,6 +69,9 @@ class IrFunction {
 
     BasicBlock *new_basic_block(BasicBlock * = nullptr);
     BasicBlock *new_basic_block(std::vector<BasicBlock *> &);
+
+    std::unordered_map<BasicBlock *, std::set<BasicBlock *>>
+    dominance_frontier() const;
 
    private:
     Operand create_variable_from_id(unsigned) const;

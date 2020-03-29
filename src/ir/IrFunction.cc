@@ -63,6 +63,26 @@ BasicBlock *IrFunction::new_basic_block(std::vector<BasicBlock *> &parents) {
     return current_block();
 }
 
+std::unordered_map<BasicBlock *, std::set<BasicBlock *>>
+IrFunction::dominance_frontier() const {
+    std::unordered_map<BasicBlock *, std::set<BasicBlock *>>
+        dominance_frontiers {};
+
+    for (const ptr_t<BasicBlock> &block_ptr : m_basic_blocks) {
+        dominance_frontiers.insert(block_ptr.get(), {});
+    }
+
+    for (const ptr_t<BasicBlock> &block_ptr : m_basic_blocks) {
+        const std::vector<BasicBlock *> &immediate_predecessors =
+            block_ptr->parents();
+        if (immediate_predecessors.size() > 1) {
+            for (BasicBlock *p : immediate_predecessors) {
+                BasicBlock *runner = p;
+            }
+        }
+    }
+}
+
 unsigned new_label_id() {
     static unsigned label_id = 0;
     return label_id++;
