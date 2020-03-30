@@ -2,3 +2,4 @@
 editor/
 build/
 .vscode
+compile_commands.json
