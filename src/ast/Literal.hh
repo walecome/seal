@@ -11,4 +11,5 @@ class Literal : public Expression {
     AST_NODE_NAME(Literal)
 
     virtual void analyze(Scope *) override {};
+    virtual std::string dump(unsigned index) const override;
 };
