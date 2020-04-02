@@ -1,7 +1,9 @@
 include_directories(.)
 cmake_minimum_required(VERSION 3.10)
-project(compiler CXX)
+project(sealc CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+
 
 add_executable(${PROJECT_NAME})
 
@@ -26,8 +28,6 @@ include_directories(lib/argparse)
 
 add_subdirectory(src)
 
-message("SOURCES: ${SOURCES}")
-
 
 set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
 
@@ -37,7 +37,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
 endif ()
-
 
 # FMT
 add_subdirectory(lib/fmt EXCLUDE_FROM_ALL)

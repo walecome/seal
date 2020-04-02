@@ -32,9 +32,9 @@ function run_and_print() {
    arr=("$@")
    for i in "${arr[@]}";
       do
-        printf "${LIGHT_GREY}$ build/compiler --source $i${NC}\n"
+        printf "${LIGHT_GREY}$ build/sealc --source $i${NC}\n"
 
-        ret="$(build/compiler --source $i) " 
+        ret="$(build/sealc --source $i) " 
         status=$?
         if [ "$status" == "$expected" ]
         then
