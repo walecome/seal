@@ -1,14 +1,8 @@
-include_directories(.)
 cmake_minimum_required(VERSION 3.10)
 project(sealc CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-
-
-add_executable(${PROJECT_NAME})
-
 include(CMakeParseArguments)
-
 macro(add_source_files)
     cmake_parse_arguments(
         ARGS
@@ -23,13 +17,18 @@ macro(add_source_files)
     endforeach(src)
 endmacro(add_source_files)
 
-
+add_executable(${PROJECT_NAME})
 include_directories(lib/argparse)
-
 add_subdirectory(src)
 
+# FMT
+add_subdirectory(lib/fmt EXCLUDE_FROM_ALL)
+target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 
-set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
+# target_compile_features(SourceLib PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+
+set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
 
 # Force colored output (mostly needed for Ninja build)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -38,8 +37,15 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcolor-diagnostics")
 endif ()
 
-# FMT
-add_subdirectory(lib/fmt EXCLUDE_FROM_ALL)
-target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+# Below needed for lld client and link launcher links
+if(CMAKE_CXX_COMPILER_LAUNCHER STREQUAL "link_launcher")
+    set(CMAKE_CXX_LINK_EXECUTABLE "link_launcher")
+
+add_custom_target(pre_build_target ALL
+                  COMMAND ${CMAKE_CXX_COMPILER} -pie -fuse-ld=/home/alexanderw/courses/exjobb/llvm-fork/build/bin/ld.lld -o sealc -Wl,--start-group -Wl,--end-group
+                  VERBATIM)
+
+add_dependencies(${PROJECT_NAME} pre_build_target)
+
+endif()
