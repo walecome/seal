@@ -73,8 +73,6 @@ class Operand {
 
     bool is_used() const { return m_kind != OperandKind::UNUSED; }
 
-    std::string_view variable_name() const;
-
     auto env() const { return m_env; }
     void set_env(const IrFunction* env) { m_env = env; }
 

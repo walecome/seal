@@ -21,11 +21,6 @@ bool Operand::is_label() const { return m_kind == OperandKind::LABEL; }
 bool Operand::is_variable() const { return m_kind == OperandKind::VARIABLE; }
 bool Operand::is_function() const { return m_kind == OperandKind::FUNCTION; }
 
-std::string_view Operand::variable_name() const {
-    ASSERT(m_kind == OperandKind::VARIABLE);
-    return env()->resolve_variable_name(std::get<VariableOperand>(m_data));
-}
-
 struct ValueOperandPrinter {
     std::ostringstream oss {};
 

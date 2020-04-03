@@ -127,11 +127,11 @@ void IrFunction::dump_quads() const {
     }
 }
 
-std::string_view IrFunction::resolve_variable_name(unsigned variable_id) const {
+std::string IrFunction::resolve_variable_name(unsigned variable_id) const {
     auto it = m_variable_ref.find(variable_id);
 
     if (it != std::end(m_variable_ref)) {
-        return it->second;
+        return std::string(it->second);
     }
 
     std::ostringstream oss {};

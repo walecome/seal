@@ -48,7 +48,7 @@ class IrFunction {
 
     // Returns the name bound to variable_id if present, otherwise
     // tmp#<variable_id>.
-    std::string_view resolve_variable_name(unsigned variable_id) const;
+    std::string resolve_variable_name(unsigned variable_id) const;
 
     auto declaration() const { return m_decl; }
 
