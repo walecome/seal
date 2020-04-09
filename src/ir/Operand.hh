@@ -40,7 +40,7 @@ struct ValueOperand {
 
 // For named operands (label, variable, function)
 ADD_OPERAND_TYPE(LabelOperand, unsigned)
-ADD_OPERAND_TYPE(VariableOperand, unsigned)
+ADD_OPERAND_TYPE(VariableOperand, std::string_view)
 ADD_OPERAND_TYPE(FunctionOperand, unsigned)
 
 using operand_type_t =

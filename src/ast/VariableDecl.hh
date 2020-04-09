@@ -15,7 +15,7 @@ class VariableDecl : public Decl {
 
    public:
     VariableDecl(const std::string_view identifier, const Type type,
-                 ptr_t<Expression> &value, bool is_mutable)
+                 ptr_t<Expression>& value, bool is_mutable)
         : m_identifier { identifier },
           m_type { type },
           m_value { std::move(value) },
@@ -27,11 +27,12 @@ class VariableDecl : public Decl {
           m_value { nullptr },
           m_is_mutable { false } {}
 
-    auto is_mutable() const { return m_is_mutable; }
-    auto type() const { return m_type; }
-    auto identifier() const { return m_identifier; }
-    auto value() const { return m_value.get(); }
+    bool is_mutable() const { return m_is_mutable; }
     bool has_value() const { return m_value != nullptr; }
+
+    Type type() const { return m_type; }
+    std::string_view identifier() const { return m_identifier; }
+    Expression* value() const { return m_value.get(); }
 
    private:
     const std::string_view m_identifier;

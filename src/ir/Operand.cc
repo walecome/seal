@@ -1,5 +1,3 @@
-#include <iomanip>
-
 #include <fmt/format.h>
 
 #include "ir/IrFunction.hh"
@@ -40,19 +38,15 @@ struct OperandPrinter {
     }
 
     std::string operator()(FunctionOperand function_id) {
-        oss << "function#" << function_id;
-        return oss.str();
+        return fmt::format("function#{}", function_id);
     }
 
-    std::string operator()(VariableOperand var_id) {
-        oss << context->env()->resolve_variable_name(var_id) << " (" << var_id
-            << ")";
-        return oss.str();
+    std::string operator()(VariableOperand variable) {
+        return fmt::format("{}", variable.value);
     }
 
     std::string operator()(LabelOperand label_id) {
-        oss << "L#" << label_id;
-        return oss.str();
+        return fmt::format("L#{}", label_id);
     }
 };
 

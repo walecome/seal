@@ -1,4 +1,4 @@
-#include <iostream>
+#include <fmt/format.h>
 
 #include "IrFunction.hh"
 #include "ast/FunctionDecl.hh"
@@ -6,11 +6,6 @@
 unsigned new_label_id() {
     static unsigned label_id = 0;
     return label_id++;
-}
-
-unsigned new_variable_id() {
-    static unsigned variable_id = 0;
-    return variable_id++;
 }
 
 template <class ValueType, class T = decltype(ValueType().value)>
@@ -49,23 +44,23 @@ Operand IrFunction::create_label() const {
     return operand;
 }
 
-Operand IrFunction::create_variable_from_id(unsigned id) const {
-    Operand operand { OperandKind::VARIABLE, VariableOperand { id } };
+Operand IrFunction::create_variable(const std::string_view identifier) const {
+    Operand operand { OperandKind::VARIABLE, VariableOperand { identifier } };
     operand.set_env(this);
 
     return operand;
 }
 
-Operand IrFunction::create_variable() const {
-    return create_variable_from_id(new_variable_id());
-}
+Operand IrFunction::create_tmp_variable() {
+    static unsigned variable_count = 0;
 
-Operand IrFunction::get_variable(std::string_view identifier) const {
-    auto it = m_varname_to_id.find(identifier);
+    // m_tmp_variables own the string object for the tmp variable identifier.
+    m_tmp_variables.emplace_back(fmt::format("tmp${}", variable_count++));
+    Operand operand { OperandKind::VARIABLE,
+                      VariableOperand { m_tmp_variables.back() } };
+    operand.set_env(this);
 
-    ASSERT(it != std::end(m_varname_to_id));
-
-    return create_variable_from_id(it->second);
+    return operand;
 }
 
 Operand IrFunction::create_function_from_id(unsigned function_id) const {
@@ -111,32 +106,10 @@ void IrFunction::bind_label(LabelOperand label, size_t quad_idx) {
     m_labels.insert({ label, quad_idx });
 }
 
-void IrFunction::bind_variable(const Operand &variable,
-                               const std::string_view var_name) {
-    ASSERT(variable.is_variable());
-
-    VariableOperand var_raw = std::get<VariableOperand>(variable.data());
-
-    m_varname_to_id.insert_or_assign(var_name, var_raw);
-    m_variable_ref.insert_or_assign(var_raw, var_name);
-}
-
 void IrFunction::dump_quads() const {
     for (auto &quad : m_quads) {
         std::cout << quad->to_string() << std::endl;
     }
-}
-
-std::string IrFunction::resolve_variable_name(unsigned variable_id) const {
-    auto it = m_variable_ref.find(variable_id);
-
-    if (it != std::end(m_variable_ref)) {
-        return std::string(it->second);
-    }
-
-    std::ostringstream oss {};
-    oss << "tmp#" << variable_id;
-    return oss.str();
 }
 
 std::vector<const Quad *> IrFunction::quads_as_pointers() const {
@@ -147,12 +120,6 @@ std::vector<const Quad *> IrFunction::quads_as_pointers() const {
     }
 
     return quad_ptrs;
-}
-
-void IrFunction::__dump_variables() const {
-    for (auto &x : m_variable_ref) {
-        std::cout << x.first << "=" << x.second << std::endl;
-    }
 }
 
 unsigned IrFunction::id() const { return declaration()->function_id(); }

@@ -34,7 +34,7 @@ class StackFrame {
     StackFrame* get_variable_frame(VariableOperand identifier);
 
     StackFrame* m_parent { nullptr };
-    std::map<VariableOperand, ValueOperand> m_variables {};
+    std::map<std::string_view, ValueOperand> m_variables {};
     std::vector<ValueOperand> m_arguments {};
 };
 
