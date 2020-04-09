@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <vector>
 
@@ -36,7 +37,8 @@ class IrFunction {
     // Add a label to waiting labels
     void queue_label(const Operand &);
 
-    // Binds the queued labels to the given quad. Also clears the label queue.
+    // Binds the queued labels to the given quad. Also clears the label
+    // queue.
     void bind_queued_labels(size_t);
 
     void dump_quads() const;
@@ -67,5 +69,7 @@ class IrFunction {
     std::vector<ptr_t<Quad>> m_quads {};
     std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
-    std::vector<std::string> m_tmp_variables {};
+
+    // See comment in create_tmp_variable
+    std::set<std::string> m_tmp_variables {};
 };

@@ -54,10 +54,19 @@ Operand IrFunction::create_variable(const std::string_view identifier) const {
 Operand IrFunction::create_tmp_variable() {
     static unsigned variable_count = 0;
 
+    // This is kind of ugly... VariableOperand keeps a std::string_view to the
+    // variable identifier. When creating a temporary variable we need the name
+    // (tmp$NUM) to have a lifetime as least as long as the VariableOperand. We
+    // insert the std::string name into a set, and the reference it by a
+    // std::string_view object. The first implementation used a std::vector,
+    // which would invalidate the std::string_view's when resized. We should
+    // probably have a better solution for this...
+
     // m_tmp_variables own the string object for the tmp variable identifier.
-    m_tmp_variables.emplace_back(fmt::format("tmp${}", variable_count++));
+    auto inserted =
+        m_tmp_variables.emplace(fmt::format("temp${}", variable_count++));
     Operand operand { OperandKind::VARIABLE,
-                      VariableOperand { m_tmp_variables.back() } };
+                      VariableOperand { *inserted.first } };
     operand.set_env(this);
 
     return operand;

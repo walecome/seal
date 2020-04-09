@@ -20,12 +20,14 @@ bool Operand::is_variable() const { return m_kind == OperandKind::VARIABLE; }
 bool Operand::is_function() const { return m_kind == OperandKind::FUNCTION; }
 
 struct ValueOperandPrinter {
-    std::ostringstream oss {};
-
-    template <typename T>
-    std::string operator()(T value) {
-        oss << value;
-        return oss.str();
+    std::string operator()(StringOperand value) {
+        return fmt::format("{}", value);
+    }
+    std::string operator()(IntOperand value) {
+        return fmt::format("{}", value);
+    }
+    std::string operator()(RealOperand value) {
+        return fmt::format("{}", value);
     }
 };
 
