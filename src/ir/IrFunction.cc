@@ -110,7 +110,7 @@ void IrFunction::bind_queued_labels(size_t quad_idx) {
 void IrFunction::bind_label(LabelOperand label, size_t quad_idx) {
     ASSERT(m_labels.find(label) == std::end(m_labels));
 
-    quads().at(quad_idx)->set_label(label);
+    quads().at(quad_idx)->add_label(label);
 
     m_labels.insert({ label, quad_idx });
 }

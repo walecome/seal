@@ -309,7 +309,7 @@ void Interpreter::call(const Quad* quad) {
     if (BuiltIn::is_builtin(func)) {
         BuiltIn::call_builtin_function(func, current_frame()->get_arguments());
     } else {
-        ASSERT_NOT_REACHED();
+        ASSERT_NOT_REACHED_MSG("Function calls not implemented yet");
     };
 
     current_frame()->clear_arguments();

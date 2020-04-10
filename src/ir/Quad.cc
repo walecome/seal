@@ -1,11 +1,11 @@
 #include "Quad.hh"
 #include "Util.hh"
 
-void Quad::set_label(unsigned label_id) {
-    ASSERT(!m_has_label);
-
+void Quad::add_label(unsigned label_id) {
+    // BUG: We need to support a quad having more than one label
     m_has_label = true;
-    m_label_id = label_id;
+
+    m_label_ids.push_back(label_id);
 }
 
 unsigned nr_chars(unsigned number) {
@@ -25,13 +25,18 @@ unsigned nr_chars(unsigned number) {
 }
 
 std::string Quad::to_string() const {
+    // TODO: Use fmtlib for this function...
     std::ostringstream oss {};
 
     unsigned indent_steps = 8;
 
     if (has_label()) {
-        oss << "L" << label_id() << ": ";
-        indent_steps -= (nr_chars(label_id()) + 3);
+        for (unsigned label_id : m_label_ids) {
+            oss << "L" << label_id << " ";
+            indent_steps -= (nr_chars(label_id) + 2);
+        }
+        oss << ": ";
+        indent_steps -= 2;
     }
 
     ASSERT(indent_steps <= 8);

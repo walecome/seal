@@ -1,27 +1,16 @@
 #include "Util.hh"
+#include <fmt/format.h>
+#include <fstream>
 
 namespace util {
 
 std::string indent(unsigned steps) {
-    std::ostringstream oss {};
-
-    const std::string indent_content = "    ";
-
-    for (unsigned i = 0; i < steps; ++i) {
-        oss << indent_content;
-    }
-
-    return oss.str();
+    const int indent_length = 4;
+    return fmt::format("{:<{}}", "", indent_length * steps);
 }
 
 std::string indent_spaces(unsigned nr_spaces) {
-    std::ostringstream oss {};
-
-    for (unsigned i = 0; i < nr_spaces; ++i) {
-        oss << " ";
-    }
-
-    return oss.str();
+    return fmt::format("{:<{}}", "", nr_spaces);
 }
 
 std::shared_ptr<std::string> read_source(const std::string &filename) {
@@ -31,11 +20,8 @@ std::shared_ptr<std::string> read_source(const std::string &filename) {
 }
 
 void print_col_indication(int col) {
-    for (int i = 1; i < col; ++i) {
-        std::cout << "~";
-    }
-
-    std::cout << "^" << std::endl;
+    fmt::print("{:~<{}}", "", col - 1);
+    fmt::print("^\n");
 }
 
 }  // namespace util
