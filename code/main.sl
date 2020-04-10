@@ -8,9 +8,9 @@ fn main() -> int {
 
     x = x * 10.0;
     
-    asd : int = 4;
+    asd : mut int = 4;
 
-    z : int = 1 -(--asd);
+    z : int = -(--asd);
 
     println(x);
 

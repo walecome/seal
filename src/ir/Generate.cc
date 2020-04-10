@@ -337,17 +337,20 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
         return result;
     }
 
-    auto var_expr =
-        dynamic_cast<VariableExpression *>(unary_expr->expression());
-    ASSERT(var_expr != nullptr);
-
     Operand result_operand;
-    if (sym == OperatorSym::INC) {
+
+    if (VariableExpression *var_expr =
+            dynamic_cast<VariableExpression *>(unary_expr->expression());
+        var_expr != nullptr) {
         result_operand = gen_variable_expression(var_expr);
+    } else {
+        result_operand = env()->create_tmp_variable();
+    }
+
+    if (sym == OperatorSym::INC) {
         env()->add_quad(OPCode::ADD, result_operand, target_operand,
                         env()->create_immediate_int(1));
     } else if (sym == OperatorSym::DEC) {
-        result_operand = gen_variable_expression(var_expr);
         env()->add_quad(OPCode::SUB, result_operand, target_operand,
                         env()->create_immediate_int(1));
     } else {
