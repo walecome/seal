@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(sealc CXX)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 include(CMakeParseArguments)
 macro(add_source_files)
     cmake_parse_arguments(
@@ -21,12 +24,12 @@ add_executable(${PROJECT_NAME})
 include_directories(lib/argparse)
 add_subdirectory(src)
 
+
 # FMT
 add_subdirectory(lib/fmt EXCLUDE_FROM_ALL)
 target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 
-# target_compile_features(SourceLib PUBLIC cxx_std_17)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC)
 
 set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
 
