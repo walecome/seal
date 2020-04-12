@@ -1,9 +1,12 @@
 #pragma once
 
+#include <map>
 #include <unordered_map>
 
 #include "Constants.hh"
 #include "Operand.hh"
+#include "ir/IrFunction.hh"
+#include "ir/Quad.hh"
 
 // AST nodes
 class IntegerLiteral;
@@ -31,8 +34,16 @@ class StringLiteral;
 class CompilationUnit;
 
 class IrProgram;
-class IrFunction;
 class FunctionDecl;
+
+struct QuadCollection {
+    std::map<unsigned, unsigned> function_to_quad {};
+    std::map<unsigned, unsigned> label_to_quad {};
+    std::vector<Quad> quads {};
+    unsigned main_function_id {};
+
+    void dump() const;
+};
 
 class Generate {
     MAKE_NONMOVABLE(Generate)
@@ -42,7 +53,7 @@ class Generate {
     Generate(const CompilationUnit* compilation_unit)
         : m_compilation_unit { compilation_unit } {}
 
-    ptr_t<IrProgram> generate();
+    QuadCollection generate();
 
    private:
     // Quads

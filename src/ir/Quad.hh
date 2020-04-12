@@ -7,7 +7,7 @@
 
 class Quad {
     MAKE_DEFAULT_CONSTRUCTABLE(Quad)
-    MAKE_NONCOPYABLE(Quad)
+    MAKE_DEFAULT_COPYABLE(Quad)
     MAKE_DEFAULT_MOVABLE(Quad)
 
    public:

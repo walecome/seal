@@ -6,9 +6,8 @@
 
 #include "ir/Operand.hh"
 
-class IrProgram;
-class IrFunction;
 class Quad;
+struct QuadCollection;
 
 class StackFrame {
    public:
@@ -25,6 +24,10 @@ class StackFrame {
     void clear_arguments();
     const std::vector<ValueOperand>& get_arguments() const;
 
+    unsigned program_counter() const { return m_current_quad_idx; }
+    void increment_program_counter() { ++m_current_quad_idx; }
+    void set_program_counter(unsigned value) { m_current_quad_idx = value; }
+
    private:
     // Assign a value to an existing variable.
     void assign_variable(VariableOperand var, ValueOperand value);
@@ -36,47 +39,46 @@ class StackFrame {
     StackFrame* m_parent { nullptr };
     std::map<std::string_view, ValueOperand> m_variables {};
     std::vector<ValueOperand> m_arguments {};
+    unsigned m_current_quad_idx {};
 };
 
 class Interpreter {
    public:
-    Interpreter(const IrProgram* ir_program) : m_ir_program { ir_program } {
-        m_stack_frames.push(StackFrame {});
-    }
+    Interpreter(const QuadCollection&);
 
     void interpret();
 
    private:
-    void interpret_function(const IrFunction* function);
+    void interpret_function(unsigned function_id);
 
     // Interpret function for different opcodes
-    void add(const Quad* quad);
-    void sub(const Quad* quad);
-    void mult(const Quad* quad);
-    void div(const Quad* quad);
-    void cmp_eq(const Quad* quad);
-    void cmp_gt(const Quad* quad);
-    void cmp_lt(const Quad* quad);
-    void cmp_gteq(const Quad* quad);
-    void cmp_lteq(const Quad* quad);
-    void cmp_noteq(const Quad* quad);
-    void jmp(const Quad* quad);
-    void jmp_z(const Quad* quad);
-    void jmp_nz(const Quad* quad);
-    void push_arg(const Quad* quad);
-    void call(const Quad* quad);
-    void ret(const Quad* quad);
-    void move(const Quad* quad);
-    void index_move(const Quad* quad);
+    void add(Quad);
+    void sub(Quad);
+    void mult(Quad);
+    void div(Quad);
+    void cmp_eq(Quad);
+    void cmp_gt(Quad);
+    void cmp_lt(Quad);
+    void cmp_gteq(Quad);
+    void cmp_lteq(Quad);
+    void cmp_noteq(Quad);
+    void jmp(Quad);
+    void jmp_z(Quad);
+    void jmp_nz(Quad);
+    void push_arg(Quad);
+    void call(Quad);
+    void ret(Quad);
+    void move(Quad);
+    void index_move(Quad);
 
     StackFrame* current_frame() { return &m_stack_frames.top(); }
     void enter_new_frame() {
         m_stack_frames.push(StackFrame { current_frame() });
     };
 
-    const IrProgram* m_ir_program;
+    const QuadCollection& m_quads;
+
     std::stack<StackFrame> m_stack_frames {};
-    std::stack<const IrFunction*> m_call_stack {};
 
     bool m_jump_performed { false };
 

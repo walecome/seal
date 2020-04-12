@@ -27,16 +27,39 @@
 #include "builtin/BuiltIn.hh"
 #include "ir/IrProgram.hh"
 
-ptr_t<IrProgram> Generate::generate() {
+#include "fmt/format.h"
+
+void QuadCollection::dump() const {
+    for (const Quad &quad : quads) {
+        fmt::print("{}\n", quad.to_string());
+    }
+}
+
+QuadCollection Generate::generate() {
     auto ir_program = std::make_unique<IrProgram>();
+
+    QuadCollection ret {};
 
     m_compilation_unit->for_each_function([&](auto function_decl) {
         m_current_ir_function = std::make_unique<IrFunction>(function_decl);
         gen_function_decl(function_decl);
+
+        ret.function_to_quad.insert(
+            { m_current_ir_function->declaration()->function_id(),
+              ret.quads.size() });
+        for (const Quad *quad : m_current_ir_function->quads_as_pointers()) {
+            for (unsigned label_id : quad->label_ids()) {
+                ret.label_to_quad.insert({ label_id, ret.quads.size() });
+            }
+            ret.quads.push_back(*quad);
+        }
+
         ir_program->add_function(m_current_ir_function);
     });
 
-    return ir_program;
+    ret.main_function_id = ir_program->main_function_id();
+
+    return ret;
 }
 
 void Generate::gen_block(const Block *block) {
