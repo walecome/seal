@@ -32,5 +32,8 @@ jobs:
         cmake ..
         make
 
+      env:
+        CXX: clang
+
     - name: Run test script
       run: ./test.sh
