@@ -23,8 +23,19 @@ void QuadCollection::dump() const {
     print_row("ATTRIBUTES", "OPCODE", "DEST", "SRC_A", "SRC_B");
     fmt::print("{:-^{}}\n", "", width);
 
-    for (const Quad &quad : quads) {
-        auto [labels, opcode, dest, src_a, src_b] = quad.to_string_segments();
+    std::map<unsigned, unsigned> quad_to_function {};
+
+    for (auto [function_id, quad_idx] : function_to_quad) {
+        quad_to_function.insert({ quad_idx, function_id });
+    }
+
+    for (unsigned i = 0; i < quads.size(); ++i) {
+        auto [labels, opcode, dest, src_a, src_b] =
+            quads[i].to_string_segments();
+
+        if (quad_to_function.count(i)) {
+            labels = fmt::format("F#{} {}", quad_to_function[i], labels);
+        }
         print_row(labels, opcode, dest, src_a, src_b);
     }
     fmt::print("{:-^{}}\n", "", width);
