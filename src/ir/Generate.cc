@@ -75,6 +75,10 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
         [this](auto param) { gen_variable_decl(param); });
 
     gen_block(function_decl->body());
+
+    if (function_decl->type().is_void()) {
+        env()->add_quad(OPCode::RET, {}, {}, {});
+    }
 }
 
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {

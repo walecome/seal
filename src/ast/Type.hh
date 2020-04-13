@@ -47,6 +47,8 @@ class Type {
     void change_primitive(const Primitive);
     void change_kind(const Kind);
 
+    bool is_void() const { return m_primitive == Primitive::VOID; }
+
     std::string to_string() const;
 
    private:
