@@ -4,7 +4,7 @@ SOURCES=(
     code/main.sl
     code/expression.sl
     code/function.sl
-    code/recursion.sl
+    # code/recursion.sl
     code/simple.sl
     code/weird_unary.sl
 )

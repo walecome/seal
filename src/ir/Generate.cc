@@ -188,9 +188,7 @@ Operand Generate::gen_expression(const Expression *expression) {
 Operand Generate::gen_function_call(const FunctionCall *func_call) {
     bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
 
-    if (!is_builtin) {
-        env()->add_quad(OPCode::PREPARE_FRAME, {}, {}, {});
-    }
+    // env()->add_quad(OPCode::PREPARE_FRAME, {}, {}, {});
 
     // Push arguments
     func_call->argument_list()->for_each_enumerated_argument(
@@ -198,7 +196,9 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
             auto arg_operand = gen_expression(arg);
 
             if (is_builtin) {
-                env()->add_quad(OPCode::PUSH_ARG, {}, arg_operand, {});
+                // TODO: This is an ugly fix for builtins...
+                env()->add_quad(OPCode::PUSH_ARG, env()->create_tmp_variable(),
+                                arg_operand, {});
             } else {
                 std::string_view parameter_name = func_call->declaration()
                                                       ->parameter_list()

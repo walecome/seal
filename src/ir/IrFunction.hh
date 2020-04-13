@@ -69,7 +69,4 @@ class IrFunction {
     std::vector<ptr_t<Quad>> m_quads {};
     std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
-
-    // See comment in create_tmp_variable
-    std::set<std::string> m_tmp_variables {};
 };

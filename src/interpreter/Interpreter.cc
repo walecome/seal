@@ -4,7 +4,8 @@
 #include "builtin/BuiltIn.hh"
 #include "ir/QuadCollection.hh"
 
-Interpreter::Interpreter(const QuadCollection& quads) : m_quads { quads } {}
+Interpreter::Interpreter(const QuadCollection& quads, bool verbose)
+    : m_quads { quads }, m_verbose { verbose } {}
 
 void Interpreter::interpret() {
     m_stack_frames.push(StackFrame { 0, nullptr });
@@ -12,13 +13,18 @@ void Interpreter::interpret() {
 }
 
 void Interpreter::interpret_function(unsigned function_id) {
-    fmt::print("Interpreting function with id {}\n", function_id);
+    if (m_verbose) {
+        fmt::print("Interpreting function with id {}\n", function_id);
+    }
 
     current_frame()->set_program_counter(
         m_quads.function_to_quad.at(function_id));
 
     while (true) {
         Quad quad = m_quads.quads[current_frame()->program_counter()];
+
+        fmt::print("Interpreting quad: {}\n", quad.to_string());
+
         switch (quad.opcode()) {
             case OPCode::ADD:
                 add(quad);
@@ -81,9 +87,6 @@ void Interpreter::interpret_function(unsigned function_id) {
                 move(quad);
                 break;
             case OPCode::INDEX_MOVE:
-                break;
-            case OPCode::PREPARE_FRAME:
-                prepare_frame();
                 break;
 
             default:
@@ -224,30 +227,40 @@ void Interpreter::jmp_nz(Quad quad) {
 void Interpreter::push_arg(Quad quad) {
     // TODO: Built-ins will break from this as they do not have parameter names
 
-    VariableOperand var =
-        quad.dest().is_used() ? quad.dest().as_variable() : VariableOperand {};
+    if (!m_arguments) {
+        m_arguments = ArgumentWrapper {};
+    }
 
-    current_frame()->set_variable(
-        var, current_frame()->resolve_operand(quad.src_a()), true);
+    ValueOperand value = current_frame()->resolve_operand(quad.src_a());
+    // This means we have a named argument
+    if (quad.dest().is_used()) {
+        m_arguments.value().add_named_argument(quad.dest().as_variable(),
+                                               value);
+    } else {
+        m_arguments.value().add_argument(value);
+    }
 }
 
 void Interpreter::call(Quad quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
     ASSERT(quad.src_a().is_function());
 
-    // When we get here, the prepare_frame quad should have already been
-    // interpreted. This means we simply have to set the program counter to
-    // correct quad.
-
     FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
-        BuiltIn::call_builtin_function(func, current_frame()->get_variables());
+        BuiltIn::call_builtin_function(func, take_arguments().value_vector());
         return;
     }
 
-    current_frame()->set_parent_program_counter(
-        m_quads.function_to_quad.at(func) + 1);
+    enter_new_frame();
+
+    // Program counter will be incremented in interpret function
+    current_frame()->set_program_counter(m_quads.function_to_quad.at(func) - 1);
+
+    take_arguments().for_each_name_value(
+        [&](VariableOperand var, ValueOperand value) {
+            current_frame()->set_variable(var, value, true);
+        });
 
     if (!quad.dest().is_used()) {
         return;
@@ -259,7 +272,10 @@ void Interpreter::call(Quad quad) {
 }
 
 void Interpreter::ret(Quad quad) {
-    ASSERT(quad.dest().is_used());
+    if (!quad.dest().is_used()) {
+        exit_frame();
+        return;
+    }
 
     ValueOperand value = current_frame()->resolve_operand(quad.dest());
 
@@ -288,17 +304,26 @@ void Interpreter::move(Quad quad) {
 
 void Interpreter::index_move(Quad) {}
 
-void Interpreter::prepare_frame() { enter_new_frame(); }
-
 StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
 
 void Interpreter::enter_new_frame() {
-    fmt::print("enter_frame()\n");
+    // fmt::print("enter_frame()\n");
 
     m_stack_frames.push(
         StackFrame { current_frame()->program_counter(), current_frame() });
 };
 void Interpreter::exit_frame() {
-    fmt::print("exit_frame()\n");
+    // fmt::print("exit_frame()\n");
     m_stack_frames.pop();
+}
+
+ArgumentWrapper Interpreter::take_arguments() {
+    if (!m_arguments) {
+        return {};
+    }
+
+    ArgumentWrapper arguments = m_arguments.value();
+    m_arguments = std::nullopt;
+
+    return arguments;
 }

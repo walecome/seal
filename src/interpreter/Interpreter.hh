@@ -13,7 +13,7 @@ struct QuadCollection;
 
 class Interpreter {
    public:
-    Interpreter(const QuadCollection&);
+    Interpreter(const QuadCollection&, bool verbose);
 
     void interpret();
 
@@ -45,7 +45,10 @@ class Interpreter {
     void enter_new_frame();
     void exit_frame();
 
-    const QuadCollection& m_quads;
+    ArgumentWrapper take_arguments();
 
+    const QuadCollection& m_quads;
+    bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
+    std::optional<ArgumentWrapper> m_arguments { std::nullopt };
 };

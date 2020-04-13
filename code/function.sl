@@ -2,7 +2,7 @@ fn main() -> int {
     print("fib");
     asd := fib(10);
     print(asd);
-    return 1;
+    return 0;
 }
 
 

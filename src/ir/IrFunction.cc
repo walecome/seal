@@ -62,11 +62,10 @@ Operand IrFunction::create_tmp_variable() {
     // which would invalidate the std::string_view's when resized. We should
     // probably have a better solution for this...
 
-    // m_tmp_variables own the string object for the tmp variable identifier.
-    auto inserted =
-        m_tmp_variables.emplace(fmt::format("temp${}", variable_count++));
-    Operand operand { OperandKind::VARIABLE,
-                      VariableOperand { *inserted.first } };
+    // We should probably just have a global symbol table instead...
+    std::string *tmp =
+        new std::string { fmt::format("temp${}", variable_count++) };
+    Operand operand { OperandKind::VARIABLE, VariableOperand { *tmp } };
     operand.set_env(this);
 
     return operand;

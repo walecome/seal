@@ -108,9 +108,7 @@ int main(int argc, char **argv) {
         quads.dump();
     }
 
-    fmt::print("{}\n", sizeof(Quad));
-
-    Interpreter interpreter { quads };
+    Interpreter interpreter { quads, verbose };
     interpreter.interpret();
 
     return 0;
