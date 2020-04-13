@@ -19,6 +19,7 @@
 #include "interpreter/Interpreter.hh"
 #include "ir/Generate.hh"
 #include "ir/IrProgram.hh"
+#include "ir/QuadCollection.hh"
 
 ArgumentParser parse_args(int argc, char **argv) {
     ArgumentParser parser("CLI argument parser");

@@ -27,7 +27,7 @@ struct ValueOperandPrinter {
         return fmt::format("{}", value);
     }
     std::string operator()(RealOperand value) {
-        return fmt::format("{}", value);
+        return fmt::format("{:.5f}", value);
     }
 };
 

@@ -2,7 +2,7 @@
 
 #include "Interpreter.hh"
 #include "builtin/BuiltIn.hh"
-#include "ir/Generate.hh"
+#include "ir/QuadCollection.hh"
 
 void StackFrame::set_variable(Operand var, ValueOperand value) {
     ASSERT(var.is_variable());

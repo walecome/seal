@@ -25,15 +25,10 @@
 #include "ast/VariableExpression.hh"
 #include "ast/While.hh"
 #include "builtin/BuiltIn.hh"
+
 #include "ir/IrProgram.hh"
 
 #include "fmt/format.h"
-
-void QuadCollection::dump() const {
-    for (const Quad &quad : quads) {
-        fmt::print("{}\n", quad.to_string());
-    }
-}
 
 QuadCollection Generate::generate() {
     auto ir_program = std::make_unique<IrProgram>();

@@ -7,6 +7,7 @@
 #include "Operand.hh"
 #include "ir/IrFunction.hh"
 #include "ir/Quad.hh"
+#include "ir/QuadCollection.hh"
 
 // AST nodes
 class IntegerLiteral;
@@ -35,15 +36,6 @@ class CompilationUnit;
 
 class IrProgram;
 class FunctionDecl;
-
-struct QuadCollection {
-    std::map<unsigned, unsigned> function_to_quad {};
-    std::map<unsigned, unsigned> label_to_quad {};
-    std::vector<Quad> quads {};
-    unsigned main_function_id {};
-
-    void dump() const;
-};
 
 class Generate {
     MAKE_NONMOVABLE(Generate)

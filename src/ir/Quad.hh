@@ -1,4 +1,5 @@
 #pragma once
+#include <tuple>
 #include <vector>
 
 #include "Constants.hh"
@@ -18,6 +19,8 @@ class Quad {
           m_src_b { src_b } {}
 
     std::string to_string() const;
+    std::tuple<std::string, std::string, std::string, std::string, std::string>
+    to_string_segments() const;
 
     const std::vector<unsigned>& label_ids() const { return m_label_ids; }
     bool has_label() const { return m_has_label; }
