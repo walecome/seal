@@ -186,9 +186,11 @@ Operand Generate::gen_expression(const Expression *expression) {
 }
 
 Operand Generate::gen_function_call(const FunctionCall *func_call) {
-    env()->add_quad(OPCode::PREPARE_FRAME, {}, {}, {});
-
     bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
+
+    if (!is_builtin) {
+        env()->add_quad(OPCode::PREPARE_FRAME, {}, {}, {});
+    }
 
     // Push arguments
     func_call->argument_list()->for_each_enumerated_argument(

@@ -41,11 +41,9 @@ class Interpreter {
     void index_move(Quad);
     void prepare_frame();
 
-    StackFrame* current_frame() { return &m_stack_frames.top(); }
-    void enter_new_frame() {
-        m_stack_frames.push(StackFrame { current_frame() });
-    };
-    void exit_frame() { m_stack_frames.pop(); }
+    StackFrame* current_frame();
+    void enter_new_frame();
+    void exit_frame();
 
     const QuadCollection& m_quads;
 

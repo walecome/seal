@@ -2,7 +2,7 @@
 
 void StackFrame::set_variable(VariableOperand var, ValueOperand value,
                               bool force_current_frame) {
-    StackFrame* target_frame = this;
+    StackFrame* target_frame = nullptr;
 
     if (!force_current_frame) {
         target_frame = get_variable_frame(var);

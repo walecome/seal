@@ -7,7 +7,7 @@
 Interpreter::Interpreter(const QuadCollection& quads) : m_quads { quads } {}
 
 void Interpreter::interpret() {
-    m_stack_frames.push(StackFrame {});
+    m_stack_frames.push(StackFrame { 0, nullptr });
     interpret_function(m_quads.main_function_id);
 }
 
@@ -19,9 +19,6 @@ void Interpreter::interpret_function(unsigned function_id) {
 
     while (true) {
         Quad quad = m_quads.quads[current_frame()->program_counter()];
-
-        // fmt::print("Interpreting: {}\n", quad.to_string());
-
         switch (quad.opcode()) {
             case OPCode::ADD:
                 add(quad);
@@ -78,6 +75,7 @@ void Interpreter::interpret_function(unsigned function_id) {
                 call(quad);
                 break;
             case OPCode::RET:
+                ret(quad);
                 break;
             case OPCode::MOVE:
                 move(quad);
@@ -225,9 +223,12 @@ void Interpreter::jmp_nz(Quad quad) {
 
 void Interpreter::push_arg(Quad quad) {
     // TODO: Built-ins will break from this as they do not have parameter names
+
+    VariableOperand var =
+        quad.dest().is_used() ? quad.dest().as_variable() : VariableOperand {};
+
     current_frame()->set_variable(
-        quad.dest().as_variable(),
-        current_frame()->resolve_operand(quad.src_a()), true);
+        var, current_frame()->resolve_operand(quad.src_a()), true);
 }
 
 void Interpreter::call(Quad quad) {
@@ -245,7 +246,8 @@ void Interpreter::call(Quad quad) {
         return;
     }
 
-    current_frame()->set_program_counter(m_quads.function_to_quad.at(func));
+    current_frame()->set_parent_program_counter(
+        m_quads.function_to_quad.at(func) + 1);
 
     if (!quad.dest().is_used()) {
         return;
@@ -257,13 +259,17 @@ void Interpreter::call(Quad quad) {
 }
 
 void Interpreter::ret(Quad quad) {
+    ASSERT(quad.dest().is_used());
+
+    ValueOperand value = current_frame()->resolve_operand(quad.dest());
+
+    if (current_frame()->is_main_frame()) {
+        exit(value.as_int());
+    }
+
     if (current_frame()->return_variable()) {
-        ASSERT(quad.dest().is_used());
-
         VariableOperand ret = current_frame()->return_variable().value();
-        ValueOperand value = current_frame()->resolve_operand(quad.dest());
         exit_frame();
-
         current_frame()->set_variable(ret, value, false);
     } else {
         exit_frame();
@@ -283,3 +289,16 @@ void Interpreter::move(Quad quad) {
 void Interpreter::index_move(Quad) {}
 
 void Interpreter::prepare_frame() { enter_new_frame(); }
+
+StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
+
+void Interpreter::enter_new_frame() {
+    fmt::print("enter_frame()\n");
+
+    m_stack_frames.push(
+        StackFrame { current_frame()->program_counter(), current_frame() });
+};
+void Interpreter::exit_frame() {
+    fmt::print("exit_frame()\n");
+    m_stack_frames.pop();
+}

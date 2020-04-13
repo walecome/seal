@@ -36,6 +36,21 @@ using value_operand_t = std::variant<IntOperand, RealOperand, StringOperand>;
 
 struct ValueOperand {
     value_operand_t value {};
+
+    unsigned long as_int() const {
+        ASSERT(std::holds_alternative<IntOperand>(value));
+        return std::get<IntOperand>(value).value;
+    }
+
+    double as_real() const {
+        ASSERT(std::holds_alternative<RealOperand>(value));
+        return std::get<RealOperand>(value).value;
+    }
+
+    std::string_view as_string() const {
+        ASSERT(std::holds_alternative<StringOperand>(value));
+        return std::get<StringOperand>(value).value;
+    }
 };
 
 // For named operands (label, variable, function)
