@@ -57,16 +57,12 @@ class Operand {
     Operand(OperandKind kind, operand_type_t data)
         : m_kind { kind }, m_data { data } {}
 
-    OperandKind& kind() { return m_kind; }
-    operand_type_t& data() { return m_data; }
-
-    const operand_type_t& data() const { return m_data; }
-    const OperandKind& kind() const { return m_kind; }
-
     bool is_number() const;
     bool is_integer() const;
     bool is_real() const;
     bool is_string() const;
+    bool is_value() const;
+
     bool is_label() const;
     bool is_variable() const;
     bool is_function() const;
@@ -77,6 +73,11 @@ class Operand {
     void set_env(const IrFunction* env) { m_env = env; }
 
     std::string to_string() const;
+
+    ValueOperand as_value() const;
+    VariableOperand as_variable() const;
+    LabelOperand as_label() const;
+    FunctionOperand as_function() const;
 
    private:
     OperandKind m_kind;

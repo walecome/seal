@@ -94,7 +94,7 @@ void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
 
 void IrFunction::queue_label(const Operand &label) {
     ASSERT(label.is_label());
-    m_waiting_labels.push_back(std::get<LabelOperand>(label.data()));
+    m_waiting_labels.push_back(label.as_label());
 }
 
 void IrFunction::bind_queued_labels(size_t quad_idx) {

@@ -20,11 +20,17 @@ class ArgumentList : public Node {
     auto argument_at(unsigned i) const { return m_arguments.at(i).get(); }
     const auto& arguments() const { return m_arguments; }
 
-    // @TODO: Check why this cannot be in the source file...
     template <typename Function>
     void for_each_argument(Function callback) const {
         for (auto& argument : m_arguments) {
             callback(argument.get());
+        }
+    }
+
+    template <typename Function>
+    void for_each_enumerated_argument(Function callback) const {
+        for (unsigned i = 0; i < m_arguments.size(); ++i) {
+            callback(m_arguments[i].get(), i);
         }
     }
 

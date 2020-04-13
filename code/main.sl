@@ -28,6 +28,8 @@ fn stupid() -> int {
 
     x : mut int = 3;
     x = 3;
+
+    return x;
 }
 
 fn unary_test() -> int {
@@ -36,6 +38,8 @@ fn unary_test() -> int {
     ++x;
     --x;
     x = -x;
+
+    return x;
 }
 
 fn top_level_func() -> int {

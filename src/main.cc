@@ -110,8 +110,8 @@ int main(int argc, char **argv) {
 
     fmt::print("{}\n", sizeof(Quad));
 
-    // Interpreter interpreter { quads };
-    // interpreter.interpret();
+    Interpreter interpreter { quads };
+    interpreter.interpret();
 
     return 0;
 }

@@ -4,82 +4,6 @@
 #include "builtin/BuiltIn.hh"
 #include "ir/QuadCollection.hh"
 
-void StackFrame::set_variable(Operand var, ValueOperand value) {
-    ASSERT(var.is_variable());
-
-    VariableOperand var_raw = std::get<VariableOperand>(var.data());
-
-    auto target_frame = get_variable_frame(var_raw);
-
-    if (target_frame) {
-        target_frame->assign_variable(var_raw, value);
-    } else {
-        // No frame had the variable previously set
-        m_variables[var_raw] = value;
-    }
-}
-
-void StackFrame::assign_variable(VariableOperand var, ValueOperand value) {
-    ASSERT(m_variables.count(var) == 1);
-
-    m_variables[var] = value;
-}
-
-ValueOperand StackFrame::get_variable(VariableOperand var) const {
-    auto it = m_variables.find(var);
-
-    if (it == std::end(m_variables)) {
-        return m_parent->get_variable(var);
-    }
-
-    return it->second;
-}
-
-struct OperandResolver {
-    const StackFrame* env;
-
-    ValueOperand operator()(ValueOperand value_operand) {
-        return value_operand;
-    }
-
-    ValueOperand operator()(VariableOperand var) {
-        return env->get_variable(var);
-    }
-
-    template <class T>
-    ValueOperand operator()(T) {
-        ASSERT_NOT_REACHED();
-    }
-};
-
-ValueOperand StackFrame::resolve_operand(Operand operand) const {
-    return std::visit(OperandResolver { this }, operand.data());
-}
-
-void StackFrame::push_argument(ValueOperand value) {
-    m_arguments.push_back(std::move(value));
-}
-
-void StackFrame::clear_arguments() { m_arguments.clear(); }
-
-const std::vector<ValueOperand>& StackFrame::get_arguments() const {
-    return m_arguments;
-}
-
-StackFrame* StackFrame::get_variable_frame(VariableOperand var) {
-    auto it = m_variables.find(var);
-
-    if (it == std::end(m_variables)) {
-        if (!m_parent) {
-            return nullptr;
-        }
-
-        return m_parent->get_variable_frame(var);
-    }
-
-    return this;
-}
-
 Interpreter::Interpreter(const QuadCollection& quads) : m_quads { quads } {}
 
 void Interpreter::interpret() {
@@ -93,10 +17,10 @@ void Interpreter::interpret_function(unsigned function_id) {
     current_frame()->set_program_counter(
         m_quads.function_to_quad.at(function_id));
 
-    while (m_current_quad_idx < m_quads.quads.size()) {
-        Quad quad = m_quads.quads[m_current_quad_idx];
+    while (true) {
+        Quad quad = m_quads.quads[current_frame()->program_counter()];
 
-        m_jump_performed = false;
+        // fmt::print("Interpreting: {}\n", quad.to_string());
 
         switch (quad.opcode()) {
             case OPCode::ADD:
@@ -160,13 +84,18 @@ void Interpreter::interpret_function(unsigned function_id) {
                 break;
             case OPCode::INDEX_MOVE:
                 break;
+            case OPCode::PREPARE_FRAME:
+                prepare_frame();
+                break;
 
             default:
                 ASSERT_NOT_REACHED();
         }
 
-        if (!m_jump_performed) {
-            ++m_current_quad_idx;
+        if (current_frame()->jump_performed()) {
+            current_frame()->set_jump_performed(false);
+        } else {
+            current_frame()->increment_program_counter();
         }
     }
 }
@@ -198,7 +127,8 @@ void binop_helper(StackFrame* context, Quad quad) {
     value_operand_t result =
         std::visit(BinOpVisitor<Operator> {}, lhs.value, rhs.value);
 
-    context->set_variable(quad.dest(), ValueOperand { result });
+    context->set_variable(quad.dest().as_variable(), ValueOperand { result },
+                          false);
 }
 
 void Interpreter::add(Quad quad) {
@@ -241,7 +171,8 @@ void cmp_helper(StackFrame* context, Quad quad) {
     bool result = std::visit(CmpVisitor<Operator> {}, lhs.value, rhs.value);
 
     value_operand_t ret = IntOperand { result };
-    context->set_variable(quad.dest(), ValueOperand { ret });
+    context->set_variable(quad.dest().as_variable(), ValueOperand { ret },
+                          false);
 }
 
 void Interpreter::cmp_eq(Quad quad) {
@@ -270,10 +201,12 @@ void Interpreter::cmp_noteq(Quad quad) {
 void Interpreter::jmp(Quad quad) {
     ASSERT(quad.dest().is_label());
 
-    m_jump_performed = true;
+    unsigned label_id = quad.dest().as_label();
 
-    unsigned label_id = std::get<LabelOperand>(quad.dest().data()).value;
-    m_current_quad_idx = m_quads.label_to_quad.at(label_id);
+    auto target_quad = m_quads.label_to_quad.find(label_id);
+    ASSERT(target_quad != m_quads.label_to_quad.end());
+    current_frame()->set_program_counter(target_quad->second);
+    current_frame()->set_jump_performed(true);
 }
 
 void Interpreter::jmp_z(Quad quad) {
@@ -291,30 +224,62 @@ void Interpreter::jmp_nz(Quad quad) {
 }
 
 void Interpreter::push_arg(Quad quad) {
-    current_frame()->push_argument(
-        current_frame()->resolve_operand(quad.src_a()));
+    // TODO: Built-ins will break from this as they do not have parameter names
+    current_frame()->set_variable(
+        quad.dest().as_variable(),
+        current_frame()->resolve_operand(quad.src_a()), true);
 }
 
 void Interpreter::call(Quad quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
     ASSERT(quad.src_a().is_function());
 
-    FunctionOperand func = std::get<FunctionOperand>(quad.src_a().data());
+    // When we get here, the prepare_frame quad should have already been
+    // interpreted. This means we simply have to set the program counter to
+    // correct quad.
+
+    FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
-        BuiltIn::call_builtin_function(func, current_frame()->get_arguments());
-    } else {
-        ASSERT_NOT_REACHED_MSG("Function calls not implemented yet");
-    };
+        BuiltIn::call_builtin_function(func, current_frame()->get_variables());
+        return;
+    }
 
-    current_frame()->clear_arguments();
+    current_frame()->set_program_counter(m_quads.function_to_quad.at(func));
+
+    if (!quad.dest().is_used()) {
+        return;
+    }
+
+    ASSERT(quad.dest().is_variable());
+
+    current_frame()->set_return_variable(quad.dest().as_variable());
 }
 
-void Interpreter::ret(Quad) {}
+void Interpreter::ret(Quad quad) {
+    if (current_frame()->return_variable()) {
+        ASSERT(quad.dest().is_used());
+
+        VariableOperand ret = current_frame()->return_variable().value();
+        ValueOperand value = current_frame()->resolve_operand(quad.dest());
+        exit_frame();
+
+        current_frame()->set_variable(ret, value, false);
+    } else {
+        exit_frame();
+    }
+}
 
 void Interpreter::move(Quad quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
+
+    ASSERT(quad.dest().is_variable());
+
     current_frame()->set_variable(
-        quad.dest(), current_frame()->resolve_operand(quad.src_a()));
+        quad.dest().as_variable(),
+        current_frame()->resolve_operand(quad.src_a()), false);
 }
+
 void Interpreter::index_move(Quad) {}
+
+void Interpreter::prepare_frame() { enter_new_frame(); }

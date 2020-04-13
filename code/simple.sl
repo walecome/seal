@@ -11,6 +11,4 @@ fn main() -> int {
     }
 
     println("final a=", a);
-
-
 }
