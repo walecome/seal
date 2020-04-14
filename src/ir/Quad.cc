@@ -1,11 +1,13 @@
 #include "Quad.hh"
 #include "Util.hh"
 
-void Quad::set_label(unsigned label_id) {
-    ASSERT(!m_has_label);
+#include <fmt/format.h>
 
+void Quad::add_label(unsigned label_id) {
+    // BUG: We need to support a quad having more than one label
     m_has_label = true;
-    m_label_id = label_id;
+
+    m_label_ids.push_back(label_id);
 }
 
 unsigned nr_chars(unsigned number) {
@@ -25,13 +27,18 @@ unsigned nr_chars(unsigned number) {
 }
 
 std::string Quad::to_string() const {
+    // TODO: Use fmtlib for this function...
     std::ostringstream oss {};
 
     unsigned indent_steps = 8;
 
     if (has_label()) {
-        oss << "L" << label_id() << ": ";
-        indent_steps -= (nr_chars(label_id()) + 3);
+        for (unsigned label_id : m_label_ids) {
+            oss << "L" << label_id << " ";
+            indent_steps -= (nr_chars(label_id) + 2);
+        }
+        oss << ": ";
+        indent_steps -= 2;
     }
 
     ASSERT(indent_steps <= 8);
@@ -56,4 +63,22 @@ std::string Quad::to_string() const {
     oss << ")";
 
     return oss.str();
+}
+
+std::tuple<std::string, std::string, std::string, std::string, std::string>
+Quad::to_string_segments() const {
+    std::ostringstream oss {};
+
+    if (has_label()) {
+        for (unsigned label_id : m_label_ids) {
+            oss << "L" << label_id << " ";
+        }
+    }
+
+    std::string labels = oss.str();
+    std::string opcode = opcode_to_string(m_op_code);
+    std::string dest = m_dest.is_used() ? m_dest.to_string() : "_";
+    std::string src_a = m_src_a.is_used() ? m_src_a.to_string() : "_";
+    std::string src_b = m_src_b.is_used() ? m_src_b.to_string() : "_";
+    return { labels, opcode, dest, src_a, src_b };
 }

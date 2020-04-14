@@ -1,5 +1,3 @@
-#include <iomanip>
-
 #include <fmt/format.h>
 
 #include "ir/IrFunction.hh"
@@ -17,17 +15,41 @@ bool Operand::is_string() const {
     return m_kind == OperandKind::IMMEDIATE_STRING;
 }
 
+bool Operand::is_value() const { return is_number() || is_string(); }
+
 bool Operand::is_label() const { return m_kind == OperandKind::LABEL; }
 bool Operand::is_variable() const { return m_kind == OperandKind::VARIABLE; }
 bool Operand::is_function() const { return m_kind == OperandKind::FUNCTION; }
 
-struct ValueOperandPrinter {
-    std::ostringstream oss {};
+ValueOperand Operand::as_value() const {
+    ASSERT(is_value());
+    return std::get<ValueOperand>(m_data);
+}
 
-    template <typename T>
-    std::string operator()(T value) {
-        oss << value;
-        return oss.str();
+VariableOperand Operand::as_variable() const {
+    ASSERT(is_variable());
+    return std::get<VariableOperand>(m_data);
+}
+
+FunctionOperand Operand::as_function() const {
+    ASSERT(is_function());
+    return std::get<FunctionOperand>(m_data);
+}
+
+LabelOperand Operand::as_label() const {
+    ASSERT(is_label());
+    return std::get<LabelOperand>(m_data);
+}
+
+struct ValueOperandPrinter {
+    std::string operator()(StringOperand value) {
+        return fmt::format("{}", value);
+    }
+    std::string operator()(IntOperand value) {
+        return fmt::format("{}", value);
+    }
+    std::string operator()(RealOperand value) {
+        return fmt::format("{:.5f}", value);
     }
 };
 
@@ -40,19 +62,15 @@ struct OperandPrinter {
     }
 
     std::string operator()(FunctionOperand function_id) {
-        oss << "function#" << function_id;
-        return oss.str();
+        return fmt::format("function#{}", function_id);
     }
 
-    std::string operator()(VariableOperand var_id) {
-        oss << context->env()->resolve_variable_name(var_id) << " (" << var_id
-            << ")";
-        return oss.str();
+    std::string operator()(VariableOperand variable) {
+        return fmt::format("{}", variable.value);
     }
 
     std::string operator()(LabelOperand label_id) {
-        oss << "L#" << label_id;
-        return oss.str();
+        return fmt::format("L#{}", label_id);
     }
 };
 

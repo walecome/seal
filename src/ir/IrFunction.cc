@@ -1,4 +1,4 @@
-#include <iostream>
+#include <fmt/format.h>
 
 #include "IrFunction.hh"
 #include "ast/FunctionDecl.hh"
@@ -6,11 +6,6 @@
 unsigned new_label_id() {
     static unsigned label_id = 0;
     return label_id++;
-}
-
-unsigned new_variable_id() {
-    static unsigned variable_id = 0;
-    return variable_id++;
 }
 
 template <class ValueType, class T = decltype(ValueType().value)>
@@ -49,23 +44,31 @@ Operand IrFunction::create_label() const {
     return operand;
 }
 
-Operand IrFunction::create_variable_from_id(unsigned id) const {
-    Operand operand { OperandKind::VARIABLE, VariableOperand { id } };
+Operand IrFunction::create_variable(const std::string_view identifier) const {
+    Operand operand { OperandKind::VARIABLE, VariableOperand { identifier } };
     operand.set_env(this);
 
     return operand;
 }
 
-Operand IrFunction::create_variable() const {
-    return create_variable_from_id(new_variable_id());
-}
+Operand IrFunction::create_tmp_variable() {
+    static unsigned variable_count = 0;
 
-Operand IrFunction::get_variable(std::string_view identifier) const {
-    auto it = m_varname_to_id.find(identifier);
+    // This is kind of ugly... VariableOperand keeps a std::string_view to the
+    // variable identifier. When creating a temporary variable we need the name
+    // (tmp$NUM) to have a lifetime as least as long as the VariableOperand. We
+    // insert the std::string name into a set, and the reference it by a
+    // std::string_view object. The first implementation used a std::vector,
+    // which would invalidate the std::string_view's when resized. We should
+    // probably have a better solution for this...
 
-    ASSERT(it != std::end(m_varname_to_id));
+    // We should probably just have a global symbol table instead...
+    std::string *tmp =
+        new std::string { fmt::format("temp${}", variable_count++) };
+    Operand operand { OperandKind::VARIABLE, VariableOperand { *tmp } };
+    operand.set_env(this);
 
-    return create_variable_from_id(it->second);
+    return operand;
 }
 
 Operand IrFunction::create_function_from_id(unsigned function_id) const {
@@ -90,7 +93,7 @@ void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
 
 void IrFunction::queue_label(const Operand &label) {
     ASSERT(label.is_label());
-    m_waiting_labels.push_back(std::get<LabelOperand>(label.data()));
+    m_waiting_labels.push_back(label.as_label());
 }
 
 void IrFunction::bind_queued_labels(size_t quad_idx) {
@@ -106,37 +109,15 @@ void IrFunction::bind_queued_labels(size_t quad_idx) {
 void IrFunction::bind_label(LabelOperand label, size_t quad_idx) {
     ASSERT(m_labels.find(label) == std::end(m_labels));
 
-    quads().at(quad_idx)->set_label(label);
+    quads().at(quad_idx)->add_label(label);
 
     m_labels.insert({ label, quad_idx });
-}
-
-void IrFunction::bind_variable(const Operand &variable,
-                               const std::string_view var_name) {
-    ASSERT(variable.is_variable());
-
-    VariableOperand var_raw = std::get<VariableOperand>(variable.data());
-
-    m_varname_to_id.insert_or_assign(var_name, var_raw);
-    m_variable_ref.insert_or_assign(var_raw, var_name);
 }
 
 void IrFunction::dump_quads() const {
     for (auto &quad : m_quads) {
         std::cout << quad->to_string() << std::endl;
     }
-}
-
-std::string IrFunction::resolve_variable_name(unsigned variable_id) const {
-    auto it = m_variable_ref.find(variable_id);
-
-    if (it != std::end(m_variable_ref)) {
-        return std::string(it->second);
-    }
-
-    std::ostringstream oss {};
-    oss << "tmp#" << variable_id;
-    return oss.str();
 }
 
 std::vector<const Quad *> IrFunction::quads_as_pointers() const {
@@ -147,12 +128,6 @@ std::vector<const Quad *> IrFunction::quads_as_pointers() const {
     }
 
     return quad_ptrs;
-}
-
-void IrFunction::__dump_variables() const {
-    for (auto &x : m_variable_ref) {
-        std::cout << x.first << "=" << x.second << std::endl;
-    }
 }
 
 unsigned IrFunction::id() const { return declaration()->function_id(); }

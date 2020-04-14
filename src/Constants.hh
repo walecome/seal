@@ -5,6 +5,7 @@
 #include <sstream>
 
 #define ASSERT_NOT_REACHED() assert(false)
+#define ASSERT_NOT_REACHED_MSG(message) assert(false && message)
 #define ASSERT assert
 
 static std::ostringstream out {};

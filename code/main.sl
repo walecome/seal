@@ -1,6 +1,6 @@
 fn main() -> int {
 
-    print("hej");
+    println("hej");
 
     x : mut float = 0.1337 * 100.0;
 
@@ -8,9 +8,9 @@ fn main() -> int {
 
     x = x * 10.0;
     
-    asd : int = 4;
+    asd : mut int = 4;
 
-    z : int = 1 -(--asd);
+    z : int = -(--asd);
 
     println(x);
 
@@ -28,6 +28,8 @@ fn stupid() -> int {
 
     x : mut int = 3;
     x = 3;
+
+    return x;
 }
 
 fn unary_test() -> int {
@@ -36,6 +38,8 @@ fn unary_test() -> int {
     ++x;
     --x;
     x = -x;
+
+    return x;
 }
 
 fn top_level_func() -> int {

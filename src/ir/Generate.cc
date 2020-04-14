@@ -25,18 +25,36 @@
 #include "ast/VariableExpression.hh"
 #include "ast/While.hh"
 #include "builtin/BuiltIn.hh"
+
 #include "ir/IrProgram.hh"
 
-ptr_t<IrProgram> Generate::generate() {
+#include "fmt/format.h"
+
+QuadCollection Generate::generate() {
     auto ir_program = std::make_unique<IrProgram>();
+
+    QuadCollection ret {};
 
     m_compilation_unit->for_each_function([&](auto function_decl) {
         m_current_ir_function = std::make_unique<IrFunction>(function_decl);
         gen_function_decl(function_decl);
+
+        ret.function_to_quad.insert(
+            { m_current_ir_function->declaration()->function_id(),
+              ret.quads.size() });
+        for (const Quad *quad : m_current_ir_function->quads_as_pointers()) {
+            for (unsigned label_id : quad->label_ids()) {
+                ret.label_to_quad.insert({ label_id, ret.quads.size() });
+            }
+            ret.quads.push_back(*quad);
+        }
+
         ir_program->add_function(m_current_ir_function);
     });
 
-    return ir_program;
+    ret.main_function_id = ir_program->main_function_id();
+
+    return ret;
 }
 
 void Generate::gen_block(const Block *block) {
@@ -57,11 +75,14 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
         [this](auto param) { gen_variable_decl(param); });
 
     gen_block(function_decl->body());
+
+    if (function_decl->type().is_void()) {
+        env()->add_quad(OPCode::RET, {}, {}, {});
+    }
 }
 
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
-    auto var = env()->create_variable();
-    env()->bind_variable(var, variable_decl->identifier());
+    auto var = env()->create_variable(variable_decl->identifier());
 
     if (variable_decl->value()) {
         auto value = gen_expression(variable_decl->value());
@@ -165,16 +186,32 @@ Operand Generate::gen_expression(const Expression *expression) {
 }
 
 Operand Generate::gen_function_call(const FunctionCall *func_call) {
-    // Push arguments
-    func_call->argument_list()->for_each_argument([this](auto arg) {
-        auto arg_operand = gen_expression(arg);
-        env()->add_quad(OPCode::PUSH_ARG, {}, arg_operand, {});
-    });
-
     bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
 
+    // env()->add_quad(OPCode::PREPARE_FRAME, {}, {}, {});
+
+    // Push arguments
+    func_call->argument_list()->for_each_enumerated_argument(
+        [&](auto arg, unsigned index) {
+            auto arg_operand = gen_expression(arg);
+
+            if (is_builtin) {
+                // TODO: This is an ugly fix for builtins...
+                env()->add_quad(OPCode::PUSH_ARG, env()->create_tmp_variable(),
+                                arg_operand, {});
+            } else {
+                std::string_view parameter_name = func_call->declaration()
+                                                      ->parameter_list()
+                                                      ->parameter_at(index)
+                                                      ->identifier();
+                env()->add_quad(OPCode::PUSH_ARG,
+                                env()->create_variable(parameter_name),
+                                arg_operand, {});
+            }
+        });
+
     // @TODO: Handle if there is not return value
-    auto return_value = env()->create_variable();
+    auto return_value = env()->create_tmp_variable();
 
     auto function_id =
         is_builtin
@@ -193,9 +230,8 @@ Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
     auto var = dynamic_cast<VariableExpression *>(assign_expr->left());
     ASSERT(var != nullptr);
 
-    // Order important as gen_variable_expression will generate a new id
     auto right = gen_expression(assign_expr->right());
-    auto left = gen_variable_expression(var, true);
+    auto left = gen_variable_expression(var);
 
     env()->add_quad(OPCode::MOVE, left, right, {});
 
@@ -205,7 +241,7 @@ Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
 
 Operand Generate::gen_equality_expression(
     const EqualityExpression *equality_expr) {
-    auto result = env()->create_variable();
+    auto result = env()->create_tmp_variable();
 
     auto left = gen_expression(equality_expr->left());
     auto right = gen_expression(equality_expr->right());
@@ -228,7 +264,7 @@ Operand Generate::gen_equality_expression(
 
 Operand Generate::gen_compare_expression(
     const CompareExpression *compare_expr) {
-    auto result = env()->create_variable();
+    auto result = env()->create_tmp_variable();
 
     auto left = gen_expression(compare_expr->left());
     auto right = gen_expression(compare_expr->right());
@@ -269,23 +305,23 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
     auto right = gen_expression(bin_expr->right());
     auto left = gen_expression(bin_expr->left());
 
-    auto var = env()->create_variable();
+    Operand result = env()->create_tmp_variable();
 
     switch (bin_expr->op()->symbol()) {
         case OperatorSym::PLUS:
-            env()->add_quad(OPCode::ADD, var, left, right);
+            env()->add_quad(OPCode::ADD, result, left, right);
             break;
 
         case OperatorSym::MINUS:
-            env()->add_quad(OPCode::SUB, var, left, right);
+            env()->add_quad(OPCode::SUB, result, left, right);
             break;
 
         case OperatorSym::MULT:
-            env()->add_quad(OPCode::MULT, var, left, right);
+            env()->add_quad(OPCode::MULT, result, left, right);
             break;
 
         case OperatorSym::DIV:
-            env()->add_quad(OPCode::DIV, var, left, right);
+            env()->add_quad(OPCode::DIV, result, left, right);
             break;
 
         // @TODO: Handle
@@ -304,7 +340,7 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
             ASSERT_NOT_REACHED();
     }
 
-    return var;
+    return result;
 }
 
 Operand Generate::gen_index_expression(const IndexExpression *) {
@@ -333,23 +369,26 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     auto sym = unary_expr->op()->symbol();
 
     if (sym == OperatorSym::MINUS) {
-        auto result_operand = env()->create_variable();
-        env()->add_quad(OPCode::SUB, result_operand,
-                        env()->create_immediate_int(0), target_operand);
-        return result_operand;
+        auto result = env()->create_tmp_variable();
+        env()->add_quad(OPCode::SUB, result, env()->create_immediate_int(0),
+                        target_operand);
+        return result;
     }
 
-    auto var_expr =
-        dynamic_cast<VariableExpression *>(unary_expr->expression());
-    ASSERT(var_expr != nullptr);
-
     Operand result_operand;
+
+    if (VariableExpression *var_expr =
+            dynamic_cast<VariableExpression *>(unary_expr->expression());
+        var_expr != nullptr) {
+        result_operand = gen_variable_expression(var_expr);
+    } else {
+        result_operand = env()->create_tmp_variable();
+    }
+
     if (sym == OperatorSym::INC) {
-        result_operand = gen_variable_expression(var_expr, true);
         env()->add_quad(OPCode::ADD, result_operand, target_operand,
                         env()->create_immediate_int(1));
     } else if (sym == OperatorSym::DEC) {
-        result_operand = gen_variable_expression(var_expr, true);
         env()->add_quad(OPCode::SUB, result_operand, target_operand,
                         env()->create_immediate_int(1));
     } else {
@@ -359,15 +398,8 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     return result_operand;
 }
 
-Operand Generate::gen_variable_expression(const VariableExpression *var_expr,
-                                          bool give_new_id) {
-    if (!give_new_id) {
-        return env()->get_variable(var_expr->identifier());
-    }
-
-    auto var = env()->create_variable();
-    env()->bind_variable(var, var_expr->identifier());
-    return var;
+Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {
+    return env()->create_variable(var_expr->identifier());
 }
 
 Operand Generate::create_integer_literal(

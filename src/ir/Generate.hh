@@ -1,9 +1,13 @@
 #pragma once
 
+#include <map>
 #include <unordered_map>
 
 #include "Constants.hh"
 #include "Operand.hh"
+#include "ir/IrFunction.hh"
+#include "ir/Quad.hh"
+#include "ir/QuadCollection.hh"
 
 // AST nodes
 class IntegerLiteral;
@@ -31,7 +35,6 @@ class StringLiteral;
 class CompilationUnit;
 
 class IrProgram;
-class IrFunction;
 class FunctionDecl;
 
 class Generate {
@@ -42,7 +45,7 @@ class Generate {
     Generate(const CompilationUnit* compilation_unit)
         : m_compilation_unit { compilation_unit } {}
 
-    ptr_t<IrProgram> generate();
+    QuadCollection generate();
 
    private:
     // Quads
@@ -62,8 +65,7 @@ class Generate {
     Operand gen_assign_expression(const AssignExpression*);
     Operand gen_equality_expression(const EqualityExpression*);
     Operand gen_compare_expression(const CompareExpression*);
-    Operand gen_variable_expression(const VariableExpression*,
-                                    bool give_new_id = false);
+    Operand gen_variable_expression(const VariableExpression*);
     Operand gen_index_expression(const IndexExpression*);
     Operand gen_unary_expression(const UnaryExpression*);
 

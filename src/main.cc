@@ -19,6 +19,7 @@
 #include "interpreter/Interpreter.hh"
 #include "ir/Generate.hh"
 #include "ir/IrProgram.hh"
+#include "ir/QuadCollection.hh"
 
 ArgumentParser parse_args(int argc, char **argv) {
     ArgumentParser parser("CLI argument parser");
@@ -98,17 +99,16 @@ int main(int argc, char **argv) {
     }
 
     Generate ir_generator { parser.compilation_unit.get() };
-    ptr_t<IrProgram> ir_program;
-    long ir_duration =
-        measure_time([&] { ir_program = ir_generator.generate(); });
+    QuadCollection quads;
+    long ir_duration = measure_time([&] { quads = ir_generator.generate(); });
 
     if (verbose) {
         std::cout << "IR generation took " << ir_duration << " milliseconds"
                   << std::endl;
-        ir_program->dump();
+        quads.dump();
     }
 
-    Interpreter interpreter { ir_program.get() };
+    Interpreter interpreter { quads, verbose };
     interpreter.interpret();
 
     return 0;

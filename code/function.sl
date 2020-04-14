@@ -1,7 +1,8 @@
 fn main() -> int {
     print("fib");
-    print(fib(10));
-    return 1;
+    asd := fib(10);
+    print(asd);
+    return 0;
 }
 
 
