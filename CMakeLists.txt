@@ -5,6 +5,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always -stdlib=libc++")
+
 include(CMakeParseArguments)
 macro(add_source_files)
     cmake_parse_arguments(
@@ -31,7 +33,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 
 target_compile_features(${PROJECT_NAME} PUBLIC)
 
-set(CMAKE_CXX_FLAGS "-g -fPIC -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
+
 
 # Force colored output (mostly needed for Ninja build)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
