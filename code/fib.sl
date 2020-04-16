@@ -1,14 +1,8 @@
 fn main() -> int {
 
-    value := fib(20);
-    println(value);
+    println(fib(20));
 
     return 0;
-}
-
-fn recursive(n : int) -> int {
-    println("Recursion depth: ", n);
-    return recursive(n + 1);
 }
 
 

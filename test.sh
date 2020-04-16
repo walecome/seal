@@ -4,6 +4,8 @@ SOURCES=(
     code/main.sl
     code/expression.sl
     code/function.sl
+    code/fib.sl
+    code/nested_function.sl
     # code/recursion.sl
     code/simple.sl
     code/weird_unary.sl
