@@ -21,25 +21,24 @@ class Interpreter {
     void interpret_function(unsigned function_id);
 
     // Interpret function for different opcodes
-    void add(Quad);
-    void sub(Quad);
-    void mult(Quad);
-    void div(Quad);
-    void cmp_eq(Quad);
-    void cmp_gt(Quad);
-    void cmp_lt(Quad);
-    void cmp_gteq(Quad);
-    void cmp_lteq(Quad);
-    void cmp_noteq(Quad);
-    void jmp(Quad);
-    void jmp_z(Quad);
-    void jmp_nz(Quad);
-    void push_arg(Quad);
-    void call(Quad);
-    void ret(Quad);
-    void move(Quad);
-    void index_move(Quad);
-    void prepare_frame();
+    void add(const Quad&);
+    void sub(const Quad&);
+    void mult(const Quad&);
+    void div(const Quad&);
+    void cmp_eq(const Quad&);
+    void cmp_gt(const Quad&);
+    void cmp_lt(const Quad&);
+    void cmp_gteq(const Quad&);
+    void cmp_lteq(const Quad&);
+    void cmp_noteq(const Quad&);
+    void jmp(const Quad&);
+    void jmp_z(const Quad&);
+    void jmp_nz(const Quad&);
+    void push_arg(const Quad&);
+    void call(const Quad&);
+    void ret(const Quad&);
+    void move(const Quad&);
+    void index_move(const Quad&);
 
     StackFrame* current_frame();
     void enter_new_frame();

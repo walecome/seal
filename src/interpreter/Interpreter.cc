@@ -21,9 +21,9 @@ void Interpreter::interpret_function(unsigned function_id) {
         m_quads.function_to_quad.at(function_id));
 
     while (true) {
-        Quad quad = m_quads.quads[current_frame()->program_counter()];
+        const Quad& quad = m_quads.quads[current_frame()->program_counter()];
 
-        fmt::print("Interpreting quad: {}\n", quad.to_string());
+        // fmt::print("Interpreting quad: {}\n", quad.to_string());
 
         switch (quad.opcode()) {
             case OPCode::ADD:
@@ -119,7 +119,7 @@ struct BinOpVisitor {
 };
 
 template <class Operator>
-void binop_helper(StackFrame* context, Quad quad) {
+void binop_helper(StackFrame* context, const Quad& quad) {
     ASSERT(quad.dest().is_variable());
 
     ValueOperand lhs = context->resolve_operand(quad.src_a());
@@ -128,25 +128,24 @@ void binop_helper(StackFrame* context, Quad quad) {
     value_operand_t result =
         std::visit(BinOpVisitor<Operator> {}, lhs.value, rhs.value);
 
-    context->set_variable(quad.dest().as_variable(), ValueOperand { result },
-                          false);
+    context->set_variable(quad.dest().as_variable(), ValueOperand { result });
 }
 
-void Interpreter::add(Quad quad) {
+void Interpreter::add(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::ADD);
     binop_helper<std::plus<>>(current_frame(), quad);
 }
 
-void Interpreter::sub(Quad quad) {
+void Interpreter::sub(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::SUB);
     binop_helper<std::minus<>>(current_frame(), quad);
 }
-void Interpreter::mult(Quad quad) {
+void Interpreter::mult(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MULT);
     binop_helper<std::multiplies<>>(current_frame(), quad);
 }
 
-void Interpreter::div(Quad quad) {
+void Interpreter::div(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::DIV);
     binop_helper<std::divides<>>(current_frame(), quad);
 }
@@ -165,41 +164,40 @@ struct CmpVisitor {
 };
 
 template <class Operator>
-void cmp_helper(StackFrame* context, Quad quad) {
+void cmp_helper(StackFrame* context, const Quad& quad) {
     ValueOperand lhs = context->resolve_operand(quad.src_a());
     ValueOperand rhs = context->resolve_operand(quad.src_b());
 
     bool result = std::visit(CmpVisitor<Operator> {}, lhs.value, rhs.value);
 
     value_operand_t ret = IntOperand { result };
-    context->set_variable(quad.dest().as_variable(), ValueOperand { ret },
-                          false);
+    context->set_variable(quad.dest().as_variable(), ValueOperand { ret });
 }
 
-void Interpreter::cmp_eq(Quad quad) {
+void Interpreter::cmp_eq(const Quad& quad) {
     cmp_helper<std::equal_to<>>(current_frame(), quad);
 }
 
-void Interpreter::cmp_gt(Quad quad) {
+void Interpreter::cmp_gt(const Quad& quad) {
     cmp_helper<std::greater<>>(current_frame(), quad);
 }
 
-void Interpreter::cmp_lt(Quad quad) {
+void Interpreter::cmp_lt(const Quad& quad) {
     cmp_helper<std::less<>>(current_frame(), quad);
 }
 
-void Interpreter::cmp_gteq(Quad quad) {
+void Interpreter::cmp_gteq(const Quad& quad) {
     cmp_helper<std::greater_equal<>>(current_frame(), quad);
 }
 
-void Interpreter::cmp_lteq(Quad quad) {
+void Interpreter::cmp_lteq(const Quad& quad) {
     cmp_helper<std::less_equal<>>(current_frame(), quad);
 }
 
-void Interpreter::cmp_noteq(Quad quad) {
+void Interpreter::cmp_noteq(const Quad& quad) {
     cmp_helper<std::not_equal_to<>>(current_frame(), quad);
 }
-void Interpreter::jmp(Quad quad) {
+void Interpreter::jmp(const Quad& quad) {
     ASSERT(quad.dest().is_label());
 
     unsigned label_id = quad.dest().as_label();
@@ -210,21 +208,21 @@ void Interpreter::jmp(Quad quad) {
     current_frame()->set_jump_performed(true);
 }
 
-void Interpreter::jmp_z(Quad quad) {
+void Interpreter::jmp_z(const Quad& quad) {
     ValueOperand condition = current_frame()->resolve_operand(quad.src_a());
     if (std::get<IntOperand>(condition.value) == 0) {
         jmp(quad);
     }
 }
 
-void Interpreter::jmp_nz(Quad quad) {
+void Interpreter::jmp_nz(const Quad& quad) {
     ValueOperand condition = current_frame()->resolve_operand(quad.src_a());
     if (std::get<IntOperand>(condition.value) != 0) {
         jmp(quad);
     }
 }
 
-void Interpreter::push_arg(Quad quad) {
+void Interpreter::push_arg(const Quad& quad) {
     // TODO: Built-ins will break from this as they do not have parameter names
 
     if (!m_arguments) {
@@ -241,7 +239,7 @@ void Interpreter::push_arg(Quad quad) {
     }
 }
 
-void Interpreter::call(Quad quad) {
+void Interpreter::call(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
     ASSERT(quad.src_a().is_function());
 
@@ -259,7 +257,7 @@ void Interpreter::call(Quad quad) {
 
     take_arguments().for_each_name_value(
         [&](VariableOperand var, ValueOperand value) {
-            current_frame()->set_variable(var, value, true);
+            current_frame()->set_variable(var, value);
         });
 
     if (!quad.dest().is_used()) {
@@ -271,7 +269,7 @@ void Interpreter::call(Quad quad) {
     current_frame()->set_return_variable(quad.dest().as_variable());
 }
 
-void Interpreter::ret(Quad quad) {
+void Interpreter::ret(const Quad& quad) {
     if (!quad.dest().is_used()) {
         exit_frame();
         return;
@@ -286,32 +284,32 @@ void Interpreter::ret(Quad quad) {
     if (current_frame()->return_variable()) {
         VariableOperand ret = current_frame()->return_variable().value();
         exit_frame();
-        current_frame()->set_variable(ret, value, false);
+        current_frame()->set_variable(ret, value);
     } else {
         exit_frame();
     }
 }
 
-void Interpreter::move(Quad quad) {
+void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
 
     ASSERT(quad.dest().is_variable());
 
     current_frame()->set_variable(
         quad.dest().as_variable(),
-        current_frame()->resolve_operand(quad.src_a()), false);
+        current_frame()->resolve_operand(quad.src_a()));
 }
 
-void Interpreter::index_move(Quad) {}
+void Interpreter::index_move(const Quad&) {}
 
 StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
 
 void Interpreter::enter_new_frame() {
     // fmt::print("enter_frame()\n");
 
-    m_stack_frames.push(
-        StackFrame { current_frame()->program_counter(), current_frame() });
+    m_stack_frames.emplace(current_frame()->program_counter(), current_frame());
 };
+
 void Interpreter::exit_frame() {
     // fmt::print("exit_frame()\n");
     m_stack_frames.pop();

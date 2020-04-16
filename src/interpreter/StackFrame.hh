@@ -12,8 +12,12 @@ class StackFrame {
     StackFrame(unsigned program_counter, StackFrame* parent)
         : m_program_counter { program_counter }, m_parent { parent } {}
 
-    void set_variable(VariableOperand, ValueOperand, bool);
-    ValueOperand get_variable(VariableOperand) const;
+    inline void set_variable(VariableOperand var, ValueOperand value) {
+        m_variables[var] = value;
+    }
+    inline ValueOperand get_variable(VariableOperand var) const {
+        return m_variables.at(var);
+    }
 
     // Decays an Operand to ValueOperand
     ValueOperand resolve_operand(Operand) const;
@@ -46,13 +50,6 @@ class StackFrame {
     bool is_main_frame() const { return m_parent == nullptr; }
 
    private:
-    // Assign a value to an existing variable.
-    void assign_variable(VariableOperand var, ValueOperand value);
-
-    // Return the inner most stack frame that holds the variable with name
-    // identifier.
-    StackFrame* get_variable_frame(VariableOperand identifier);
-
     unsigned m_program_counter;
     StackFrame* m_parent;
     std::map<std::string_view, ValueOperand> m_variables {};
