@@ -40,7 +40,7 @@ jobs:
         make
 
       env:
-        CXX: clang
+        CXX: clang-9
 
     - name: Run test script
       run: ./test.sh
