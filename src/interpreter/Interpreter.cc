@@ -246,7 +246,9 @@ void Interpreter::call(const Quad& quad) {
     FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
-        BuiltIn::call_builtin_function(func, take_arguments().value_vector());
+        ValueOperand ret = BuiltIn::call_builtin_function(
+            func, take_arguments().value_vector());
+        current_frame()->set_variable(quad.dest().as_variable(), ret);
         return;
     }
 

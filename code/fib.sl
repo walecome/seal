@@ -1,6 +1,8 @@
 fn main() -> int {
 
-    println(fib(20));
+    chars_printed := println(fib(20));
+
+    println("Printed ", chars_printed, " chars");
 
     return 0;
 }

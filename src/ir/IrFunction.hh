@@ -10,6 +10,11 @@
 
 class FunctionDecl;
 
+template <class ValueType, class T = decltype(ValueType().value)>
+ValueOperand create_value_operand(T value) {
+    return ValueOperand { ValueType { value } };
+}
+
 class IrFunction {
     MAKE_NONCOPYABLE(IrFunction)
     MAKE_NONMOVABLE(IrFunction)

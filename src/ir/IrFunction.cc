@@ -8,11 +8,6 @@ unsigned new_label_id() {
     return label_id++;
 }
 
-template <class ValueType, class T = decltype(ValueType().value)>
-ValueOperand create_value_operand(T value) {
-    return ValueOperand { ValueType { value } };
-}
-
 Operand IrFunction::create_immediate_int(unsigned long value) const {
     Operand operand { OperandKind::IMMEDIATE_INT,
                       create_value_operand<IntOperand>(value) };
