@@ -22,6 +22,7 @@ macro(add_source_files)
     endforeach(src)
 endmacro(add_source_files)
 
+
 add_executable(${PROJECT_NAME})
 include_directories(lib/argparse)
 add_subdirectory(src)
@@ -43,17 +44,4 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 endif ()
 
 
-# Below needed for lld client and link launcher links
-if(CMAKE_CXX_COMPILER_LAUNCHER STREQUAL "link_launcher")
-    message("Using link_launcher")
-    set(CMAKE_CXX_LINK_EXECUTABLE "link_launcher --project-name ${PROJECT_NAME} --do-link")
-
-    add_custom_target(pre_build_target ALL
-                  COMMAND ${CMAKE_CXX_COMPILER} -pie -fuse-ld=/home/alexanderw/courses/exjobb/llvm-fork/build/bin/ld.lld -o sealc -Wl,--start-group -Wl,--end-group -Wl,--time-trace -Wl,--time-trace-file=timetrace.json -Wl,--project-name -Wl,${PROJECT_NAME}
-                  VERBATIM)
-
-    add_dependencies(${PROJECT_NAME} pre_build_target)
-
-
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --project-name ${PROJECT_NAME}")
-endif()
+include(LldClient.cmake)
