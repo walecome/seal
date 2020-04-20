@@ -2,7 +2,7 @@ fn main() -> int {
     prints_hello();
     prints_argument(123);
 
-    return 1;
+    return 0;
 }
 
 fn prints_hello() -> void {
