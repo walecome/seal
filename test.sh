@@ -2,6 +2,7 @@
 
 RED='\033[1;31m'
 GREEN='\033[1;32m'
+YELLOW='\033[1;33m'
 LIGHT_GREY='\033[0;37m'
 NC='\033[0m' # No Color
 
@@ -13,20 +14,24 @@ code_dir=./code
 
 sealc=build/sealc
 
+
 function run_one() {
     expected=$1
     source_file=$2
 
-    printf "${LIGHT_GREY}$ $sealc --source $i${NC}\n"
+    printf "${YELLOW}[RUNS] ${LIGHT_GREY}$ $sealc --source $source_file${NC}\n"
 
     ret="$($sealc --source $source_file) " 
     status=$?
+    printf "\e[1A"
     if [ "$status" == "$expected" ]
     then
-        printf "[${GREEN}PASSED${NC}]\n"
+        printf "[${GREEN}PASS${NC}] ${LIGHT_GREY}$ $sealc --source ${NC}\n"
     else
-        printf "[${RED}FAILED${NC}] - (Expected status $expected, got $status)\n"
-        printf "$ret\n"
+        printf "[${RED}FAIL${NC}] ${LIGHT_GREY}$ $sealc --source ${NC}\n"
+        printf "\tExpected status $expected, got $status\n"
+
+        printf "\tCommand output:\n$ret\n"
     fi
 }
 
@@ -40,18 +45,9 @@ function run_and_print() {
     done
 }
 
-echo ""
-printf "################################# \n"
-printf "#   RUNNING FOR PASSING FILES   #\n"
-printf "################################# \n"
-echo ""
+printf "${NC}${YELLOW}\tRUNNING EXPECTED PASS TESTS${NC}\n"
 run_and_print 0 success_expected
 
-
-echo ""
-printf "################################# \n"
-printf "#   RUNNING FOR FAILING FILES   #\n"
-printf "################################# \n"
-echo ""
+printf "${NC}${YELLOW}\tRUNNING EXPECTED FAIL TESTS${NC}\n"
 run_and_print 1 fail_expected
 
