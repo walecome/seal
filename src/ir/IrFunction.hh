@@ -31,6 +31,7 @@ class IrFunction {
     Operand create_immediate_int(unsigned long value) const;
     Operand create_immediate_string(std::string_view value) const;
     Operand create_immediate_real(double value) const;
+    Operand create_vector_operand() const;
 
     Operand create_label() const;
     Operand create_variable(const std::string_view) const;

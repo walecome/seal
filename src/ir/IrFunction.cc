@@ -29,6 +29,13 @@ Operand IrFunction::create_immediate_real(double value) const {
     return operand;
 }
 
+Operand IrFunction::create_vector_operand() const {
+    Operand operand { ValueOperand { VectorOperand {} } };
+    operand.set_env(this);
+
+    return operand;
+}
+
 Operand IrFunction::create_label() const {
     Operand operand { LabelOperand { new_label_id() } };
     operand.set_env(this);
@@ -46,13 +53,14 @@ Operand IrFunction::create_variable(const std::string_view identifier) const {
 Operand IrFunction::create_tmp_variable() {
     static unsigned variable_count = 0;
 
-    // This is kind of ugly... VariableOperand keeps a std::string_view to the
-    // variable identifier. When creating a temporary variable we need the name
-    // (tmp$NUM) to have a lifetime as least as long as the VariableOperand. We
-    // insert the std::string name into a set, and the reference it by a
-    // std::string_view object. The first implementation used a std::vector,
-    // which would invalidate the std::string_view's when resized. We should
-    // probably have a better solution for this...
+    // This is kind of ugly... VariableOperand keeps a std::string_view
+    // to the variable identifier. When creating a temporary variable we
+    // need the name (tmp$NUM) to have a lifetime as least as long as
+    // the VariableOperand. We insert the std::string name into a set,
+    // and the reference it by a std::string_view object. The first
+    // implementation used a std::vector, which would invalidate the
+    // std::string_view's when resized. We should probably have a better
+    // solution for this...
 
     // We should probably just have a global symbol table instead...
     std::string *tmp =

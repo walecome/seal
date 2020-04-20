@@ -343,9 +343,14 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
     return result;
 }
 
-Operand Generate::gen_index_expression(const IndexExpression *) {
-    throw std::runtime_error(
-        "IR generation of index expression not implemented");
+Operand Generate::gen_index_expression(const IndexExpression *expr) {
+    Operand indexed = gen_expression(expr->indexed_expression());
+    Operand index = gen_expression(expr->index());
+    Operand result = env()->create_tmp_variable();
+
+    env()->add_quad(OPCode::INDEX_MOVE, result, indexed, index);
+
+    return result;
 }
 
 Operand Generate::create_literal(const Literal *literal) {
@@ -407,8 +412,15 @@ Operand Generate::create_integer_literal(
     return env()->create_immediate_int(integer_literal->value());
 }
 
-Operand Generate::create_array_literal(const ArrayLiteral *) {
-    throw std::runtime_error("IR generation of array literal not implemented");
+Operand Generate::create_array_literal(const ArrayLiteral *array) {
+    Operand vector_operand = env()->create_vector_operand();
+
+    array->for_each_element([&](Expression *element) {
+        ValueOperand element_operand = gen_expression(element).as_value();
+        vector_operand.as_value().as_vector()->push_back(element_operand);
+    });
+
+    return vector_operand;
 }
 
 Operand Generate::create_boolean_literal(

@@ -3,24 +3,36 @@
 #include "ir/IrFunction.hh"
 #include "ir/Operand.hh"
 
-bool Operand::is_number() const { return is_integer() || is_real(); }
+bool ValueOperand::is_vector() const { return holds<VectorOperand>(); }
+bool ValueOperand::is_integer() const { return holds<IntOperand>(); }
+bool ValueOperand::is_number() const { return is_integer() || is_real(); }
+bool ValueOperand::is_real() const { return holds<RealOperand>(); }
+bool ValueOperand::is_string() const { return holds<StringOperand>(); }
 
-bool Operand::is_integer() const {
-    return is_value() && as_value().holds<IntOperand>();
+VectorOperand::value_type_t ValueOperand::as_vector() const {
+    ASSERT(is_vector());
+    return get_as<VectorOperand>();
 }
 
-bool Operand::is_real() const {
-    return is_value() && as_value().holds<RealOperand>();
+unsigned long ValueOperand::as_int() const {
+    ASSERT(is_integer());
+    return get_as<IntOperand>();
 }
 
-bool Operand::is_string() const {
-    return is_value() && as_value().holds<StringOperand>();
+double ValueOperand::as_real() const {
+    ASSERT(is_real());
+    return get_as<RealOperand>();
 }
 
-bool Operand::is_value() const { return holds<ValueOperand>(); }
-bool Operand::is_label() const { return holds<LabelOperand>(); }
-bool Operand::is_variable() const { return holds<VariableOperand>(); }
+std::string_view ValueOperand::as_string() const {
+    ASSERT(is_string());
+    return get_as<StringOperand>();
+}
+
 bool Operand::is_function() const { return holds<FunctionOperand>(); }
+bool Operand::is_label() const { return holds<LabelOperand>(); }
+bool Operand::is_value() const { return holds<ValueOperand>(); }
+bool Operand::is_variable() const { return holds<VariableOperand>(); }
 
 ValueOperand Operand::as_value() const {
     ASSERT(is_value());
@@ -51,6 +63,22 @@ struct ValueOperandPrinter {
     }
     std::string operator()(RealOperand value) {
         return fmt::format("{:.5f}", value);
+    }
+
+    std::string operator()(VectorOperand vec) {
+        std::ostringstream oss {};
+        oss << "[";
+        for (ValueOperand& value : *vec.value.get()) {
+            oss << std::visit(ValueOperandPrinter {}, value.value) << ", ";
+        }
+        oss << "]";
+
+        return oss.str();
+    }
+
+    template <class T>
+    std::string operator()(T) {
+        ASSERT_NOT_REACHED();
     }
 };
 

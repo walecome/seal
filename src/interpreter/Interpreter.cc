@@ -4,6 +4,11 @@
 #include "builtin/BuiltIn.hh"
 #include "ir/QuadCollection.hh"
 
+void runtime_error(const std::string& message) {
+    fmt::print("{}\n", message);
+    exit(EXIT_FAILURE);
+}
+
 Interpreter::Interpreter(const QuadCollection& quads, bool verbose)
     : m_quads { quads }, m_verbose { verbose } {}
 
@@ -87,6 +92,7 @@ void Interpreter::interpret_function(unsigned function_id) {
                 move(quad);
                 break;
             case OPCode::INDEX_MOVE:
+                index_move(quad);
                 break;
 
             default:
@@ -109,6 +115,10 @@ struct BinOpVisitor {
     }
 
     value_operand_t operator()(StringOperand, StringOperand) {
+        ASSERT_NOT_REACHED();
+    }
+
+    value_operand_t operator()(VectorOperand, VectorOperand) {
         ASSERT_NOT_REACHED();
     }
 
@@ -302,7 +312,30 @@ void Interpreter::move(const Quad& quad) {
         current_frame()->resolve_operand(quad.src_a()));
 }
 
-void Interpreter::index_move(const Quad&) {}
+void bounds_check(VectorOperand::value_type_t vec, int index) {
+    if (index < 0) {
+        runtime_error(
+            fmt::format("Cannot index vector with negative index [{}]", index));
+    }
+
+    if (index >= static_cast<int>(vec->size())) {
+        runtime_error(
+            fmt::format("Index out-of-bounds error. Error indexing vector of "
+                        "size {} with index {}",
+                        vec->size(), index));
+    }
+}
+
+void Interpreter::index_move(const Quad& quad) {
+    int index = current_frame()->resolve_operand(quad.src_b()).as_int();
+    VectorOperand::value_type_t indexed =
+        current_frame()->resolve_operand(quad.src_a()).as_vector();
+
+    bounds_check(indexed, index);
+
+    ValueOperand value = indexed->at(index);
+    current_frame()->set_variable(quad.dest().as_variable(), value);
+}
 
 StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
 

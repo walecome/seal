@@ -1,6 +1,7 @@
 #pragma once
 
 #include <variant>
+#include <vector>
 
 #include "Constants.hh"
 #include "OperandType.hh"
@@ -22,30 +23,46 @@
 ADD_OPERAND_TYPE(IntOperand, unsigned long)
 ADD_OPERAND_TYPE(RealOperand, double)
 ADD_OPERAND_TYPE(StringOperand, std::string_view)
+struct ValueOperand;
 
-using value_operand_t = std::variant<IntOperand, RealOperand, StringOperand>;
+struct VectorOperand {
+   private:
+    using vector_type_t = std::vector<ValueOperand>;
+
+   public:
+    using value_type_t = std::shared_ptr<vector_type_t>;
+    VectorOperand() : value { std::make_shared<vector_type_t>() } {}
+
+    value_type_t value;
+
+    operator value_type_t() const { return value; }
+};
+
+using value_operand_t =
+    std::variant<IntOperand, RealOperand, StringOperand, VectorOperand>;
 
 struct ValueOperand {
     value_operand_t value {};
 
-    unsigned long as_int() const {
-        ASSERT(std::holds_alternative<IntOperand>(value));
-        return std::get<IntOperand>(value).value;
-    }
+    VectorOperand::value_type_t as_vector() const;
+    unsigned long as_int() const;
+    double as_real() const;
+    std::string_view as_string() const;
 
-    double as_real() const {
-        ASSERT(std::holds_alternative<RealOperand>(value));
-        return std::get<RealOperand>(value).value;
-    }
-
-    std::string_view as_string() const {
-        ASSERT(std::holds_alternative<StringOperand>(value));
-        return std::get<StringOperand>(value).value;
-    }
+    bool is_vector() const;
+    bool is_integer() const;
+    bool is_number() const;
+    bool is_real() const;
+    bool is_string() const;
 
     template <class T>
     bool holds() const {
         return std::holds_alternative<T>(value);
+    }
+
+    template <class T>
+    T get_as() const {
+        return std::get<T>(value);
     }
 };
 
@@ -64,12 +81,7 @@ class Operand {
     Operand() : m_used { false }, m_data {} {}
     Operand(operand_type_t data) : m_used { true }, m_data { data } {}
 
-    bool is_number() const;
-    bool is_integer() const;
-    bool is_real() const;
-    bool is_string() const;
     bool is_value() const;
-
     bool is_label() const;
     bool is_variable() const;
     bool is_function() const;
