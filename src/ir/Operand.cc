@@ -6,20 +6,21 @@
 bool Operand::is_number() const { return is_integer() || is_real(); }
 
 bool Operand::is_integer() const {
-    return m_kind == OperandKind::IMMEDIATE_INT;
+    return is_value() && as_value().holds<IntOperand>();
 }
 
-bool Operand::is_real() const { return m_kind == OperandKind::IMMEDIATE_REAL; }
+bool Operand::is_real() const {
+    return is_value() && as_value().holds<RealOperand>();
+}
 
 bool Operand::is_string() const {
-    return m_kind == OperandKind::IMMEDIATE_STRING;
+    return is_value() && as_value().holds<StringOperand>();
 }
 
-bool Operand::is_value() const { return is_number() || is_string(); }
-
-bool Operand::is_label() const { return m_kind == OperandKind::LABEL; }
-bool Operand::is_variable() const { return m_kind == OperandKind::VARIABLE; }
-bool Operand::is_function() const { return m_kind == OperandKind::FUNCTION; }
+bool Operand::is_value() const { return holds<ValueOperand>(); }
+bool Operand::is_label() const { return holds<LabelOperand>(); }
+bool Operand::is_variable() const { return holds<VariableOperand>(); }
+bool Operand::is_function() const { return holds<FunctionOperand>(); }
 
 ValueOperand Operand::as_value() const {
     ASSERT(is_value());

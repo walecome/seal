@@ -9,38 +9,35 @@ unsigned new_label_id() {
 }
 
 Operand IrFunction::create_immediate_int(unsigned long value) const {
-    Operand operand { OperandKind::IMMEDIATE_INT,
-                      create_value_operand<IntOperand>(value) };
+    Operand operand { create_value_operand<IntOperand>(value) };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_immediate_string(std::string_view value) const {
-    Operand operand { OperandKind::IMMEDIATE_STRING,
-                      create_value_operand<StringOperand>(value) };
+    Operand operand { create_value_operand<StringOperand>(value) };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_immediate_real(double value) const {
-    Operand operand { OperandKind::IMMEDIATE_REAL,
-                      create_value_operand<RealOperand>(value) };
+    Operand operand { create_value_operand<RealOperand>(value) };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_label() const {
-    Operand operand { OperandKind::LABEL, LabelOperand { new_label_id() } };
+    Operand operand { LabelOperand { new_label_id() } };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_variable(const std::string_view identifier) const {
-    Operand operand { OperandKind::VARIABLE, VariableOperand { identifier } };
+    Operand operand { VariableOperand { identifier } };
     operand.set_env(this);
 
     return operand;
@@ -60,14 +57,14 @@ Operand IrFunction::create_tmp_variable() {
     // We should probably just have a global symbol table instead...
     std::string *tmp =
         new std::string { fmt::format("temp${}", variable_count++) };
-    Operand operand { OperandKind::VARIABLE, VariableOperand { *tmp } };
+    Operand operand { VariableOperand { *tmp } };
     operand.set_env(this);
 
     return operand;
 }
 
 Operand IrFunction::create_function_from_id(unsigned function_id) const {
-    Operand operand { OperandKind::FUNCTION, FunctionOperand { function_id } };
+    Operand operand { FunctionOperand { function_id } };
     operand.set_env(this);
 
     return operand;

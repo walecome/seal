@@ -5,15 +5,6 @@
 #include "Constants.hh"
 #include "OperandType.hh"
 
-enum class OperandKind {
-    IMMEDIATE_INT,
-    IMMEDIATE_REAL,
-    IMMEDIATE_STRING,
-    VARIABLE,
-    LABEL,
-    FUNCTION,
-    UNUSED,
-};
 // This defines a struct with the identifier name. In addition it adds a member
 // named value of the given type, as well as an overload for that type.
 #define ADD_OPERAND_TYPE(NAME, TYPE)                                         \
@@ -51,6 +42,11 @@ struct ValueOperand {
         ASSERT(std::holds_alternative<StringOperand>(value));
         return std::get<StringOperand>(value).value;
     }
+
+    template <class T>
+    bool holds() const {
+        return std::holds_alternative<T>(value);
+    }
 };
 
 // For named operands (label, variable, function)
@@ -63,14 +59,10 @@ using operand_type_t =
 
 class IrFunction;
 
-struct OperandPrinter;
-
 class Operand {
    public:
-    Operand() : m_kind { OperandKind::UNUSED }, m_data {} {}
-
-    Operand(OperandKind kind, operand_type_t data)
-        : m_kind { kind }, m_data { data } {}
+    Operand() : m_used { false }, m_data {} {}
+    Operand(operand_type_t data) : m_used { true }, m_data { data } {}
 
     bool is_number() const;
     bool is_integer() const;
@@ -82,7 +74,7 @@ class Operand {
     bool is_variable() const;
     bool is_function() const;
 
-    bool is_used() const { return m_kind != OperandKind::UNUSED; }
+    bool is_used() const { return m_used; }
 
     auto env() const { return m_env; }
     void set_env(const IrFunction* env) { m_env = env; }
@@ -95,7 +87,12 @@ class Operand {
     FunctionOperand as_function() const;
 
    private:
-    OperandKind m_kind;
+    template <class T>
+    bool holds() const {
+        return std::holds_alternative<T>(m_data);
+    }
+
+    bool m_used;
     operand_type_t m_data;
 
     const IrFunction* m_env { nullptr };
