@@ -17,29 +17,12 @@
 
 ptr_t<Expression> Parser::parse_expression(TokenBuffer& tokens) {
     auto begin = tokens.top_iterator();
-    auto expression = parse_assign(tokens);
+    auto expression = parse_equality(tokens);
     auto end = tokens.top_iterator();
 
     expression->source_ref.begin = begin;
     expression->source_ref.end = end;
     return expression;
-}
-
-ptr_t<Expression> Parser::parse_assign(TokenBuffer& tokens) {
-    auto begin = tokens.top_iterator();
-    ptr_t<Expression> first = parse_equality(tokens);
-
-    while (tokens.eat(ASSIGN)) {
-        ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
-        ptr_t<Expression> second = parse_equality(tokens);
-        first = std::make_unique<AssignExpression>(first, op, second);
-    }
-
-    auto end = tokens.top_iterator();
-    first->source_ref.begin = begin;
-    first->source_ref.end = end;
-
-    return first;
 }
 
 ptr_t<Expression> Parser::parse_equality(TokenBuffer& tokens) {
@@ -62,7 +45,7 @@ ptr_t<Expression> Parser::parse_equality(TokenBuffer& tokens) {
 
 ptr_t<Expression> Parser::parse_compare(TokenBuffer& tokens) {
     auto begin = tokens.top_iterator();
-    ptr_t<Expression> first = parse_add_sub(tokens);
+    ptr_t<Expression> first = parse_assign(tokens);
 
     while (tokens.eat({ GT, GTEQ, LT, LTEQ })) {
         ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
@@ -72,6 +55,23 @@ ptr_t<Expression> Parser::parse_compare(TokenBuffer& tokens) {
 
     auto end = tokens.top_iterator();
 
+    first->source_ref.begin = begin;
+    first->source_ref.end = end;
+
+    return first;
+}
+
+ptr_t<Expression> Parser::parse_assign(TokenBuffer& tokens) {
+    auto begin = tokens.top_iterator();
+    ptr_t<Expression> first = parse_add_sub(tokens);
+
+    while (tokens.eat(ASSIGN)) {
+        ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
+        ptr_t<Expression> second = parse_add_sub(tokens);
+        first = std::make_unique<AssignExpression>(first, op, second);
+    }
+
+    auto end = tokens.top_iterator();
     first->source_ref.begin = begin;
     first->source_ref.end = end;
 

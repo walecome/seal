@@ -48,6 +48,10 @@ class Type {
     void change_kind(const Kind);
 
     bool is_void() const { return m_primitive == Primitive::VOID; }
+    bool is_bool() const { return m_primitive == Primitive::BOOL; }
+    bool is_string() const { return m_primitive == Primitive::STRING; }
+    bool is_float() const { return m_primitive == Primitive::FLOAT; }
+    bool is_int() const { return m_primitive == Primitive::INT; }
 
     std::string to_string() const;
 
