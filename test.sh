@@ -13,24 +13,6 @@ code_dir=./code
 
 sealc=build/sealc
 
-function run_and_print() {
-   arr=("$@")
-   for i in "${arr[@]}";
-      do
-        printf "${LIGHT_GREY}$ build/sealc --source $i${NC}\n"
-
-        ret="$(build/sealc --source $i) " 
-        status=$?
-        if [ "$status" == "$expected" ]
-        then
-            printf "[${GREEN}PASSED${NC}]\n"
-        else
-            printf "[${RED}FAILED${NC}] - (Expected status $expected, got $status)\n"
-            printf "$ret\n"
-        fi
-      done
-}
-
 function run_one() {
     expected=$1
     source_file=$2
