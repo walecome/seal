@@ -95,6 +95,10 @@ void Interpreter::interpret_function(unsigned function_id) {
                 index_move(quad);
                 break;
 
+            case OPCode::INDEX_ASSIGN:
+                index_assign(quad);
+                break;
+
             default:
                 ASSERT_NOT_REACHED();
         }
@@ -335,6 +339,17 @@ void Interpreter::index_move(const Quad& quad) {
 
     ValueOperand value = indexed->at(index);
     current_frame()->set_variable(quad.dest().as_variable(), value);
+}
+
+void Interpreter::index_assign(const Quad& quad) {
+    int index = current_frame()->resolve_operand(quad.src_a()).as_int();
+    VectorOperand::value_type_t indexed =
+        current_frame()->resolve_operand(quad.dest()).as_vector();
+
+    ValueOperand value = current_frame()->resolve_operand(quad.src_b());
+
+    bounds_check(indexed, index);
+    indexed->at(index) = value;
 }
 
 StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }

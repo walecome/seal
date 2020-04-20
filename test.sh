@@ -19,16 +19,19 @@ function run_one() {
     expected=$1
     source_file=$2
 
-    printf "${YELLOW}[RUNS] ${LIGHT_GREY}$ $sealc --source $source_file${NC}\n"
+    compile_command="$sealc --source $source_file"
+
+    printf "${YELLOW}[RUNS] ${LIGHT_GREY} $compile_command\n"
+
 
     ret="$($sealc --source $source_file) " 
     status=$?
     printf "\e[1A"
     if [ "$status" == "$expected" ]
     then
-        printf "[${GREEN}PASS${NC}] ${LIGHT_GREY}$ $sealc --source ${NC}\n"
+        printf "[${GREEN}PASS${NC}] ${LIGHT_GREY} $compile_command ${NC}\n"
     else
-        printf "[${RED}FAIL${NC}] ${LIGHT_GREY}$ $sealc --source ${NC}\n"
+        printf "[${RED}FAIL${NC}] ${LIGHT_GREY} $compile_command ${NC}\n"
         printf "\tExpected status $expected, got $status\n"
 
         printf "\tCommand output:\n$ret\n"

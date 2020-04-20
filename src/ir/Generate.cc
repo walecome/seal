@@ -152,7 +152,7 @@ void Generate::gen_for(const For *for_statement) {
     auto stop_condition = gen_expression(for_statement->stop_condition());
 
     auto end_label = env()->create_label();
-    env()->add_quad(OPCode::JMP_NZ, end_label, stop_condition, {});
+    env()->add_quad(OPCode::JMP_Z, end_label, stop_condition, {});
 
     gen_block(for_statement->body());
     gen_expression(for_statement->per_iteration_expression());
@@ -227,16 +227,30 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
 Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
     ASSERT(assign_expr->op()->symbol() == OperatorSym::ASSIGN);
 
-    auto var = dynamic_cast<VariableExpression *>(assign_expr->left());
-    ASSERT(var != nullptr);
+    Operand right = gen_expression(assign_expr->right());
 
-    auto right = gen_expression(assign_expr->right());
-    auto left = gen_variable_expression(var);
+    VariableExpression *var =
+        dynamic_cast<VariableExpression *>(assign_expr->left());
+    if (var) {
+        Operand left = gen_variable_expression(var);
+        env()->add_quad(OPCode::MOVE, left, right, {});
+        return left;
+    }
 
-    env()->add_quad(OPCode::MOVE, left, right, {});
+    // TODO: Not sure if this should be done here or somewhere else. The
+    // IndexExpression in not evaluated not, which is kind of counter
+    // intuitive...
+    IndexExpression *index_expr =
+        dynamic_cast<IndexExpression *>(assign_expr->left());
 
-    // @FIXME: Return what?
-    return left;
+    if (index_expr) {
+        Operand indexed = gen_expression(index_expr->indexed_expression());
+        Operand index = gen_expression(index_expr->index());
+        env()->add_quad(OPCode::INDEX_ASSIGN, indexed, index, right);
+        return right;
+    }
+
+    ASSERT_NOT_REACHED();
 }
 
 Operand Generate::gen_equality_expression(
