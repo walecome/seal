@@ -7,6 +7,7 @@ class LogicalExpression : public BinaryExpression {
     MAKE_NONCOPYABLE(LogicalExpression)
 
     AST_NODE_NAME(LogicalExpression)
+    AST_ANALYZABLE(LogicalExpression)
 
    public:
     LogicalExpression(ptr_t<Expression> &left, ptr_t<Operator> &op,

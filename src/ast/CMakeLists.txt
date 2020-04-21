@@ -17,6 +17,7 @@ add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
     IndexExpression.cc
     IntegerLiteral.cc
     Literal.cc
+    LogicalExpression.cc
     Operator.cc
     ParameterList.cc
     RealLiteral.cc
