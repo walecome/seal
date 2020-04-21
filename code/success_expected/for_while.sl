@@ -17,11 +17,8 @@ fn main() -> int {
         c = i;
     }
 
-
-    if (d == b){
-        if (c == (a - 1)) {
-            return 0;
-        }
+    if (d == b && c == (a - 1)) {
+        return 0;
     }
 
     return 1;

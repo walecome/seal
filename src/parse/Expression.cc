@@ -9,6 +9,7 @@
 #include "ast/FunctionCall.hh"
 #include "ast/IndexExpression.hh"
 #include "ast/IntegerLiteral.hh"
+#include "ast/LogicalExpression.hh"
 #include "ast/Operator.hh"
 #include "ast/RealLiteral.hh"
 #include "ast/StringLiteral.hh"
@@ -17,12 +18,30 @@
 
 ptr_t<Expression> Parser::parse_expression(TokenBuffer& tokens) {
     auto begin = tokens.top_iterator();
-    auto expression = parse_equality(tokens);
+    auto expression = parse_logical_expression(tokens);
     auto end = tokens.top_iterator();
 
     expression->source_ref.begin = begin;
     expression->source_ref.end = end;
     return expression;
+}
+
+ptr_t<Expression> Parser::parse_logical_expression(TokenBuffer& tokens) {
+    auto begin = tokens.top_iterator();
+
+    ptr_t<Expression> first = parse_equality(tokens);
+
+    while (tokens.eat({ AMP_AMP, PIPE_PIPE })) {
+        ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
+        ptr_t<Expression> second = parse_equality(tokens);
+        first = std::make_unique<LogicalExpression>(first, op, second);
+    }
+
+    auto end = tokens.top_iterator();
+    first->source_ref.begin = begin;
+    first->source_ref.end = end;
+
+    return first;
 }
 
 ptr_t<Expression> Parser::parse_equality(TokenBuffer& tokens) {

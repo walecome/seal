@@ -48,6 +48,7 @@ class Parser {
     ptr_t<Expression> parse_compare(TokenBuffer &tokens);
     ptr_t<Expression> parse_equality(TokenBuffer &tokens);
     ptr_t<Expression> parse_expression(TokenBuffer &tokens);
+    ptr_t<Expression> parse_logical_expression(TokenBuffer &tokens);
     ptr_t<Expression> parse_mult_div(TokenBuffer &tokens);
     ptr_t<Expression> parse_primary(TokenBuffer &tokens);
     ptr_t<Expression> parse_unary(TokenBuffer &tokens);

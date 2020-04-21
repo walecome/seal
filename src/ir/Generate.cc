@@ -338,6 +338,14 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
             env()->add_quad(OPCode::DIV, result, left, right);
             break;
 
+        case OperatorSym::AND:
+            env()->add_quad(OPCode::AND, result, left, right);
+            break;
+
+        case OperatorSym::OR:
+            env()->add_quad(OPCode::OR, result, left, right);
+            break;
+
         // @TODO: Handle
         case OperatorSym::MODULO:
         case OperatorSym::INC:

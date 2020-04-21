@@ -41,6 +41,9 @@ class Interpreter {
     void index_move(const Quad&);
     void index_assign(const Quad&);
 
+    void interpret_and(const Quad&);
+    void interpret_or(const Quad&);
+
     StackFrame* current_frame();
     void enter_new_frame();
     void exit_frame();

@@ -99,6 +99,14 @@ void Interpreter::interpret_function(unsigned function_id) {
                 index_assign(quad);
                 break;
 
+            case OPCode::AND:
+                interpret_and(quad);
+                break;
+
+            case OPCode::OR:
+                interpret_or(quad);
+                break;
+
             default:
                 ASSERT_NOT_REACHED();
         }
@@ -350,6 +358,26 @@ void Interpreter::index_assign(const Quad& quad) {
 
     bounds_check(indexed, index);
     indexed->at(index) = value;
+}
+
+void Interpreter::interpret_and(const Quad& quad) {
+    ValueOperand lhs = current_frame()->resolve_operand(quad.src_a());
+    ValueOperand rhs = current_frame()->resolve_operand(quad.src_b());
+
+    ValueOperand result =
+        ValueOperand { IntOperand { lhs.as_int() && rhs.as_int() } };
+
+    current_frame()->set_variable(quad.dest().as_variable(), result);
+}
+
+void Interpreter::interpret_or(const Quad& quad) {
+    ValueOperand lhs = current_frame()->resolve_operand(quad.src_a());
+    ValueOperand rhs = current_frame()->resolve_operand(quad.src_b());
+
+    ValueOperand result =
+        ValueOperand { IntOperand { lhs.as_int() || rhs.as_int() } };
+
+    current_frame()->set_variable(quad.dest().as_variable(), result);
 }
 
 StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
