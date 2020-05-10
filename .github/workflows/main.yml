@@ -43,4 +43,4 @@ jobs:
         CXX: clang++-9
 
     - name: Run test script
-      run: ./test.sh
+      run: ./test.py
