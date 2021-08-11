@@ -39,6 +39,9 @@ class QuadSource {
   }
   
   std::string to_string() const {
+    if (!holds_value()) {
+      return "QuadSource [EMPTY]";
+    }
     if (is_register()) {
       return fmt::format("QuadSource [{}]", as_register().to_string());
     }

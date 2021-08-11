@@ -30,6 +30,9 @@ class QuadDest {
   }
   
   std::string to_string() const {
+    if (!holds_value()) {
+      return "QuadDest [EMPTY]";
+    }
     if (is_label()) {
       return fmt::format("QuadDest [{}]", Operand{as_label()}.to_string());
     }
