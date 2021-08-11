@@ -1,4 +1,5 @@
 #include <fmt/format.h>
+#include <variant>
 
 #include "ir/IrFunction.hh"
 #include "ir/Operand.hh"
@@ -105,6 +106,10 @@ struct OperandPrinter {
 
 std::string Operand::to_string() const {
     return std::visit(OperandPrinter { this }, m_data);
+}
+
+std::string ValueOperand::to_string() const {
+    return std::visit(ValueOperandPrinter {}, this->value);
 }
 
 void print_value_operand(value_operand_t value) {

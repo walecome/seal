@@ -79,8 +79,9 @@ class Generate {
     ValueOperand create_integer_literal(const IntegerLiteral*);
     ValueOperand create_string_literal(const StringLiteral*);
     
-    Register create_register() const;
+    Register create_register();
 
     const CompilationUnit* m_compilation_unit;
     ptr_t<IrFunction> m_current_ir_function;
+    unsigned m_register_count{0};
 };

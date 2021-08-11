@@ -15,6 +15,7 @@ add_subdirectory(semantic)
 
 
 add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
+    Constants.cc
     Error.cc
     Lexer.cc
     main.cc

@@ -54,6 +54,8 @@ QuadCollection Generate::generate() {
 
     ret.main_function_id = ir_program->main_function_id();
 
+    ret.register_count = m_register_count;
+
     return ret;
 }
 
@@ -84,9 +86,9 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
     if (variable_decl->value()) {
         auto value = gen_expression(variable_decl->value());
-        auto dest = QuadDest {env()->create_variable(variable_decl->identifier(), [this] {
-            return create_register();
-        })};
+        auto dest = QuadDest { env()->create_variable(
+            variable_decl->identifier(),
+            [this] { return create_register(); }) };
         env()->add_quad(OPCode::MOVE, dest, value, {});
     }
 }
@@ -114,13 +116,13 @@ void Generate::gen_statement(const Statement *statement) {
 void Generate::gen_if_statement(const IfStatement *if_statement) {
     auto condition = gen_expression(if_statement->condition());
 
-    auto else_label = QuadDest {env()->create_label() };
+    auto else_label = QuadDest { env()->create_label() };
     env()->add_quad(OPCode::JMP_Z, else_label, condition, {});
 
     gen_block(if_statement->if_body());
 
     if (if_statement->else_body()) {
-        auto end_label = QuadDest{ env()->create_label()};
+        auto end_label = QuadDest { env()->create_label() };
         env()->add_quad(OPCode::JMP, end_label, {}, {});
         env()->queue_label(else_label.as_label());
         gen_block(if_statement->else_body());
@@ -131,10 +133,10 @@ void Generate::gen_if_statement(const IfStatement *if_statement) {
 }
 
 void Generate::gen_while(const While *while_statement) {
-    auto condition_label = QuadDest{env()->create_and_queue_label()};
+    auto condition_label = QuadDest { env()->create_and_queue_label() };
     auto condition = gen_expression(while_statement->condition());
 
-    auto end_label = QuadDest{env()->create_label()};
+    auto end_label = QuadDest { env()->create_label() };
     env()->add_quad(OPCode::JMP_Z, end_label, condition, {});
 
     gen_block(while_statement->body());
@@ -148,23 +150,24 @@ void Generate::gen_while(const While *while_statement) {
 void Generate::gen_for(const For *for_statement) {
     gen_variable_decl(for_statement->initial_expression());
 
-    auto condition_label = env()->create_and_queue_label();
+    auto condition_label = QuadDest { env()->create_and_queue_label() };
 
     auto stop_condition = gen_expression(for_statement->stop_condition());
 
-    auto end_label = env()->create_label();
+    auto end_label = QuadDest { env()->create_label() };
     env()->add_quad(OPCode::JMP_Z, end_label, stop_condition, {});
 
     gen_block(for_statement->body());
     gen_expression(for_statement->per_iteration_expression());
     env()->add_quad(OPCode::JMP, condition_label, {}, {});
 
-    env()->queue_label(end_label);
+    env()->queue_label(end_label.as_label());
 }
 
 void Generate::gen_return(const ReturnStatement *return_statement) {
-    auto value = gen_expression(return_statement->return_value());
-    env()->add_quad(OPCode::RET, value, {}, {});
+    // TODO: Figure out where to place return values
+    QuadSource source = gen_expression(return_statement->return_value());
+    env()->add_quad(OPCode::RET, {}, source, {});
 }
 
 QuadSource Generate::gen_expression(const Expression *expression) {
@@ -175,7 +178,7 @@ QuadSource Generate::gen_expression(const Expression *expression) {
     } else if (auto ptr = dynamic_cast<const IndexExpression *>(expression)) {
         return gen_index_expression(ptr);
     } else if (auto ptr = dynamic_cast<const Literal *>(expression)) {
-        return create_literal(ptr);
+        return QuadSource { create_literal(ptr) };
     } else if (auto ptr = dynamic_cast<const UnaryExpression *>(expression)) {
         return gen_unary_expression(ptr);
     } else if (auto ptr =
@@ -191,22 +194,10 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
 
     // Push arguments
     func_call->argument_list()->for_each_enumerated_argument(
-        [&](auto arg, unsigned index) {
+        [&](auto arg, unsigned) {
             auto arg_operand = gen_expression(arg);
-
-            if (is_builtin) {
-                // TODO: This is an ugly fix for builtins...
-                env()->add_quad(OPCode::PUSH_ARG, env()->create_tmp_variable(),
-                                arg_operand, {});
-            } else {
-                std::string_view parameter_name = func_call->declaration()
-                                                      ->parameter_list()
-                                                      ->parameter_at(index)
-                                                      ->identifier();
-                env()->add_quad(OPCode::PUSH_ARG,
-                                env()->create_variable(parameter_name),
-                                arg_operand, {});
-            }
+            env()->add_quad(OPCode::PUSH_ARG, QuadDest { create_register() },
+                            arg_operand, {});
         });
 
     auto function_id =
@@ -218,7 +209,8 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
 
     auto return_register = create_register();
 
-    env()->add_quad(OPCode::CALL, return_register, QuadSource { func }, {});
+    env()->add_quad(OPCode::CALL, QuadDest { return_register },
+                    QuadSource { func }, {});
 
     return QuadSource { return_register };
 }
@@ -233,8 +225,9 @@ QuadSource Generate::gen_assign_expression(
         dynamic_cast<VariableExpression *>(assign_expr->left());
     if (var) {
         QuadSource left = gen_variable_expression(var);
-        env()->add_quad(OPCode::MOVE, left.as_register(), right, {});
-        return QuadSource { left };
+        env()->add_quad(OPCode::MOVE, QuadDest { left.as_register() }, right,
+                        {});
+        return left;
     }
 
     // TODO: Not sure if this should be done here or somewhere else. The
@@ -262,11 +255,12 @@ QuadSource Generate::gen_equality_expression(
 
     switch (equality_expr->op()->symbol()) {
         case OperatorSym::EQ:
-            env()->add_quad(OPCode::CMP_EQ, result, left, right);
+            env()->add_quad(OPCode::CMP_EQ, QuadDest { result }, left, right);
             break;
 
         case OperatorSym::NOT_EQ:
-            env()->add_quad(OPCode::CMP_NOTEQ, result, left, right);
+            env()->add_quad(OPCode::CMP_NOTEQ, QuadDest { result }, left,
+                            right);
             break;
 
         default:
@@ -280,24 +274,26 @@ QuadSource Generate::gen_compare_expression(
     const CompareExpression *compare_expr) {
     auto result = create_register();
 
+    auto result_dest = QuadDest { result };
+
     auto left = gen_expression(compare_expr->left());
     auto right = gen_expression(compare_expr->right());
 
     switch (compare_expr->op()->symbol()) {
         case OperatorSym::LT:
-            env()->add_quad(OPCode::CMP_LT, result, left, right);
+            env()->add_quad(OPCode::CMP_LT, result_dest, left, right);
             break;
 
         case OperatorSym::LTEQ:
-            env()->add_quad(OPCode::CMP_LTEQ, result, left, right);
+            env()->add_quad(OPCode::CMP_LTEQ, result_dest, left, right);
             break;
 
         case OperatorSym::GT:
-            env()->add_quad(OPCode::CMP_GT, result, left, right);
+            env()->add_quad(OPCode::CMP_GT, result_dest, left, right);
             break;
 
         case OperatorSym::GTEQ:
-            env()->add_quad(OPCode::CMP_GTEQ, result, left, right);
+            env()->add_quad(OPCode::CMP_GTEQ, result_dest, left, right);
             break;
 
         default:
@@ -321,29 +317,31 @@ QuadSource Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
 
     auto result = create_register();
 
+    auto result_dest = QuadDest { result };
+
     switch (bin_expr->op()->symbol()) {
         case OperatorSym::PLUS:
-            env()->add_quad(OPCode::ADD, result, left, right);
+            env()->add_quad(OPCode::ADD, result_dest, left, right);
             break;
 
         case OperatorSym::MINUS:
-            env()->add_quad(OPCode::SUB, result, left, right);
+            env()->add_quad(OPCode::SUB, result_dest, left, right);
             break;
 
         case OperatorSym::MULT:
-            env()->add_quad(OPCode::MULT, result, left, right);
+            env()->add_quad(OPCode::MULT, result_dest, left, right);
             break;
 
         case OperatorSym::DIV:
-            env()->add_quad(OPCode::DIV, result, left, right);
+            env()->add_quad(OPCode::DIV, result_dest, left, right);
             break;
 
         case OperatorSym::AND:
-            env()->add_quad(OPCode::AND, result, left, right);
+            env()->add_quad(OPCode::AND, result_dest, left, right);
             break;
 
         case OperatorSym::OR:
-            env()->add_quad(OPCode::OR, result, left, right);
+            env()->add_quad(OPCode::OR, result_dest, left, right);
             break;
 
         // @TODO: Handle
@@ -401,7 +399,7 @@ QuadSource Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     if (sym == OperatorSym::MINUS) {
         auto result = create_register();
         auto zero = QuadSource { env()->create_immediate_int(0) };
-        env()->add_quad(OPCode::SUB, result, zero, target_operand);
+        env()->add_quad(OPCode::SUB, QuadDest { result }, zero, target_operand);
         return QuadSource { result };
     }
 
@@ -414,9 +412,9 @@ QuadSource Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     auto one = QuadSource { env()->create_immediate_int(1) };
 
     if (sym == OperatorSym::INC) {
-        env()->add_quad(OPCode::ADD, result, target_operand, one);
+        env()->add_quad(OPCode::ADD, QuadDest { result }, target_operand, one);
     } else if (sym == OperatorSym::DEC) {
-        env()->add_quad(OPCode::SUB, result, target_operand, one);
+        env()->add_quad(OPCode::SUB, QuadDest { result }, target_operand, one);
     } else {
         ASSERT_NOT_REACHED();
     }
@@ -461,11 +459,11 @@ ValueOperand Generate::create_float_literal(const RealLiteral *real_literal) {
     return env()->create_immediate_real(real_literal->value());
 }
 
-ValueOperand Generate::create_string_literal(const StringLiteral *string_literal) {
+ValueOperand Generate::create_string_literal(
+    const StringLiteral *string_literal) {
     return env()->create_immediate_string(string_literal->value());
 }
 
-Register Generate::create_register() const {
-    static unsigned register_count = 0;
-    return Register(register_count++);
+Register Generate::create_register() {
+    return Register(m_register_count++);
 }

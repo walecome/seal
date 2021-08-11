@@ -10,10 +10,6 @@
 #include "QuadDest.hh"
 
 class Quad {
-    MAKE_NONCOPYABLE(Quad)
-    MAKE_NONMOVABLE(Quad)
-    
-
    public:
     Quad(OPCode op_code, QuadDest dest, QuadSource src_a, QuadSource src_b)
         : m_op_code { op_code },

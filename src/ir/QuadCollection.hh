@@ -11,7 +11,7 @@ struct QuadCollection {
     std::vector<Quad> quads {};
     unsigned main_function_id {};
     
-    unsigned register_count() const;
+    unsigned register_count;
 
     void dump() const;
 };

@@ -64,6 +64,8 @@ struct ValueOperand {
     T get_as() const {
         return std::get<T>(value);
     }
+    
+    std::string to_string() const;
 };
 
 // For named operands (label, variable, function)

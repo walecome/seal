@@ -9,6 +9,8 @@
 #include "ir/Operand.hh"
 
 class Quad;
+class QuadDest;
+class QuadSource;
 class Register;
 struct QuadCollection;
 
@@ -19,6 +21,7 @@ class Interpreter {
     void interpret();
     
     Operand resolve_register(Register reg) const;
+    ValueOperand resolve_source(const QuadSource& source) const;
     void set_register(Register reg, Operand operand);
 
    private:
@@ -48,7 +51,7 @@ class Interpreter {
     void interpret_and(const Quad&);
     void interpret_or(const Quad&);
     
-    unsigned resolve_label(Register reg) const;
+    unsigned resolve_label(const QuadDest& dest) const;
 
 
     StackFrame* current_frame();
