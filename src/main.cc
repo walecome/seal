@@ -1,4 +1,5 @@
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <streambuf>
@@ -56,6 +57,11 @@ int main(int argc, char **argv) {
     std::string source_file { argument_parser.get<std::string>("source") };
 
     bool verbose { argument_parser.get<bool>("verbose") };
+
+    if (!std::filesystem::exists(source_file)) {
+        fmt::print("The file \"{}\" doesn't exit\n", source_file);
+        exit(1);
+    }
 
     sptr_t<std::string> source = util::read_source(source_file);
     Lexer lexer { *source };
