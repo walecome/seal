@@ -59,25 +59,27 @@ class Generate {
     void gen_return(const ReturnStatement*);
     void gen_for(const For*);
 
-    Operand gen_function_call(const FunctionCall*);
-    Operand gen_expression(const Expression*);
-    Operand gen_binary_expression(const BinaryExpression*);
-    Operand gen_assign_expression(const AssignExpression*);
-    Operand gen_equality_expression(const EqualityExpression*);
-    Operand gen_compare_expression(const CompareExpression*);
-    Operand gen_variable_expression(const VariableExpression*);
-    Operand gen_index_expression(const IndexExpression*);
-    Operand gen_unary_expression(const UnaryExpression*);
+    QuadSource gen_function_call(const FunctionCall*);
+    QuadSource gen_expression(const Expression*);
+    QuadSource gen_binary_expression(const BinaryExpression*);
+    QuadSource gen_assign_expression(const AssignExpression*);
+    QuadSource gen_equality_expression(const EqualityExpression*);
+    QuadSource gen_compare_expression(const CompareExpression*);
+    QuadSource gen_variable_expression(const VariableExpression*);
+    QuadSource gen_index_expression(const IndexExpression*);
+    QuadSource gen_unary_expression(const UnaryExpression*);
 
     auto env() const { return m_current_ir_function.get(); }
 
     // Literals
-    Operand create_literal(const Literal*);
-    Operand create_array_literal(const ArrayLiteral*);
-    Operand create_boolean_literal(const BooleanLiteral*);
-    Operand create_float_literal(const RealLiteral*);
-    Operand create_integer_literal(const IntegerLiteral*);
-    Operand create_string_literal(const StringLiteral*);
+    ValueOperand create_literal(const Literal*);
+    ValueOperand create_array_literal(const ArrayLiteral*);
+    ValueOperand create_boolean_literal(const BooleanLiteral*);
+    ValueOperand create_float_literal(const RealLiteral*);
+    ValueOperand create_integer_literal(const IntegerLiteral*);
+    ValueOperand create_string_literal(const StringLiteral*);
+    
+    Register create_register() const;
 
     const CompilationUnit* m_compilation_unit;
     ptr_t<IrFunction> m_current_ir_function;

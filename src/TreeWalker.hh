@@ -39,6 +39,8 @@
 #include "ast/While.hh"
 #include "builtin/BuiltIn.hh"
 
+using BuiltIn::expr_value_t;
+
 class Environment {
     MAKE_DEFAULT_CONSTRUCTABLE(Environment)
     MAKE_NONMOVABLE(Environment)

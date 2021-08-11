@@ -10,6 +10,8 @@ struct QuadCollection {
     std::map<unsigned, unsigned> label_to_quad {};
     std::vector<Quad> quads {};
     unsigned main_function_id {};
+    
+    unsigned register_count() const;
 
     void dump() const;
 };

@@ -9,6 +9,7 @@
 #include "ir/Operand.hh"
 
 class Quad;
+class Register;
 struct QuadCollection;
 
 class Interpreter {
@@ -16,6 +17,9 @@ class Interpreter {
     Interpreter(const QuadCollection&, bool verbose);
 
     void interpret();
+    
+    Operand resolve_register(Register reg) const;
+    void set_register(Register reg, Operand operand);
 
    private:
     void interpret_function(unsigned function_id);
@@ -43,6 +47,9 @@ class Interpreter {
 
     void interpret_and(const Quad&);
     void interpret_or(const Quad&);
+    
+    unsigned resolve_label(Register reg) const;
+
 
     StackFrame* current_frame();
     void enter_new_frame();
@@ -51,6 +58,7 @@ class Interpreter {
     ArgumentWrapper take_arguments();
 
     const QuadCollection& m_quads;
+    std::vector<Operand> m_registers;
     bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
     std::optional<ArgumentWrapper> m_arguments { std::nullopt };

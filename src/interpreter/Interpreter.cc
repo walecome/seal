@@ -10,7 +10,9 @@ void runtime_error(const std::string& message) {
 }
 
 Interpreter::Interpreter(const QuadCollection& quads, bool verbose)
-    : m_quads { quads }, m_verbose { verbose } {}
+    : m_quads { quads },
+      m_registers(std::vector<Operand>(quads.register_count())),
+      m_verbose { verbose } {}
 
 void Interpreter::interpret() {
     m_stack_frames.push(StackFrame { 0, nullptr });
@@ -119,57 +121,65 @@ void Interpreter::interpret_function(unsigned function_id) {
     }
 }
 
+Operand Interpreter::resolve_register(Register reg) const {
+    return m_registers[reg.index()];
+}
+
+void Interpreter::set_register(Register reg, Operand operand) {
+    m_registers[reg.index()] = std::move(operand);
+}
+
+unsigned Interpreter::resolve_label(Register reg) const { return 0; }
+
 template <class BinaryOperator>
 struct BinOpVisitor {
     template <typename T, typename U>
-    value_operand_t operator()(T, U) {
+    ValueOperand operator()(T, U) {
         ASSERT_NOT_REACHED();
     }
 
-    value_operand_t operator()(StringOperand, StringOperand) {
+    ValueOperand operator()(StringOperand, StringOperand) {
         ASSERT_NOT_REACHED();
     }
 
-    value_operand_t operator()(VectorOperand, VectorOperand) {
+    ValueOperand operator()(VectorOperand, VectorOperand) {
         ASSERT_NOT_REACHED();
     }
 
     template <typename T>
-    value_operand_t operator()(T a, T b) {
-        return T { BinaryOperator {}(a, b) };
+    ValueOperand operator()(T a, T b) {
+        return ValueOperand { T { BinaryOperator {}(a, b) } };
     }
 };
 
 template <class Operator>
-void binop_helper(StackFrame* context, const Quad& quad) {
-    ASSERT(quad.dest().is_variable());
+void binop_helper(Interpreter* interpreter, const Quad& quad) {
+    ValueOperand lhs = interpreter->resolve_register(quad.src_a()).as_value();
+    ValueOperand rhs = interpreter->resolve_register(quad.src_b()).as_value();
 
-    ValueOperand lhs = context->resolve_operand(quad.src_a());
-    ValueOperand rhs = context->resolve_operand(quad.src_b());
+    Operand result =
+        Operand(std::visit(BinOpVisitor<Operator> {}, lhs.value, rhs.value));
 
-    value_operand_t result =
-        std::visit(BinOpVisitor<Operator> {}, lhs.value, rhs.value);
-
-    context->set_variable(quad.dest().as_variable(), ValueOperand { result });
+    interpreter->set_register(quad.dest(), result);
 }
 
 void Interpreter::add(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::ADD);
-    binop_helper<std::plus<>>(current_frame(), quad);
+    binop_helper<std::plus<>>(this, quad);
 }
 
 void Interpreter::sub(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::SUB);
-    binop_helper<std::minus<>>(current_frame(), quad);
+    binop_helper<std::minus<>>(this, quad);
 }
 void Interpreter::mult(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MULT);
-    binop_helper<std::multiplies<>>(current_frame(), quad);
+    binop_helper<std::multiplies<>>(this, quad);
 }
 
 void Interpreter::div(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::DIV);
-    binop_helper<std::divides<>>(current_frame(), quad);
+    binop_helper<std::divides<>>(this, quad);
 }
 
 template <class Operator>
@@ -186,43 +196,41 @@ struct CmpVisitor {
 };
 
 template <class Operator>
-void cmp_helper(StackFrame* context, const Quad& quad) {
-    ValueOperand lhs = context->resolve_operand(quad.src_a());
-    ValueOperand rhs = context->resolve_operand(quad.src_b());
+void cmp_helper(Interpreter* interpreter, const Quad& quad) {
+    ValueOperand lhs = interpreter->resolve_register(quad.src_a()).as_value();
+    ValueOperand rhs = interpreter->resolve_register(quad.src_b()).as_value();
 
     bool result = std::visit(CmpVisitor<Operator> {}, lhs.value, rhs.value);
 
-    value_operand_t ret = IntOperand { result };
-    context->set_variable(quad.dest().as_variable(), ValueOperand { ret });
+    Operand ret = Operand { ValueOperand { IntOperand { result } } };
+    interpreter->set_register(quad.dest(), ret);
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
-    cmp_helper<std::equal_to<>>(current_frame(), quad);
+    cmp_helper<std::equal_to<>>(this, quad);
 }
 
 void Interpreter::cmp_gt(const Quad& quad) {
-    cmp_helper<std::greater<>>(current_frame(), quad);
+    cmp_helper<std::greater<>>(this, quad);
 }
 
 void Interpreter::cmp_lt(const Quad& quad) {
-    cmp_helper<std::less<>>(current_frame(), quad);
+    cmp_helper<std::less<>>(this, quad);
 }
 
 void Interpreter::cmp_gteq(const Quad& quad) {
-    cmp_helper<std::greater_equal<>>(current_frame(), quad);
+    cmp_helper<std::greater_equal<>>(this, quad);
 }
 
 void Interpreter::cmp_lteq(const Quad& quad) {
-    cmp_helper<std::less_equal<>>(current_frame(), quad);
+    cmp_helper<std::less_equal<>>(this, quad);
 }
 
 void Interpreter::cmp_noteq(const Quad& quad) {
-    cmp_helper<std::not_equal_to<>>(current_frame(), quad);
+    cmp_helper<std::not_equal_to<>>(this, quad);
 }
 void Interpreter::jmp(const Quad& quad) {
-    ASSERT(quad.dest().is_label());
-
-    unsigned label_id = quad.dest().as_label();
+    unsigned label_id = resolve_label(quad.dest());
 
     auto target_quad = m_quads.label_to_quad.find(label_id);
     ASSERT(target_quad != m_quads.label_to_quad.end());
@@ -231,15 +239,15 @@ void Interpreter::jmp(const Quad& quad) {
 }
 
 void Interpreter::jmp_z(const Quad& quad) {
-    ValueOperand condition = current_frame()->resolve_operand(quad.src_a());
-    if (std::get<IntOperand>(condition.value) == 0) {
+    ValueOperand condition = resolve_register(quad.src_a()).as_value();
+    if (condition.as_int() == 0) {
         jmp(quad);
     }
 }
 
 void Interpreter::jmp_nz(const Quad& quad) {
-    ValueOperand condition = current_frame()->resolve_operand(quad.src_a());
-    if (std::get<IntOperand>(condition.value) != 0) {
+    ValueOperand condition = resolve_register(quad.src_a()).as_value();
+    if (condition.as_int() != 0) {
         jmp(quad);
     }
 }
@@ -251,26 +259,20 @@ void Interpreter::push_arg(const Quad& quad) {
         m_arguments = ArgumentWrapper {};
     }
 
-    ValueOperand value = current_frame()->resolve_operand(quad.src_a());
-    // This means we have a named argument
-    if (quad.dest().is_used()) {
-        m_arguments.value().add_named_argument(quad.dest().as_variable(),
-                                               value);
-    } else {
-        m_arguments.value().add_argument(value);
-    }
+    ValueOperand value = resolve_register(quad.src_a()).as_value();
+    m_arguments.value().add_argument(value);
 }
 
 void Interpreter::call(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
-    ASSERT(quad.src_a().is_function());
 
-    FunctionOperand func = quad.src_a().as_function();
+    FunctionOperand func = resolve_register(quad.src_a()).as_function();
 
     if (BuiltIn::is_builtin(func)) {
         ValueOperand ret = BuiltIn::call_builtin_function(
             func, take_arguments().value_vector());
-        current_frame()->set_variable(quad.dest().as_variable(), ret);
+        current_frame()->set_variable(
+            resolve_register(quad.dest()).as_variable(), ret);
         return;
     }
 
@@ -284,22 +286,12 @@ void Interpreter::call(const Quad& quad) {
             current_frame()->set_variable(var, value);
         });
 
-    if (!quad.dest().is_used()) {
-        return;
-    }
-
-    ASSERT(quad.dest().is_variable());
-
-    current_frame()->set_return_variable(quad.dest().as_variable());
+    current_frame()->set_return_variable(
+        resolve_register(quad.dest()).as_variable());
 }
 
 void Interpreter::ret(const Quad& quad) {
-    if (!quad.dest().is_used()) {
-        exit_frame();
-        return;
-    }
-
-    ValueOperand value = current_frame()->resolve_operand(quad.dest());
+    ValueOperand value = resolve_register(quad.dest()).as_value();
 
     if (current_frame()->is_main_frame()) {
         exit(value.as_int());
@@ -316,12 +308,7 @@ void Interpreter::ret(const Quad& quad) {
 
 void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
-
-    ASSERT(quad.dest().is_variable());
-
-    current_frame()->set_variable(
-        quad.dest().as_variable(),
-        current_frame()->resolve_operand(quad.src_a()));
+    set_register(quad.dest(), resolve_register(quad.src_a()));
 }
 
 void bounds_check(VectorOperand::value_type_t vec, int index) {
@@ -339,52 +326,51 @@ void bounds_check(VectorOperand::value_type_t vec, int index) {
 }
 
 void Interpreter::index_move(const Quad& quad) {
-    int index = current_frame()->resolve_operand(quad.src_b()).as_int();
-    VectorOperand::value_type_t indexed =
-        current_frame()->resolve_operand(quad.src_a()).as_vector();
+    // int index = current_frame()->resolve_operand(quad.src_b()).as_int();
+    // VectorOperand::value_type_t indexed =
+    //     current_frame()->resolve_operand(quad.src_a()).as_vector();
 
-    bounds_check(indexed, index);
+    // bounds_check(indexed, index);
 
-    ValueOperand value = indexed->at(index);
-    current_frame()->set_variable(quad.dest().as_variable(), value);
+    // ValueOperand value = indexed->at(index);
+    // current_frame()->set_variable(quad.dest().as_variable(), value);
 }
 
 void Interpreter::index_assign(const Quad& quad) {
-    int index = current_frame()->resolve_operand(quad.src_a()).as_int();
-    VectorOperand::value_type_t indexed =
-        current_frame()->resolve_operand(quad.dest()).as_vector();
+    // int index = current_frame()->resolve_operand(quad.src_a()).as_int();
+    // VectorOperand::value_type_t indexed =
+    //     current_frame()->resolve_operand(quad.dest()).as_vector();
 
-    ValueOperand value = current_frame()->resolve_operand(quad.src_b());
+    // ValueOperand value = current_frame()->resolve_operand(quad.src_b());
 
-    bounds_check(indexed, index);
-    indexed->at(index) = value;
+    // bounds_check(indexed, index);
+    // indexed->at(index) = value;
 }
 
 void Interpreter::interpret_and(const Quad& quad) {
-    ValueOperand lhs = current_frame()->resolve_operand(quad.src_a());
-    ValueOperand rhs = current_frame()->resolve_operand(quad.src_b());
+    ValueOperand lhs = resolve_register(quad.src_a()).as_value();
+    ValueOperand rhs = resolve_register(quad.src_b()).as_value();
 
-    ValueOperand result =
-        ValueOperand { IntOperand { lhs.as_int() && rhs.as_int() } };
+    Operand result = Operand { ValueOperand {
+        IntOperand { lhs.as_int() && rhs.as_int() } } };
 
-    current_frame()->set_variable(quad.dest().as_variable(), result);
+    set_register(quad.dest(), result);
 }
 
 void Interpreter::interpret_or(const Quad& quad) {
-    ValueOperand lhs = current_frame()->resolve_operand(quad.src_a());
-    ValueOperand rhs = current_frame()->resolve_operand(quad.src_b());
+    ValueOperand lhs = resolve_register(quad.src_a()).as_value();
+    ValueOperand rhs = resolve_register(quad.src_b()).as_value();
 
-    ValueOperand result =
-        ValueOperand { IntOperand { lhs.as_int() || rhs.as_int() } };
+    Operand result = Operand { ValueOperand {
+        IntOperand { lhs.as_int() || rhs.as_int() } } };
 
-    current_frame()->set_variable(quad.dest().as_variable(), result);
+
+    set_register(quad.dest(), result);
 }
 
 StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
 
 void Interpreter::enter_new_frame() {
-    // fmt::print("enter_frame()\n");
-
     m_stack_frames.emplace(current_frame()->program_counter(), current_frame());
 };
 
