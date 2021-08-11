@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-set -ex
+set -e
 
 SCRIPT_DIR=`dirname $0`
 BUILD_DIR="${SCRIPT_DIR}/build"
@@ -18,7 +18,7 @@ function clean {
 
 function configure {
     cd $SCRIPT_DIR
-    mkdir $BUILD_DIR
+    mkdir -p $BUILD_DIR
     cd $BUILD_DIR
     cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -GNinja ..
 }
@@ -26,6 +26,10 @@ function configure {
 function build {
     run_from "$BUILD_DIR" "ninja -j6"
     cd "$SCRIPT_DIR"
+}
+
+function print_help {
+    echo "Usage ./b <clean|configure|build|help>"
 }
 
 function error_and_exit {
@@ -43,6 +47,9 @@ case "$1" in
         ;;
     build)
         build
+        ;;
+    help)
+        print_help
         ;;
     *)
         error_and_exit
