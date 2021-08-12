@@ -31,13 +31,13 @@ class QuadDest {
   
   std::string to_string() const {
     if (!holds_value()) {
-      return "QuadDest [EMPTY]";
+      return "_";
     }
     if (is_label()) {
-      return fmt::format("QuadDest [{}]", Operand{as_label()}.to_string());
+      return Operand{as_label()}.to_string();
     }
     if (is_register()) {
-      return fmt::format("QuadDest [{}]", as_register().to_string());
+      return as_register().to_string();
     }
 
     ASSERT_NOT_REACHED();
