@@ -24,7 +24,9 @@ function configure {
 }
 
 function build {
-    run_from "$BUILD_DIR" "ninja -j6"
+    local core_count=$(nproc)
+    echo "Using ${core_count} compilation jobs"
+    run_from "$BUILD_DIR" "ninja -j${core_count}"
     cd "$SCRIPT_DIR"
 }
 
