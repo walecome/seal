@@ -1,6 +1,7 @@
 #include "Generate.hh"
 #include "IrFunction.hh"
 #include "OperandType.hh"
+#include "Register.hh"
 #include "ast/ArrayLiteral.hh"
 #include "ast/AssignExpression.hh"
 #include "ast/BinaryExpression.hh"
@@ -167,7 +168,9 @@ void Generate::gen_for(const For *for_statement) {
 void Generate::gen_return(const ReturnStatement *return_statement) {
     // TODO: Figure out where to place return values
     QuadSource source = gen_expression(return_statement->return_value());
-    env()->add_quad(OPCode::RET, {}, source, {});
+    env()->add_quad(OPCode::MOVE, QuadDest { get_return_register() }, source,
+                    {});
+    env()->add_quad(OPCode::RET, {}, QuadSource { get_return_register() }, {});
 }
 
 QuadSource Generate::gen_expression(const Expression *expression) {
@@ -207,12 +210,10 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
 
     FunctionOperand func = env()->create_function_from_id(function_id);
 
-    auto return_register = create_register();
-
-    env()->add_quad(OPCode::CALL, QuadDest { return_register },
+    env()->add_quad(OPCode::CALL, QuadDest { get_return_register() },
                     QuadSource { func }, {});
 
-    return QuadSource { return_register };
+    return QuadSource { get_return_register() };
 }
 
 QuadSource Generate::gen_assign_expression(
@@ -464,6 +465,6 @@ ValueOperand Generate::create_string_literal(
     return env()->create_immediate_string(string_literal->value());
 }
 
-Register Generate::create_register() {
-    return Register(m_register_count++);
-}
+Register Generate::create_register() { return Register(m_register_count++); }
+
+Register Generate::get_return_register() const { return Register(0); }

@@ -80,8 +80,10 @@ class Generate {
     ValueOperand create_string_literal(const StringLiteral*);
     
     Register create_register();
+    Register get_return_register() const;
 
     const CompilationUnit* m_compilation_unit;
     ptr_t<IrFunction> m_current_ir_function;
-    unsigned m_register_count{0};
+    // Register 0 is reserved for function returns.
+    unsigned m_register_count{1};
 };

@@ -30,7 +30,6 @@ void Interpreter::interpret_function(unsigned function_id) {
 
     while (true) {
         const Quad& quad = m_quads.quads[current_frame()->program_counter()];
-
         // fmt::print("Interpreting quad: {}\n", quad.to_string());
 
         switch (quad.opcode()) {
@@ -131,9 +130,7 @@ void Interpreter::set_register(Register reg, Operand operand) {
 }
 
 unsigned Interpreter::resolve_label(const QuadDest& dest) const {
-    // TODO(FIX)
-    ASSERT_NOT_REACHED();
-    return 0;
+    return dest.as_label().value;
 }
 
 ValueOperand Interpreter::resolve_source(const QuadSource& source) const {
@@ -146,8 +143,8 @@ ValueOperand Interpreter::resolve_source(const QuadSource& source) const {
     if (source.is_register()) {
         return resolve_register(source.as_register()).as_value();
     }
-
-    ASSERT_NOT_REACHED_MSG("Invalid QuadSource type");
+    
+    ASSERT_NOT_REACHED_MSG(fmt::format("Invalid QuadSource type: {}", source.to_string()).c_str());
 }
 
 template <class BinaryOperator>
@@ -285,8 +282,7 @@ void Interpreter::push_arg(const Quad& quad) {
 void Interpreter::call(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
 
-    FunctionOperand func =
-        resolve_register(quad.src_a().as_register()).as_function();
+    FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
         ValueOperand ret = BuiltIn::call_builtin_function(
@@ -297,9 +293,6 @@ void Interpreter::call(const Quad& quad) {
 
     enter_new_frame();
 
-    // TODO: FIX
-    ASSERT_NOT_REACHED();
-
     // Program counter will be incremented in interpret function
     current_frame()->set_program_counter(m_quads.function_to_quad.at(func) - 1);
 
@@ -307,22 +300,19 @@ void Interpreter::call(const Quad& quad) {
         [&](VariableOperand var, ValueOperand value) {
             current_frame()->set_variable(var, value);
         });
-
-    // current_frame()->set_return_variable(
-    //     resolve_register(quad.dest()).as_variable());
 }
 
 void Interpreter::ret(const Quad& quad) {
-    ValueOperand value = resolve_source(quad.src_a());
+    auto source = quad.src_a();
 
     if (current_frame()->is_main_frame()) {
+        ValueOperand value = resolve_source(source);
         exit(value.as_int());
     }
 
     if (current_frame()->return_variable()) {
-        VariableOperand ret = current_frame()->return_variable().value();
         exit_frame();
-        current_frame()->set_variable(ret, value);
+        set_register(Register(0), Operand{resolve_source(source)});
     } else {
         exit_frame();
     }
