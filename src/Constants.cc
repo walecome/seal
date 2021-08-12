@@ -4,6 +4,6 @@
 #include "Constants.hh"
 
 bool print_assert_message(const char* message) {
-   fmt::print(message);
+   fmt::print(fmt::format("{}\n", message));
    return false;
 }

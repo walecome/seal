@@ -7,7 +7,7 @@
 bool print_assert_message(const char* message);
 
 #define ASSERT_NOT_REACHED() assert(false)
-#define ASSERT_NOT_REACHED_MSG(message) assert(print_assert_message(message))
+#define ASSERT_NOT_REACHED_MSG(message) assert(print_assert_message(message) && false)
 #define ASSERT assert
 
 static std::ostringstream out {};
