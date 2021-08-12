@@ -1,5 +1,3 @@
-#pragma once
-
 #include <fmt/format.h>
 #include <string>
 #include "fmt/core.h"
