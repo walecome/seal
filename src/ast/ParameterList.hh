@@ -20,11 +20,17 @@ class ParameterList : public Node {
     size_t nr_params() const { return m_parameters.size(); }
     auto parameter_at(unsigned i) const { return m_parameters.at(i).get(); }
 
-    // @TODO: Check why this cannot be in the source file...
-    template <typename Function>
+    template <class Function>
     void for_each_parameter(Function callback) const {
-        for (auto& argument : m_parameters) {
-            callback(argument.get());
+        for (auto& param : m_parameters) {
+            callback(param.get());
+        }
+    }
+    
+    template <class Function>
+    void enumerate_paramters(Function callback) const {
+        for (size_t i = 0; i < m_parameters.size(); ++i) {
+            callback(i, m_parameters.at(i));
         }
     }
 
