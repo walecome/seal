@@ -11,9 +11,11 @@ fn fib(n : int) -> int {
 
 fn main() -> int {
 
-    fib(2);
+    n := 20;
+
+    result := fib(n);
+    
+    println("fib(", n, ") is=", result);
 
     return 0;
 }
-
-

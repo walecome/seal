@@ -81,6 +81,8 @@ class Generate {
     
     Register create_register();
     Register get_return_register() const;
+    Register previous_register() const;
+    Register current_register() const;
 
     const CompilationUnit* m_compilation_unit;
     ptr_t<IrFunction> m_current_ir_function;

@@ -44,6 +44,8 @@ class Interpreter {
     void jmp_nz(const Quad&);
     void push_arg(const Quad&);
     void pop_arg(const Quad&);
+    void save(const Quad&);
+    void restore(const Quad&);
     void call(const Quad&);
     void ret(const Quad&);
     void move(const Quad&);
@@ -65,4 +67,5 @@ class Interpreter {
     bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
     std::queue<ArgumentWrapper> m_arguments { };
+    std::stack<Operand> m_stack {};
 };

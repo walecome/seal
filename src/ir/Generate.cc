@@ -38,17 +38,22 @@ QuadCollection Generate::generate() {
 
     m_compilation_unit->for_each_function([&](auto function_decl) {
         m_current_ir_function = std::make_unique<IrFunction>(function_decl);
+        Register first_register = current_register();
         gen_function_decl(function_decl);
 
         ret.function_to_quad.insert(
             { m_current_ir_function->declaration()->function_id(),
               ret.quads.size() });
-        for (const Quad &quad : m_current_ir_function->quads()) {
-            for (unsigned label_id : quad.label_ids()) {
+        
+        m_current_ir_function->replace_prologue(
+            QuadSource { first_register }, QuadSource { previous_register() });
+        
+        m_current_ir_function->for_each_quad([&](Quad *quad) {
+            for (unsigned label_id : quad->label_ids()) {
                 ret.label_to_quad.insert({ label_id, ret.quads.size() });
             }
-            ret.quads.push_back(quad);
-        }
+            ret.quads.push_back(*quad);
+        });
 
         ir_program->add_function(m_current_ir_function);
     });
@@ -65,8 +70,9 @@ void Generate::gen_block(const Block *block) {
         if (auto x = dynamic_cast<Statement *>(node))
             gen_statement(x);
 
-        else if (auto x = dynamic_cast<FunctionDecl *>(node))
+        else if (auto x = dynamic_cast<FunctionDecl *>(node)) {
             gen_function_decl(x);
+        }
 
         else
             ASSERT_NOT_REACHED();
@@ -74,18 +80,21 @@ void Generate::gen_block(const Block *block) {
 }
 
 void Generate::gen_function_decl(const FunctionDecl *function_decl) {
+    env()->add_quad(OPCode::SAVE, {}, {}, {});
+    Register first_register = current_register();
+
     function_decl->parameter_list()->for_each_parameter([this](auto param) {
-        Register reg = env()->create_variable(param->identifier(), [this]() {
-            return this->create_register();
-        });
+        Register reg = env()->create_variable(
+            param->identifier(), [this]() { return this->create_register(); });
         env()->add_quad(OPCode::POP_ARG, QuadDest { reg }, {}, {});
     });
 
     gen_block(function_decl->body());
 
-    if (function_decl->type().is_void()) {
-        env()->add_quad(OPCode::RET, {}, {}, {});
-    }
+    env()->queue_label(env()->get_epilogue_label());
+    env()->add_quad(OPCode::RESTORE, {}, QuadSource { first_register },
+                    QuadSource { previous_register() });
+    env()->add_quad(OPCode::RET, {}, {}, {});
 }
 
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
@@ -174,7 +183,8 @@ void Generate::gen_return(const ReturnStatement *return_statement) {
     QuadSource source = gen_expression(return_statement->return_value());
     env()->add_quad(OPCode::MOVE, QuadDest { get_return_register() }, source,
                     {});
-    env()->add_quad(OPCode::RET, {}, QuadSource { get_return_register() }, {});
+    env()->add_quad(OPCode::JMP, QuadDest { env()->get_epilogue_label() }, {},
+                    {});
 }
 
 QuadSource Generate::gen_expression(const Expression *expression) {
@@ -217,7 +227,8 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
                     QuadSource { func }, {});
 
     Register result_reg = create_register();
-    env()->add_quad(OPCode::MOVE, QuadDest {result_reg}, QuadSource {get_return_register()}, {});
+    env()->add_quad(OPCode::MOVE, QuadDest { result_reg },
+                    QuadSource { get_return_register() }, {});
 
     return QuadSource { result_reg };
 }
@@ -474,3 +485,12 @@ ValueOperand Generate::create_string_literal(
 Register Generate::create_register() { return Register(m_register_count++); }
 
 Register Generate::get_return_register() const { return Register(0); }
+
+Register Generate::current_register() const {
+    return Register(m_register_count);
+}
+
+Register Generate::previous_register() const {
+    ASSERT(m_register_count > 0);
+    return Register(m_register_count - 1);
+}

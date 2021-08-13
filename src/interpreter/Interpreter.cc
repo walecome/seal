@@ -88,6 +88,12 @@ void Interpreter::interpret_function(unsigned function_id) {
             case OPCode::POP_ARG:
                 pop_arg(quad);
                 break;
+            case OPCode::SAVE:
+                save(quad);
+                break;
+            case OPCode::RESTORE:
+                restore(quad);
+                break;
             case OPCode::CALL:
                 call(quad);
                 break;
@@ -114,7 +120,7 @@ void Interpreter::interpret_function(unsigned function_id) {
                 break;
 
             default:
-                ASSERT_NOT_REACHED();
+                ASSERT_NOT_REACHED_MSG(fmt::format("Invalid OPCode: {}", opcode_to_string(quad.opcode())).c_str());
         }
 
         if (current_frame()->jump_performed()) {
@@ -289,6 +295,25 @@ void Interpreter::pop_arg(const Quad& quad) {
     set_register(quad.dest().as_register(), Operand { argument.value });
 }
 
+
+void Interpreter::save(const Quad& quad) {
+    int start_idx = quad.src_a().as_register().index();
+    int end_index = quad.src_b().as_register().index();
+    
+    for (int i = start_idx; i <= end_index; ++i) {
+        m_stack.push(m_registers.at(i));
+    }
+}
+
+void Interpreter::restore(const Quad& quad) {
+    int start_idx = quad.src_a().as_register().index();
+    int end_index = quad.src_b().as_register().index();
+    for (int i = end_index; i >= start_idx; --i) {
+        set_register(Register(i), m_stack.top());
+        m_stack.pop();
+    }
+}
+
 void Interpreter::call(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
 
@@ -315,7 +340,7 @@ void Interpreter::ret(const Quad& quad) {
     auto source = quad.src_a();
 
     if (current_frame()->is_main_frame()) {
-        ValueOperand value = resolve_source(source);
+        ValueOperand value = resolve_source(QuadSource { Register(0) });
         exit(value.as_int());
     }
 
