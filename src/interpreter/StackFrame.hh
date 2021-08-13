@@ -57,23 +57,13 @@ class StackFrame {
     bool m_jump_performed { false };
 };
 
-class ArgumentWrapper {
-   public:
-    ArgumentWrapper() = default;
+struct ArgumentWrapper {
+    ArgumentWrapper() = delete;
+    explicit ArgumentWrapper(ValueOperand value)
+        : identifier(std::nullopt), value(std::move(value)) {}
+    explicit ArgumentWrapper(std::string_view identifier, ValueOperand value)
+        : identifier(identifier), value(std::move(value)) {}
 
-    void add_named_argument(VariableOperand, ValueOperand);
-    void add_argument(ValueOperand);
-    const std::vector<ValueOperand>& value_vector() const;
-
-    template <class Callback>
-    void for_each_name_value(Callback callback) {
-        ASSERT(m_identifiers.size() == m_values.size());
-        for (unsigned i = 0; i < m_identifiers.size(); ++i) {
-            callback(m_identifiers[i], m_values[i]);
-        }
-    }
-
-   private:
-    std::vector<VariableOperand> m_identifiers {};
-    std::vector<ValueOperand> m_values {};
+    const std::optional<std::string_view> identifier;
+    const ValueOperand value;
 };

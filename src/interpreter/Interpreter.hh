@@ -4,6 +4,7 @@
 #include <optional>
 #include <stack>
 #include <vector>
+#include <queue>
 
 #include "interpreter/StackFrame.hh"
 #include "ir/Operand.hh"
@@ -42,6 +43,7 @@ class Interpreter {
     void jmp_z(const Quad&);
     void jmp_nz(const Quad&);
     void push_arg(const Quad&);
+    void pop_arg(const Quad&);
     void call(const Quad&);
     void ret(const Quad&);
     void move(const Quad&);
@@ -58,11 +60,9 @@ class Interpreter {
     void enter_new_frame();
     void exit_frame();
 
-    ArgumentWrapper take_arguments();
-
     const QuadCollection& m_quads;
     std::vector<Operand> m_registers;
     bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
-    std::optional<ArgumentWrapper> m_arguments { std::nullopt };
+    std::queue<ArgumentWrapper> m_arguments { };
 };

@@ -1,13 +1,3 @@
-fn main() -> int {
-
-    chars_printed := println(fib(20));
-
-    println("Printed ", chars_printed, " chars");
-
-    return 0;
-}
-
-
 fn fib(n : int) -> int {
     if (n == 0) {
         return 0;
@@ -18,3 +8,12 @@ fn fib(n : int) -> int {
 
     return fib(n - 1) + fib(n - 2);
 }
+
+fn main() -> int {
+
+    fib(2);
+
+    return 0;
+}
+
+

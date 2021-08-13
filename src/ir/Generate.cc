@@ -74,8 +74,12 @@ void Generate::gen_block(const Block *block) {
 }
 
 void Generate::gen_function_decl(const FunctionDecl *function_decl) {
-    function_decl->parameter_list()->for_each_parameter(
-        [this](auto param) { gen_variable_decl(param); });
+    function_decl->parameter_list()->for_each_parameter([this](auto param) {
+        Register reg = env()->create_variable(param->identifier(), [this]() {
+            return this->create_register();
+        });
+        env()->add_quad(OPCode::POP_ARG, QuadDest { reg }, {}, {});
+    });
 
     gen_block(function_decl->body());
 
@@ -199,8 +203,7 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
     func_call->argument_list()->for_each_enumerated_argument(
         [&](auto arg, unsigned) {
             auto arg_operand = gen_expression(arg);
-            env()->add_quad(OPCode::PUSH_ARG, QuadDest { create_register() },
-                            arg_operand, {});
+            env()->add_quad(OPCode::PUSH_ARG, {}, arg_operand, {});
         });
 
     auto function_id =
@@ -213,7 +216,10 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
     env()->add_quad(OPCode::CALL, QuadDest { get_return_register() },
                     QuadSource { func }, {});
 
-    return QuadSource { get_return_register() };
+    Register result_reg = create_register();
+    env()->add_quad(OPCode::MOVE, QuadDest {result_reg}, QuadSource {get_return_register()}, {});
+
+    return QuadSource { result_reg };
 }
 
 QuadSource Generate::gen_assign_expression(

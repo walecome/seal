@@ -1,5 +1,7 @@
 fn plusone(arg: int) -> int {
-  return arg + 1;
+  return_value := arg + 1;
+  println("Will return ", return_value);
+  return return_value;
 }
 
 fn main() -> int {

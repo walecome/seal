@@ -1,4 +1,5 @@
 #include <fmt/format.h>
+#include <vector>
 
 #include "Constants.hh"
 #include "Interpreter.hh"
@@ -84,6 +85,9 @@ void Interpreter::interpret_function(unsigned function_id) {
             case OPCode::PUSH_ARG:
                 push_arg(quad);
                 break;
+            case OPCode::POP_ARG:
+                pop_arg(quad);
+                break;
             case OPCode::CALL:
                 call(quad);
                 break;
@@ -143,8 +147,9 @@ ValueOperand Interpreter::resolve_source(const QuadSource& source) const {
     if (source.is_register()) {
         return resolve_register(source.as_register()).as_value();
     }
-    
-    ASSERT_NOT_REACHED_MSG(fmt::format("Invalid QuadSource type: {}", source.to_string()).c_str());
+
+    ASSERT_NOT_REACHED_MSG(
+        fmt::format("Invalid QuadSource type: {}", source.to_string()).c_str());
 }
 
 template <class BinaryOperator>
@@ -271,12 +276,17 @@ void Interpreter::jmp_nz(const Quad& quad) {
 void Interpreter::push_arg(const Quad& quad) {
     // TODO: Built-ins will break from this as they do not have parameter names
 
-    if (!m_arguments) {
-        m_arguments = ArgumentWrapper {};
-    }
-
     ValueOperand value = resolve_source(quad.src_a());
-    m_arguments.value().add_argument(value);
+    m_arguments.push(ArgumentWrapper { value });
+}
+
+void Interpreter::pop_arg(const Quad& quad) {
+    ASSERT(!m_arguments.empty());
+
+    ArgumentWrapper argument = m_arguments.front();
+    m_arguments.pop();
+
+    set_register(quad.dest().as_register(), Operand { argument.value });
 }
 
 void Interpreter::call(const Quad& quad) {
@@ -285,8 +295,12 @@ void Interpreter::call(const Quad& quad) {
     FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
-        ValueOperand ret = BuiltIn::call_builtin_function(
-            func, take_arguments().value_vector());
+        std::vector<ValueOperand> args {};
+        while (!m_arguments.empty()) {
+            args.push_back(m_arguments.front().value);
+            m_arguments.pop();
+        }
+        ValueOperand ret = BuiltIn::call_builtin_function(func, args);
         set_register(quad.dest().as_register(), Operand { ret });
         return;
     }
@@ -295,11 +309,6 @@ void Interpreter::call(const Quad& quad) {
 
     // Program counter will be incremented in interpret function
     current_frame()->set_program_counter(m_quads.function_to_quad.at(func) - 1);
-
-    take_arguments().for_each_name_value(
-        [&](VariableOperand var, ValueOperand value) {
-            current_frame()->set_variable(var, value);
-        });
 }
 
 void Interpreter::ret(const Quad& quad) {
@@ -312,7 +321,7 @@ void Interpreter::ret(const Quad& quad) {
 
     if (current_frame()->return_variable()) {
         exit_frame();
-        set_register(Register(0), Operand{resolve_source(source)});
+        set_register(Register(0), Operand { resolve_source(source) });
     } else {
         exit_frame();
     }
@@ -365,7 +374,7 @@ void Interpreter::index_assign(const Quad& quad) {
 void Interpreter::interpret_and(const Quad& quad) {
     ValueOperand lhs = resolve_source(quad.src_a());
     ValueOperand rhs = resolve_source(quad.src_b());
-    
+
     Operand result = Operand { ValueOperand {
         IntOperand { lhs.as_int() && rhs.as_int() } } };
 
@@ -391,15 +400,4 @@ void Interpreter::enter_new_frame() {
 void Interpreter::exit_frame() {
     // fmt::print("exit_frame()\n");
     m_stack_frames.pop();
-}
-
-ArgumentWrapper Interpreter::take_arguments() {
-    if (!m_arguments) {
-        return {};
-    }
-
-    ArgumentWrapper arguments = m_arguments.value();
-    m_arguments = std::nullopt;
-
-    return arguments;
 }
