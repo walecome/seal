@@ -120,7 +120,10 @@ void Interpreter::interpret_function(unsigned function_id) {
                 break;
 
             default:
-                ASSERT_NOT_REACHED_MSG(fmt::format("Invalid OPCode: {}", opcode_to_string(quad.opcode())).c_str());
+                ASSERT_NOT_REACHED_MSG(
+                    fmt::format("Invalid OPCode: {}",
+                                opcode_to_string(quad.opcode()))
+                        .c_str());
         }
 
         if (current_frame()->jump_performed()) {
@@ -295,11 +298,10 @@ void Interpreter::pop_arg(const Quad& quad) {
     set_register(quad.dest().as_register(), Operand { argument.value });
 }
 
-
 void Interpreter::save(const Quad& quad) {
     int start_idx = quad.src_a().as_register().index();
     int end_index = quad.src_b().as_register().index();
-    
+
     for (int i = start_idx; i <= end_index; ++i) {
         m_stack.push(m_registers.at(i));
     }
@@ -373,27 +375,25 @@ void bounds_check(VectorOperand::value_type_t vec, int index) {
 }
 
 void Interpreter::index_move(const Quad& quad) {
-    ASSERT_NOT_REACHED();
-    // int index = current_frame()->resolve_operand(quad.src_b()).as_int();
-    // VectorOperand::value_type_t indexed =
-    //     current_frame()->resolve_operand(quad.src_a()).as_vector();
+    int index = resolve_source(quad.src_b()).as_int();
+    VectorOperand::value_type_t indexed =
+        resolve_source(quad.src_a()).as_vector();
 
-    // bounds_check(indexed, index);
+    bounds_check(indexed, index);
 
-    // ValueOperand value = indexed->at(index);
-    // current_frame()->set_variable(quad.dest().as_variable(), value);
+    ValueOperand value = indexed->at(index);
+    set_register(quad.dest().as_register(), Operand { value });
 }
 
 void Interpreter::index_assign(const Quad& quad) {
-    ASSERT_NOT_REACHED();
-    // int index = current_frame()->resolve_operand(quad.src_a()).as_int();
-    // VectorOperand::value_type_t indexed =
-    //     current_frame()->resolve_operand(quad.dest()).as_vector();
+    int index = resolve_source(quad.src_a()).as_int();
+    VectorOperand::value_type_t indexed =
+        resolve_source(QuadSource { quad.dest().as_register() }).as_vector();
 
-    // ValueOperand value = current_frame()->resolve_operand(quad.src_b());
+    ValueOperand value = resolve_source(quad.src_b());
 
-    // bounds_check(indexed, index);
-    // indexed->at(index) = value;
+    bounds_check(indexed, index);
+    indexed->at(index) = value;
 }
 
 void Interpreter::interpret_and(const Quad& quad) {

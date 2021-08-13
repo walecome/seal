@@ -1,6 +1,7 @@
 #include "Generate.hh"
 #include "IrFunction.hh"
 #include "OperandType.hh"
+#include "QuadDest.hh"
 #include "Register.hh"
 #include "ast/ArrayLiteral.hh"
 #include "ast/AssignExpression.hh"
@@ -251,15 +252,15 @@ QuadSource Generate::gen_assign_expression(
     // TODO: Not sure if this should be done here or somewhere else. The
     // IndexExpression in not evaluated not, which is kind of counter
     // intuitive...
-    // IndexExpression *index_expr =
-    //     dynamic_cast<IndexExpression *>(assign_expr->left());
+    IndexExpression *index_expr =
+        dynamic_cast<IndexExpression *>(assign_expr->left());
 
-    // if (index_expr) {
-    //     Operand indexed = gen_expression(index_expr->indexed_expression());
-    //     Operand index = gen_expression(index_expr->index());
-    //     env()->add_quad(OPCode::INDEX_ASSIGN, indexed, index, right);
-    //     return right;
-    // }
+    if (index_expr) {
+        Register indexed = gen_expression(index_expr->indexed_expression()).as_register();
+        QuadSource index = gen_expression(index_expr->index());
+        env()->add_quad(OPCode::INDEX_ASSIGN, QuadDest{ indexed }, index, right);
+        return right;
+    }
 
     ASSERT_NOT_REACHED();
 }
@@ -382,16 +383,13 @@ QuadSource Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
 }
 
 QuadSource Generate::gen_index_expression(const IndexExpression *expr) {
-    // Operand indexed = gen_expression(expr->indexed_expression());
-    // Operand index = gen_expression(expr->index());
-    // Operand result = env()->create_tmp_variable();
+    QuadSource indexed = gen_expression(expr->indexed_expression());
+    QuadSource index = gen_expression(expr->index());
+    Register result = create_register();
 
-    // env()->add_quad(OPCode::INDEX_MOVE, result, indexed, index);
+    env()->add_quad(OPCode::INDEX_MOVE, QuadDest {result}, indexed, index);
 
-    // return result;
-    // TODO: Implement
-    ASSERT_NOT_REACHED();
-    return QuadSource { create_register() };
+    return QuadSource {result};
 }
 
 ValueOperand Generate::create_literal(const Literal *literal) {
