@@ -3,6 +3,7 @@ fn plusone(arg: int) -> int {
 }
 
 fn main() -> int {
-  six: int = plusone(5);
+  five := 5;
+  six: int = plusone(five);
   return six - 6;
 }
