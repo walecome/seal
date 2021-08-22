@@ -1,3 +1,5 @@
+#include <fmt/format.h>
+
 #include "FunctionDecl.hh"
 #include "builtin/BuiltIn.hh"
 
@@ -8,7 +10,8 @@ int new_function_id() {
 
 void FunctionDecl::analyze(Scope *scope) {
     if (!scope->is_top_level()) {
-        scope->add_function(this);
+        error::add_semantic_error(
+            fmt::format("Nested function \"{}\" not allowed", identifier()), source_ref);
     }
 
     ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope, this);

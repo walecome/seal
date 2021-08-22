@@ -44,12 +44,7 @@ fn unary_test() -> int {
 
 fn top_level_func() -> int {
 
-    fn nested_func(val : int) -> int {
-
-        return val + 10;
-    }
-
-    return nested_func(10);
+    return 10;
 }
 
 fn assert(value : bool, desc : string) -> void {
