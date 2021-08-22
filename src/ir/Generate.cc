@@ -90,7 +90,7 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
         env()->add_quad(OPCode::POP_ARG, QuadDest { reg }, {}, {});
     });
 
-    gen_block(function_decl->body());
+    // gen_block(function_decl->body());
 
     env()->queue_label(env()->get_epilogue_label());
     env()->add_quad(OPCode::RESTORE, {}, QuadSource { first_register },

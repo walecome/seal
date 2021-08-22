@@ -63,7 +63,8 @@
     __ENUMERATE_TOKEN(TYPE)         \
     __ENUMERATE_TOKEN(BOOL)         \
     __ENUMERATE_TOKEN(FUNC_CALL)    \
-    __ENUMERATE_TOKEN(MUTABLE)
+    __ENUMERATE_TOKEN(MUTABLE)      \
+    __ENUMERATE_TOKEN(IN_KEYWORD)
 
 enum TokenType {
 #undef __ENUMERATE_TOKEN
@@ -96,10 +97,10 @@ static std::unordered_map<std::string_view, TokenType> string_token_map {
 };
 
 static std::unordered_map<std::string_view, TokenType> keyword_map {
-    { "fn", FUNC_KEYWORD }, { "if", IF },       { "else", ELSE },
-    { "elsif", ELSE_IF },   { "while", WHILE }, { "return", RETURN },
-    { "mut", MUTABLE },     { "true", BOOL },   { "false", BOOL },
-    { "for", FOR }
+    { "fn", FUNC_KEYWORD }, { "if", IF },        { "else", ELSE },
+    { "elsif", ELSE_IF },   { "while", WHILE },  { "return", RETURN },
+    { "mut", MUTABLE },     { "true", BOOL },    { "false", BOOL },
+    { "for", FOR },         { "in", IN_KEYWORD }
 };
 
 struct Token {

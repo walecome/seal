@@ -1,5 +1,8 @@
+#include <memory>
 #include "Parser.hh"
 #include "ast/FunctionDecl.hh"
+#include "ast/FunctionDeclC.hh"
+#include "ast/FunctionDeclUser.hh"
 #include "ast/ParameterList.hh"
 #include "ast/VariableDecl.hh"
 
@@ -19,13 +22,48 @@ ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
 
     Type type = parse_type(tokens);
 
+    if (tokens.can_pop(TokenType::IN_KEYWORD)) {
+        return parse_c_function_decl(tokens, begin, identifier, parameters, type);
+    } else {
+        return parse_user_function_decl(tokens, begin, identifier, parameters, type);
+    }
+}
+
+ptr_t<FunctionDeclC> Parser::parse_c_function_decl(
+    TokenBuffer &tokens, TokenBuffer::Iterator begin, std::string_view identifier,
+    ptr_t<ParameterList> &parameters, Type type) {
+
+    tokens.eat(TokenType::IN_KEYWORD);
+    if (!tokens.can_pop(TokenType::STRING)) {
+        return nullptr;
+    }
+    auto lib_name_quoted = tokens.top().value;
+    std::string_view lib_name = lib_name_quoted;
+    lib_name.remove_prefix(1);
+    lib_name.remove_suffix(1);
+    tokens.expect(TokenType::STRING);
+    
+    auto end = tokens.top_iterator();
+    auto function_decl = std::make_unique<FunctionDeclC>(identifier, parameters, type, lib_name);
+
+    function_decl->source_ref.begin = begin;
+    function_decl->source_ref.end = end;
+
+    return function_decl;
+    
+}
+
+ptr_t<FunctionDeclUser> Parser::parse_user_function_decl(
+    TokenBuffer &tokens, TokenBuffer::Iterator begin, std::string_view identifier,
+    ptr_t<ParameterList> &parameters, Type type) {
+
     ptr_t<Block> body = parse_block(tokens);
     // @TODO: Probably throw an error here
     if (!body) return nullptr;
 
     auto end = tokens.top_iterator();
     auto function_decl =
-        std::make_unique<FunctionDecl>(identifier, parameters, body, type);
+        std::make_unique<FunctionDeclUser>(identifier, parameters, type, body);
 
     function_decl->source_ref.begin = begin;
     function_decl->source_ref.end = end;

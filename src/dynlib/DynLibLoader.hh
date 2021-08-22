@@ -10,7 +10,7 @@
 namespace dynlib {
 class DynamicLibrary;
 
-Result<ptr_t<DynamicLibrary>> load_lib(const std::string& filename,
+Result<DynamicLibrary*> load_lib(const std::string& filename,
                                        bool verbose = false);
 
 class DynamicLibrary {
@@ -23,6 +23,12 @@ class DynamicLibrary {
         void* (*f)(...);
         *(void**)(&f) = dlsym(m_handle, func.c_str());
         f(args...);
+    }
+    
+    bool has_symbol(const std::string& func) {
+        void* (*f)(...);
+        *(void**)(&f) = dlsym(m_handle, func.c_str());
+        return f != NULL;
     }
 
    private:

@@ -1,24 +1,13 @@
 #include <fmt/format.h>
 
-#include "FunctionDecl.hh"
+#include "FunctionDeclUser.hh"
 #include "builtin/BuiltIn.hh"
 
-int new_function_id() {
-    static int function_id = BuiltIn::number_of_builtins();
-    return function_id++;
+void FunctionDeclUser::analyze(Scope *scope) {
+    FunctionDecl::analyze(scope);
 }
 
-void FunctionDecl::analyze(Scope *scope) {
-    if (!scope->is_top_level()) {
-        error::add_semantic_error(
-            fmt::format("Nested function \"{}\" not allowed", identifier()), source_ref);
-    }
-
-    ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope, this);
-    m_parameter_list->analyze(inner_scope.get());
-}
-
-std::string FunctionDecl::dump(unsigned indent) const {
+std::string FunctionDeclUser::dump(unsigned indent) const {
     std::ostringstream oss {};
 
     oss << util::indent(indent) << name() << " (id=" << m_id << ") "
@@ -30,6 +19,7 @@ std::string FunctionDecl::dump(unsigned indent) const {
     else
         oss << util::indent(indent + 1) << "EMPTY PARAMETERLIST" << std::endl;
     oss << util::indent(indent + 1) << m_type.dump(0) << std::endl;
+    oss << m_body->dump(indent + 1) << std::endl;
     oss << util::indent(indent) << ")";
 
     return oss.str();

@@ -13,6 +13,8 @@ add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
     For.cc
     FunctionCall.cc
     FunctionDecl.cc
+    FunctionDeclC.cc
+    FunctionDeclUser.cc
     IfStatement.cc
     IndexExpression.cc
     IntegerLiteral.cc

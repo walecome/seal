@@ -19,25 +19,21 @@ class FunctionDecl : public Node {
 
    public:
     FunctionDecl(const std::string_view identifier,
-                 ptr_t<ParameterList> &parameters, ptr_t<Block> &body,
-                 const Type type)
+                 ptr_t<ParameterList> &parameters, const Type type)
         : m_identifier { identifier },
           m_parameter_list { std::move(parameters) },
-          m_body { std::move(body) },
           m_type { type },
           m_id { new_function_id() } {}
 
     const auto &identifier() const { return m_identifier; }
     auto parameter_list() const { return m_parameter_list.get(); }
-    auto body() const { return m_body.get(); }
     const auto &type() const { return m_type; }
 
     int function_id() const { return m_id; }
 
-   private:
+   protected:
     const std::string_view m_identifier;
     ptr_t<ParameterList> m_parameter_list;
-    ptr_t<Block> m_body;
     Type m_type;
     int m_id;
 };

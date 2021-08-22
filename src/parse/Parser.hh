@@ -19,6 +19,8 @@ class Block;
 class Expression;
 class FunctionCall;
 class FunctionDecl;
+class FunctionDeclC;
+class FunctionDeclUser;
 class IfStatement;
 class IntegerLiteral;
 class Node;
@@ -54,6 +56,13 @@ class Parser {
     ptr_t<Expression> parse_unary(TokenBuffer &tokens);
     ptr_t<For> parse_for(TokenBuffer &tokens);
     ptr_t<FunctionDecl> parse_function_decl(TokenBuffer &tokens);
+    ptr_t<FunctionDeclC> parse_c_function_decl(TokenBuffer &tokens, TokenBuffer::Iterator begin,
+                                               std::string_view identifier,
+                                               ptr_t<ParameterList> &parameters,
+                                               Type type);
+    ptr_t<FunctionDeclUser> parse_user_function_decl(
+        TokenBuffer &tokens, TokenBuffer::Iterator begin, std::string_view identifier,
+        ptr_t<ParameterList> &parameters, Type type);
     ptr_t<IfStatement> parse_if_statement(TokenBuffer &tokens);
     ptr_t<ParameterList> parse_parameter_list(TokenBuffer &tokens);
     ptr_t<ReturnStatement> parse_return_statement(TokenBuffer &tokens);
