@@ -15,7 +15,6 @@ class FunctionDecl : public Node {
 
     AST_NODE_NAME(FunctionDecl)
     AST_DUMPABLE()
-    AST_ANALYZABLE()
 
    public:
     FunctionDecl(const std::string_view identifier,

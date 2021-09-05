@@ -8,16 +8,6 @@ int new_function_id() {
     return function_id++;
 }
 
-void FunctionDecl::analyze(Scope *scope) {
-    if (!scope->is_top_level()) {
-        error::add_semantic_error(
-            fmt::format("Nested function \"{}\" not allowed", identifier()), source_ref);
-    }
-
-    ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope, this);
-    m_parameter_list->analyze(inner_scope.get());
-}
-
 std::string FunctionDecl::dump(unsigned indent) const {
     std::ostringstream oss {};
 

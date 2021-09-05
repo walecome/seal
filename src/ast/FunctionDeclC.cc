@@ -9,7 +9,11 @@
 #include "dynlib/DynLib.hh"
 
 void FunctionDeclC::analyze(Scope* scope) {
-    FunctionDecl::analyze(scope);
+    if (!scope->is_top_level()) {
+        error::add_semantic_error(
+            fmt::format("Nested function \"{}\" not allowed", identifier()), source_ref);
+    }
+
     auto lib_or_error = dynlib::load_lib(std::string(m_lib_name), false);
     if (lib_or_error.is_error()) {
         error::add_semantic_error(
@@ -23,6 +27,10 @@ void FunctionDeclC::analyze(Scope* scope) {
             fmt::format("Unable to find symbol \"{}\" in shared library \"{}\"",
                         identifier(), m_lib_name));
     }
+    
+    
+    ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope, this);
+    m_parameter_list->analyze(inner_scope.get());
 }
 
 std::string_view FunctionDeclC::lib_name() const {

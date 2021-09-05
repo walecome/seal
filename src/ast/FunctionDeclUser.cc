@@ -4,8 +4,15 @@
 #include "builtin/BuiltIn.hh"
 
 void FunctionDeclUser::analyze(Scope *scope) {
-    FunctionDecl::analyze(scope);
-    m_body->analyze(scope);
+    if (!scope->is_top_level()) {
+        error::add_semantic_error(
+            fmt::format("Nested function \"{}\" not allowed", identifier()), source_ref);
+    }
+
+    ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope, this);
+
+    m_parameter_list->analyze(inner_scope.get());
+    m_body->analyze(inner_scope.get());
 }
 
 std::string FunctionDeclUser::dump(unsigned indent) const {

@@ -2,6 +2,7 @@
 #include "IrFunction.hh"
 #include "OperandType.hh"
 #include "QuadDest.hh"
+#include "QuadSource.hh"
 #include "Register.hh"
 #include "ast/ArrayLiteral.hh"
 #include "ast/AssignExpression.hh"
@@ -225,6 +226,18 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
 
     Register result_reg = create_register();
 
+    bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
+
+    if (is_builtin) {
+        unsigned function_id = BuiltIn::function_id_from_identifier(func_call->identifier());
+        FunctionOperand func = env()->create_function_from_id(function_id);
+        env()->add_quad(OPCode::CALL, QuadDest{get_return_register()}, QuadSource {func}, {});
+        env()->add_quad(OPCode::MOVE, QuadDest { result_reg },
+                        QuadSource { get_return_register() }, {});
+        return QuadSource {result_reg};
+    }
+    
+
     FunctionDecl *decl = func_call->declaration();
 
     auto get_function_dest = [&]() -> QuadDest {
@@ -238,14 +251,8 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
         env()->add_quad(OPCode::CALL_C, get_function_dest(), QuadSource { lib },
                         QuadSource { func });
     } else {
-        bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
-        auto function_id =
-            is_builtin
-                ? BuiltIn::function_id_from_identifier(func_call->identifier())
-                : func_call->declaration()->function_id();
-
+        auto function_id = func_call->declaration()->function_id();
         FunctionOperand func = env()->create_function_from_id(function_id);
-
         env()->add_quad(OPCode::CALL, get_function_dest(), QuadSource { func },
                         {});
     }
