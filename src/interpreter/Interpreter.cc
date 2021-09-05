@@ -1,9 +1,15 @@
 #include <fmt/format.h>
+#include <string_view>
 #include <vector>
 
 #include "Constants.hh"
+#include "CTypeWrapper.hh"
 #include "Interpreter.hh"
+#include "OPCode.hh"
 #include "builtin/BuiltIn.hh"
+#include "dynlib/DynLibLoader.hh"
+#include "dynlib/DynLib.hh"
+#include "fmt/core.h"
 #include "ir/QuadCollection.hh"
 
 void runtime_error(const std::string& message) {
@@ -96,6 +102,9 @@ void Interpreter::interpret_function(unsigned function_id) {
                 break;
             case OPCode::CALL:
                 call(quad);
+                break;
+            case OPCode::CALL_C:
+                call_c(quad);
                 break;
             case OPCode::RET:
                 ret(quad);
@@ -338,6 +347,21 @@ void Interpreter::call(const Quad& quad) {
     current_frame()->set_program_counter(m_quads.function_to_quad.at(func) - 1);
 }
 
+void Interpreter::call_c(const Quad& quad) {
+    ASSERT(quad.opcode() == OPCode::CALL_C);
+    
+    std::vector<ValueOperand> args {};
+    while (!m_arguments.empty()) {
+        args.push_back(m_arguments.front().value);
+        m_arguments.pop();
+    }
+    
+    std::string_view lib = quad.src_a().as_value().as_string();
+    std::string_view func = quad.src_b().as_value().as_string();
+
+    call_c_func(lib, func, args);
+}
+
 void Interpreter::ret(const Quad& quad) {
     auto source = quad.src_a();
 
@@ -425,4 +449,39 @@ void Interpreter::enter_new_frame() {
 void Interpreter::exit_frame() {
     // fmt::print("exit_frame()\n");
     m_stack_frames.pop();
+}
+
+void Interpreter::call_c_func(std::string_view lib, std::string_view func, const std::vector<ValueOperand>& args) {
+    Result<dynlib::DynamicLibrary*> loaded_lib_or_error = dynlib::load_lib(std::string(lib));
+    if (loaded_lib_or_error.is_error()) {
+        ASSERT_NOT_REACHED_MSG("Could not load expected library");
+    }
+
+    dynlib::DynamicLibrary* loaded_lib = loaded_lib_or_error.get();
+    ASSERT(loaded_lib->has_symbol(std::string(func)));
+    dynlib::DynamicLibrary::Callable callable = loaded_lib->get_callable(std::string(func));
+    
+    std::vector<ptr_t<vm::CTypeWrapper>> wrapped_args;
+    for (const ValueOperand& op : args) {
+        wrapped_args.push_back(vm::CTypeWrapper::from(op));
+    }
+    
+    auto arg = [&] (int idx) {
+        return wrapped_args[idx]->to_arg();
+    };
+
+    switch (wrapped_args.size()) {
+        case 0:
+            callable.call();
+            break;
+        case 1:
+            callable.call(arg(0));
+            break;
+        case 2:
+            callable.call(arg(0), arg(1));
+            break;
+
+        default:
+            ASSERT_NOT_REACHED_MSG(fmt::format("Unsupported number of arguments passed to C function: {}", wrapped_args.size()));
+    }
 }

@@ -22,6 +22,7 @@
     __ENUMERATE_OPCODE(SAVE)         \
     __ENUMERATE_OPCODE(RESTORE)      \
     __ENUMERATE_OPCODE(CALL)         \
+    __ENUMERATE_OPCODE(CALL_C)       \
     __ENUMERATE_OPCODE(RET)          \
     __ENUMERATE_OPCODE(MOVE)         \
     __ENUMERATE_OPCODE(INDEX_MOVE)   \

@@ -47,6 +47,7 @@ class Interpreter {
     void save(const Quad&);
     void restore(const Quad&);
     void call(const Quad&);
+    void call_c(const Quad&);
     void ret(const Quad&);
     void move(const Quad&);
     void index_move(const Quad&);
@@ -56,7 +57,8 @@ class Interpreter {
     void interpret_or(const Quad&);
     
     unsigned resolve_label(const QuadDest& dest) const;
-
+    void call_c_func(std::string_view lib, std::string_view func,
+                 const std::vector<ValueOperand>& args);
 
     StackFrame* current_frame();
     void enter_new_frame();

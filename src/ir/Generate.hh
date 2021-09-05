@@ -36,6 +36,8 @@ class CompilationUnit;
 
 class IrProgram;
 class FunctionDecl;
+class FunctionDeclUser;
+class FunctionDeclC;
 
 class Generate {
     MAKE_NONMOVABLE(Generate)
@@ -52,6 +54,8 @@ class Generate {
     void gen_block(const Block*);
     void gen_statement(const Statement*);
     void gen_function_decl(const FunctionDecl*);
+    void gen_user_function_decl(const FunctionDeclUser*);
+    void gen_c_function_decl(const FunctionDeclC*);
 
     void gen_variable_decl(const VariableDecl*);
     void gen_if_statement(const IfStatement*);

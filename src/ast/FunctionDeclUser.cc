@@ -5,6 +5,7 @@
 
 void FunctionDeclUser::analyze(Scope *scope) {
     FunctionDecl::analyze(scope);
+    m_body->analyze(scope);
 }
 
 std::string FunctionDeclUser::dump(unsigned indent) const {

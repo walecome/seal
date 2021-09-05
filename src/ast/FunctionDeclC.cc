@@ -1,10 +1,12 @@
 #include <fmt/format.h>
+#include <string_view>
 
 #include "Error.hh"
 #include "FunctionDeclC.hh"
 #include "Scope.hh"
 #include "builtin/BuiltIn.hh"
 #include "dynlib/DynLibLoader.hh"
+#include "dynlib/DynLib.hh"
 
 void FunctionDeclC::analyze(Scope* scope) {
     FunctionDecl::analyze(scope);
@@ -21,6 +23,10 @@ void FunctionDeclC::analyze(Scope* scope) {
             fmt::format("Unable to find symbol \"{}\" in shared library \"{}\"",
                         identifier(), m_lib_name));
     }
+}
+
+std::string_view FunctionDeclC::lib_name() const {
+    return m_lib_name;
 }
 
 std::string FunctionDeclC::dump(unsigned indent) const {

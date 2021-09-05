@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <string_view>
 #include <vector>
 
 #include "Block.hh"
@@ -22,6 +23,8 @@ class FunctionDeclC : public FunctionDecl {
                      ptr_t<ParameterList>& parameters, const Type type,
                      const std::string_view lib_name)
         : FunctionDecl(identifier, parameters, type), m_lib_name(lib_name) {}
+
+    std::string_view lib_name() const;
 
    private:
    const std::string_view m_lib_name;

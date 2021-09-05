@@ -1,4 +1,5 @@
 #include "DynLibLoader.hh"
+#include "DynLib.hh"
 
 #include <dlfcn.h>
 #include <fmt/format.h>

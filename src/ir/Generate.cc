@@ -15,6 +15,8 @@
 #include "ast/For.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/FunctionDecl.hh"
+#include "ast/FunctionDeclC.hh"
+#include "ast/FunctionDeclUser.hh"
 #include "ast/IfStatement.hh"
 #include "ast/IndexExpression.hh"
 #include "ast/IntegerLiteral.hh"
@@ -45,10 +47,10 @@ QuadCollection Generate::generate() {
         ret.function_to_quad.insert(
             { m_current_ir_function->declaration()->function_id(),
               ret.quads.size() });
-        
+
         m_current_ir_function->replace_prologue(
             QuadSource { first_register }, QuadSource { previous_register() });
-        
+
         m_current_ir_function->for_each_quad([&](Quad *quad) {
             for (unsigned label_id : quad->label_ids()) {
                 ret.label_to_quad.insert({ label_id, ret.quads.size() });
@@ -90,12 +92,18 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
         env()->add_quad(OPCode::POP_ARG, QuadDest { reg }, {}, {});
     });
 
-    // gen_block(function_decl->body());
+    if (auto x = dynamic_cast<const FunctionDeclUser *>(function_decl)) {
+        gen_user_function_decl(x);
+    }
 
     env()->queue_label(env()->get_epilogue_label());
     env()->add_quad(OPCode::RESTORE, {}, QuadSource { first_register },
                     QuadSource { previous_register() });
     env()->add_quad(OPCode::RET, {}, {}, {});
+}
+
+void Generate::gen_user_function_decl(const FunctionDeclUser *decl) {
+    gen_block(decl->body());
 }
 
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
@@ -208,8 +216,6 @@ QuadSource Generate::gen_expression(const Expression *expression) {
 }
 
 QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
-    bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
-
     // Push arguments
     func_call->argument_list()->for_each_enumerated_argument(
         [&](auto arg, unsigned) {
@@ -217,19 +223,36 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
             env()->add_quad(OPCode::PUSH_ARG, {}, arg_operand, {});
         });
 
-    auto function_id =
-        is_builtin
-            ? BuiltIn::function_id_from_identifier(func_call->identifier())
-            : func_call->declaration()->function_id();
-
-    FunctionOperand func = env()->create_function_from_id(function_id);
-
-    env()->add_quad(OPCode::CALL, QuadDest { get_return_register() },
-                    QuadSource { func }, {});
-
     Register result_reg = create_register();
-    env()->add_quad(OPCode::MOVE, QuadDest { result_reg },
-                    QuadSource { get_return_register() }, {});
+
+    FunctionDecl *decl = func_call->declaration();
+
+    auto get_function_dest = [&]() -> QuadDest {
+        return decl->type().is_void() ? QuadDest {}
+                                      : QuadDest { get_return_register() };
+    };
+
+    if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
+        ValueOperand lib = env()->create_immediate_string(x->lib_name());
+        ValueOperand func = env()->create_immediate_string(x->identifier());
+        env()->add_quad(OPCode::CALL_C, get_function_dest(), QuadSource { lib },
+                        QuadSource { func });
+    } else {
+        bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
+        auto function_id =
+            is_builtin
+                ? BuiltIn::function_id_from_identifier(func_call->identifier())
+                : func_call->declaration()->function_id();
+
+        FunctionOperand func = env()->create_function_from_id(function_id);
+
+        env()->add_quad(OPCode::CALL, get_function_dest(), QuadSource { func },
+                        {});
+    }
+    if (!decl->type().is_void()) {
+        env()->add_quad(OPCode::MOVE, QuadDest { result_reg },
+                        QuadSource { get_return_register() }, {});
+    }
 
     return QuadSource { result_reg };
 }
@@ -256,9 +279,11 @@ QuadSource Generate::gen_assign_expression(
         dynamic_cast<IndexExpression *>(assign_expr->left());
 
     if (index_expr) {
-        Register indexed = gen_expression(index_expr->indexed_expression()).as_register();
+        Register indexed =
+            gen_expression(index_expr->indexed_expression()).as_register();
         QuadSource index = gen_expression(index_expr->index());
-        env()->add_quad(OPCode::INDEX_ASSIGN, QuadDest{ indexed }, index, right);
+        env()->add_quad(OPCode::INDEX_ASSIGN, QuadDest { indexed }, index,
+                        right);
         return right;
     }
 
@@ -387,9 +412,9 @@ QuadSource Generate::gen_index_expression(const IndexExpression *expr) {
     QuadSource index = gen_expression(expr->index());
     Register result = create_register();
 
-    env()->add_quad(OPCode::INDEX_MOVE, QuadDest {result}, indexed, index);
+    env()->add_quad(OPCode::INDEX_MOVE, QuadDest { result }, indexed, index);
 
-    return QuadSource {result};
+    return QuadSource { result };
 }
 
 ValueOperand Generate::create_literal(const Literal *literal) {
