@@ -35,7 +35,13 @@ target_link_libraries(${PROJECT_NAME} PUBLIC fmt::fmt-header-only)
 
 target_compile_features(${PROJECT_NAME} PUBLIC)
 
+find_library(libffi_location NAMES libffi.so)
+message(STATUS ${libffi_location})
 
+add_library(ffi SHARED IMPORTED)
+set_target_properties(ffi PROPERTIES IMPORTED_LOCATION ${libffi_location})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC ffi)
 
 # Force colored output (mostly needed for Ninja build)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
