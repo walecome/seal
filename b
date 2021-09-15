@@ -17,6 +17,7 @@ function clean {
 }
 
 function configure {
+    clean
     cd $SCRIPT_DIR
     mkdir -p $BUILD_DIR
     cd $BUILD_DIR
