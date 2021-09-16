@@ -6,12 +6,15 @@
 #include <unordered_map>
 #include <utility>
 
+#include "ffi.h"
+
 #include "Constants.hh"
 #include "Result.hh"
+#include "CTypeWrapper.hh"
 
 namespace dynlib {
 class DynamicLibrary {
-    using CFunctionType = void* (*)(...);
+    using CFunctionType = void (*)(void);
 
    public:
     DynamicLibrary(void* handle) : m_handle(handle) {}
@@ -21,9 +24,27 @@ class DynamicLibrary {
     public:
         Callable() = default;
 
-        template <class... Args>
-        void call(Args... args) {
-            m_func(args...);
+        void call() {
+            throw 1;
+        }
+
+        template <std::size_t N>
+        void call(vm::CResultWrapper& wrapper, std::vector<ptr_t<vm::CTypeWrapper>>& values) {
+            ffi_cif cif;
+            ffi_type *arg_types[N];
+            void *arg_values[N];
+
+            for (std::size_t i = 0; i < N; ++i) {
+                arg_types[i] = &values[i]->get_type();
+                arg_values[i] = values[i]->get_value();
+            }
+
+            ffi_status status = ffi_prep_cif(&cif, FFI_DEFAULT_ABI, N, &wrapper.type(), arg_types);
+            if (status != FFI_OK) {
+                throw 1;
+            }
+
+            ffi_call(&cif, FFI_FN(m_func), wrapper.buffer(), arg_values);
         }
 
        private:

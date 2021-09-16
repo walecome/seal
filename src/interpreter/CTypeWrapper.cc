@@ -1,3 +1,5 @@
+#include <type_traits>
+
 #include "CTypeWrapper.hh"
 #include <memory>
 #include <string_view>
@@ -6,28 +8,57 @@
 namespace vm {
 
 namespace {
+
 class CIntWrapper : public CTypeWrapper {
    public:
-    CIntWrapper(unsigned long value) : m_value(value) {}
 
-    void* to_arg() const override { return reinterpret_cast<void*>(m_value); }
+    explicit CIntWrapper(unsigned long value) : CTypeWrapper(ffi_type_uint64), m_value(value) {}
+
+    void* get_value() override {
+        return &m_value;
+    }
 
    private:
-    const unsigned long m_value;
+     unsigned long m_value;
 };
 
 class CStringWrapper : public CTypeWrapper {
    public:
-    CStringWrapper(std::string_view value) : m_value(std::string(value)) {}
+    explicit CStringWrapper(std::string_view value) : CTypeWrapper(ffi_type_pointer), m_value_buffer(alloc_string(value)) {
+        m_value = m_value_buffer.get();
+        ASSERT(m_value == value);
+    }
 
-    void* to_arg() const override {
-        return const_cast<void*>(
-            reinterpret_cast<const void*>(m_value.c_str()));
+    void* get_value() override {
+        return &m_value;
     }
 
    private:
-    const std::string m_value;
+    std::unique_ptr<char[]> alloc_string(std::string_view input) {
+        auto ptr = std::unique_ptr<char[]>(new char[input.size() + 1]);
+        for (std::size_t i = 0; i < input.size(); ++i) {
+            ptr.get()[i] = std::move(input[i]);
+        }
+        ptr.get()[input.size()] = '\0';
+        return ptr;
+    }
+
+    std::unique_ptr<char[]> m_value_buffer;
+    char* m_value;
 };
+
+class CRealWrapper : public CTypeWrapper {
+    public:
+    explicit CRealWrapper(double value) : CTypeWrapper(ffi_type_double), m_value(value) {}
+
+    void* get_value() override {
+        return &m_value;
+    }
+
+    private:
+        double m_value;
+};
+
 
 }  // namespace
 
@@ -36,7 +67,7 @@ ptr_t<CTypeWrapper> CTypeWrapper::from(ValueOperand value_operand) {
         return std::make_unique<CIntWrapper>(value_operand.as_int());
     }
     if (value_operand.is_real()) {
-        ASSERT_NOT_REACHED_MSG("C real type not supported yet");
+        return std::make_unique<CRealWrapper>(value_operand.as_real());
     }
     if (value_operand.is_string()) {
         return std::make_unique<CStringWrapper>(value_operand.as_string());

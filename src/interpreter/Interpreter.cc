@@ -1,3 +1,4 @@
+#include <array>
 #include <fmt/format.h>
 #include <string_view>
 #include <vector>
@@ -11,6 +12,7 @@
 #include "dynlib/DynLib.hh"
 #include "fmt/core.h"
 #include "ir/QuadCollection.hh"
+#include "types/CType.hh"
 
 void runtime_error(const std::string& message) {
     fmt::print("{}\n", message);
@@ -105,6 +107,9 @@ void Interpreter::interpret_function(unsigned function_id) {
                 break;
             case OPCode::CALL_C:
                 call_c(quad);
+                break;
+            case OPCode::SET_RET_TYPE:
+                set_ret_type(quad);
                 break;
             case OPCode::RET:
                 ret(quad);
@@ -355,11 +360,19 @@ void Interpreter::call_c(const Quad& quad) {
         args.push_back(m_arguments.front().value);
         m_arguments.pop();
     }
-    
+
     std::string_view lib = quad.src_a().as_value().as_string();
     std::string_view func = quad.src_b().as_value().as_string();
+    std::optional<ValueOperand> return_value = call_c_func(lib, func, args, take_pending_type_id());
 
-    call_c_func(lib, func, args);
+    if (return_value.has_value()) {
+        set_register(quad.dest().as_register(), Operand { return_value.value() });
+    }
+}
+
+void Interpreter::set_ret_type(const Quad& quad) {
+    ASSERT(quad.opcode() == OPCode::SET_RET_TYPE);
+    set_pending_type_id(quad.src_a().as_value().as_int());
 }
 
 void Interpreter::ret(const Quad& quad) {
@@ -451,7 +464,19 @@ void Interpreter::exit_frame() {
     m_stack_frames.pop();
 }
 
-void Interpreter::call_c_func(std::string_view lib, std::string_view func, const std::vector<ValueOperand>& args) {
+unsigned Interpreter::take_pending_type_id() {
+    ASSERT(m_pending_return_type.has_value());
+    unsigned tmp = m_pending_return_type.value();
+    m_pending_return_type.reset();
+    return tmp;
+}
+
+void Interpreter::set_pending_type_id(unsigned value) {
+    ASSERT(!m_pending_return_type.has_value());
+    m_pending_return_type = value;
+}
+
+std::optional<ValueOperand> Interpreter::call_c_func(std::string_view lib, std::string_view func, const std::vector<ValueOperand>& args, unsigned return_type_id) {
     Result<dynlib::DynamicLibrary*> loaded_lib_or_error = dynlib::load_lib(std::string(lib));
     if (loaded_lib_or_error.is_error()) {
         ASSERT_NOT_REACHED_MSG("Could not load expected library");
@@ -460,28 +485,48 @@ void Interpreter::call_c_func(std::string_view lib, std::string_view func, const
     dynlib::DynamicLibrary* loaded_lib = loaded_lib_or_error.get();
     ASSERT(loaded_lib->has_symbol(std::string(func)));
     dynlib::DynamicLibrary::Callable callable = loaded_lib->get_callable(std::string(func));
-    
+
     std::vector<ptr_t<vm::CTypeWrapper>> wrapped_args;
+
     for (const ValueOperand& op : args) {
         wrapped_args.push_back(vm::CTypeWrapper::from(op));
     }
-    
-    auto arg = [&] (int idx) {
-        return wrapped_args[idx]->to_arg();
-    };
+
+    ctype::TypeInfo type_info = ctype::from_type_id(return_type_id);
+    vm::CResultWrapper result_wrapper { type_info.c_type };
 
     switch (wrapped_args.size()) {
         case 0:
             callable.call();
             break;
         case 1:
-            callable.call(arg(0));
+            callable.call<1>(result_wrapper, wrapped_args);
             break;
         case 2:
-            callable.call(arg(0), arg(1));
+            callable.call<2>(result_wrapper, wrapped_args);
             break;
 
         default:
             ASSERT_NOT_REACHED_MSG(fmt::format("Unsupported number of arguments passed to C function: {}", wrapped_args.size()));
     }
+
+    switch (type_info.seal_type.primitive()) {
+        case Primitive::VOID: {
+            return {};
+        }
+        case Primitive::INT: {
+            unsigned long val = *(static_cast<unsigned long*>(result_wrapper.buffer()));
+            return ValueOperand { IntOperand {val} };
+        }
+        case Primitive::FLOAT: {
+            double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
+            return ValueOperand { RealOperand { val } };
+        }
+        case Primitive::STRING:
+            ASSERT_NOT_REACHED_MSG("We need to stop representing string as string_view");
+        default:
+            ASSERT_NOT_REACHED();
+    }
+
+    return {};
 }

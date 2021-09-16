@@ -48,6 +48,7 @@ class Interpreter {
     void restore(const Quad&);
     void call(const Quad&);
     void call_c(const Quad&);
+    void set_ret_type(const Quad&);
     void ret(const Quad&);
     void move(const Quad&);
     void index_move(const Quad&);
@@ -57,12 +58,15 @@ class Interpreter {
     void interpret_or(const Quad&);
     
     unsigned resolve_label(const QuadDest& dest) const;
-    void call_c_func(std::string_view lib, std::string_view func,
-                 const std::vector<ValueOperand>& args);
+    std::optional<ValueOperand> call_c_func(std::string_view lib, std::string_view func,
+                 const std::vector<ValueOperand>& args, unsigned return_type_id);
 
     StackFrame* current_frame();
     void enter_new_frame();
     void exit_frame();
+
+    unsigned take_pending_type_id();
+    void set_pending_type_id(unsigned value);
 
     const QuadCollection& m_quads;
     std::vector<Operand> m_registers;
@@ -70,4 +74,5 @@ class Interpreter {
     std::stack<StackFrame> m_stack_frames {};
     std::queue<ArgumentWrapper> m_arguments { };
     std::stack<Operand> m_stack {};
+    std::optional<unsigned> m_pending_return_type {};
 };

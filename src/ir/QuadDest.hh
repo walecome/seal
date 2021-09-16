@@ -29,6 +29,10 @@ class QuadDest {
     return get_as<Register>();
   }
   
+  bool holds_value() const {
+    return m_dest.has_value();
+  }
+
   std::string to_string() const {
     if (!holds_value()) {
       return "_";
@@ -45,9 +49,6 @@ class QuadDest {
 
   private:
 
-  bool holds_value() const {
-    return m_dest.has_value();
-  }
 
   template<class T>
   bool is_a() const {

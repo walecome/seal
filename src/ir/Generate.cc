@@ -32,6 +32,7 @@
 #include "builtin/BuiltIn.hh"
 
 #include "ir/IrProgram.hh"
+#include "types/CType.hh"
 
 #include "fmt/format.h"
 
@@ -248,8 +249,10 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
     if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
         ValueOperand lib = env()->create_immediate_string(x->lib_name());
         ValueOperand func = env()->create_immediate_string(x->identifier());
-        env()->add_quad(OPCode::CALL_C, get_function_dest(), QuadSource { lib },
-                        QuadSource { func });
+
+        unsigned type_id = ctype::from_seal_type(x->type()).type_id;
+        env()->add_quad(OPCode::SET_RET_TYPE, {}, QuadSource { env()->create_immediate_int(type_id) }, {});
+        env()->add_quad(OPCode::CALL_C, get_function_dest(), QuadSource { lib }, QuadSource { func });
     } else {
         auto function_id = func_call->declaration()->function_id();
         FunctionOperand func = env()->create_function_from_id(function_id);
