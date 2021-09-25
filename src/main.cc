@@ -4,12 +4,10 @@
 #include <iostream>
 #include <streambuf>
 #include <string>
-// #include <variant>
 
 #include <fmt/format.h>
 
 #include "Constants.hh"
-// #include "Interpreter.hh"
 #include "Lexer.hh"
 #include "Parser.hh"
 #include "Scope.hh"
