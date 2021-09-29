@@ -12,9 +12,6 @@ class StackFrame {
     StackFrame(unsigned program_counter, StackFrame* parent)
         : m_program_counter { program_counter }, m_parent { parent } {}
 
-    inline void set_variable(VariableOperand var, ValueOperand value) {
-        m_variables[var] = value;
-    }
     inline ValueOperand get_variable(VariableOperand var) const {
         return m_variables.at(var);
     }
