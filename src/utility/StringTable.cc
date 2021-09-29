@@ -1,19 +1,13 @@
 #include <utility/StringTable.hh>
 
-StringTable::Key StringTable::add(std::string& s) {
+StringTable::Entry StringTable::add(std::string& s) {
     StringTable::Key key = Key::from(m_table.size());
-    m_table.push_back(std::move(s));
-    return key;
+    auto allocated = std::make_unique<const std::string>(std::move(s));
+    value_type_t value = allocated.get();
+    m_table.push_back(std::move(allocated));
+    return Entry{ key, value };
 }
 
-void StringTable::replace_at(Key key, std::string &s) {
-    at(key) = std::move(s);
-}
-
-const std::string StringTable::get_at(Key key) const {
-    return m_table[key.id];
-}
-
-std::string& StringTable::at(Key key) {
-    return m_table[key.id];
+StringTable::value_type_t StringTable::get_at(Key key) const {
+    return m_table[key.id].get();
 }
