@@ -71,7 +71,10 @@ int main(int argc, char **argv) {
         std::cout << "Lexed " << lexer.number_of_tokens() << " tokens in "
                   << lexer_duration << " milliseconds" << std::endl;
     }
-    Parser parser {};
+
+    StringTable string_table {};
+
+    Parser parser {&string_table};
 
     long parser_duration =
         measure_time([&] { parser.parse(lexer.get_tokens()); });
@@ -102,7 +105,7 @@ int main(int argc, char **argv) {
         std::cout << parser.compilation_unit->dump() << std::endl;
     }
 
-    Generate ir_generator { parser.compilation_unit.get() };
+    Generate ir_generator { &string_table, parser.compilation_unit.get() };
     QuadCollection quads;
     long ir_duration = measure_time([&] { quads = ir_generator.generate(); });
 

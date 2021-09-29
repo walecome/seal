@@ -213,8 +213,8 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
         std::string_view quotes_removed = current.value;
         quotes_removed.remove_prefix(1);
         quotes_removed.remove_suffix(1);
-
-        primary = std::make_unique<StringLiteral>(quotes_removed);
+        StringTable::Entry created_string = m_string_table->add(std::string(quotes_removed));
+        primary = std::make_unique<StringLiteral>(created_string.key);
     } else if (current.type == LPARENS) {
         primary = parse_expression(tokens);
         tokens.expect(RPARENS);

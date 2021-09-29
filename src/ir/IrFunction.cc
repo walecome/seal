@@ -16,8 +16,9 @@ ValueOperand IrFunction::create_immediate_int(unsigned long value) const {
     return create_value_operand<IntOperand>(value);
 }
 
-ValueOperand IrFunction::create_immediate_string(std::string& value) const {
-    return create_value_operand<StringOperand>(value);
+ValueOperand IrFunction::create_immediate_string(StringTable* string_table, std::string_view value) const {
+    StringTable::Entry inserted = string_table->add(std::string(value));
+    return create_value_operand<StringOperand>(inserted.key);
 }
 
 ValueOperand IrFunction::create_immediate_real(double value) const {

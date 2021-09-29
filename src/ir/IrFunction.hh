@@ -12,6 +12,7 @@
 #include "QuadDest.hh"
 #include "QuadSource.hh"
 #include "Register.hh"
+#include "utility/StringTable.hh"
 
 class FunctionDecl;
 
@@ -36,7 +37,7 @@ class IrFunction {
     void add_quad(OPCode, QuadDest, QuadSource, QuadSource);
 
     ValueOperand create_immediate_int(unsigned long value) const;
-    ValueOperand create_immediate_string(std::string& value) const;
+    ValueOperand create_immediate_string(StringTable* string_table, std::string_view value) const;
     ValueOperand create_immediate_real(double value) const;
     ValueOperand create_vector_operand() const;
 

@@ -1,8 +1,8 @@
 #include <utility/StringTable.hh>
 
-StringTable::Entry StringTable::add(std::string& s) {
+StringTable::Entry StringTable::add(std::string&& s) {
     StringTable::Key key = Key::from(m_table.size());
-    auto allocated = std::make_unique<const std::string>(std::move(s));
+    auto allocated = std::make_unique<const std::string>(s);
     value_type_t value = allocated.get();
     m_table.push_back(std::move(allocated));
     return Entry{ key, value };

@@ -40,7 +40,7 @@ struct VectorOperand {
 };
 
 struct StringOperand {
-    StringOperand() = delete;
+    StringOperand() : value(StringTable::Key::from(0)) {}
     explicit StringOperand(const StringTable::Key key) : value(key) {}
     const StringTable::Key value;
 

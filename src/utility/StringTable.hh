@@ -37,6 +37,7 @@ public:
     // This is destructive operation for `s`, i.e.
     // s is not usable after a call to this method.
     Entry add(std::string& s);
+    Entry add(std::string&& s);
 
     value_type_t get_at(Key key) const;
 

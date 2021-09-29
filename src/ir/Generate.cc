@@ -247,8 +247,8 @@ QuadSource Generate::gen_function_call(const FunctionCall *func_call) {
     };
 
     if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
-        ValueOperand lib = env()->create_immediate_string(x->lib_name());
-        ValueOperand func = env()->create_immediate_string(x->identifier());
+        ValueOperand lib = env()->create_immediate_string(m_string_table, x->lib_name());
+        ValueOperand func = env()->create_immediate_string(m_string_table, x->identifier());
 
         unsigned type_id = ctype::from_seal_type(x->type()).type_id;
         env()->add_quad(OPCode::SET_RET_TYPE, {}, QuadSource { env()->create_immediate_int(type_id) }, {});
@@ -512,7 +512,7 @@ ValueOperand Generate::create_float_literal(const RealLiteral *real_literal) {
 
 ValueOperand Generate::create_string_literal(
     const StringLiteral *string_literal) {
-    return env()->create_immediate_string(string_literal->value());
+    return ValueOperand { StringOperand { string_literal->value() } };
 }
 
 Register Generate::create_register() { return Register(m_register_count++); }

@@ -44,8 +44,8 @@ class Generate {
     MAKE_NONCOPYABLE(Generate)
 
    public:
-    Generate(const CompilationUnit* compilation_unit)
-        : m_compilation_unit { compilation_unit } {}
+    Generate(StringTable* string_table, const CompilationUnit* compilation_unit)
+        : m_string_table(string_table), m_compilation_unit { compilation_unit } {}
 
     QuadCollection generate();
 
@@ -88,6 +88,7 @@ class Generate {
     Register previous_register() const;
     Register current_register() const;
 
+    StringTable* m_string_table;
     const CompilationUnit* m_compilation_unit;
     ptr_t<IrFunction> m_current_ir_function;
     // Register 0 is reserved for function returns.
