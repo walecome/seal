@@ -25,7 +25,7 @@ double ValueOperand::as_real() const {
     return get_as<RealOperand>();
 }
 
-std::string_view ValueOperand::as_string() const {
+StringTable::Key ValueOperand::as_string() const {
     ASSERT(is_string());
     return get_as<StringOperand>();
 }
@@ -57,7 +57,7 @@ LabelOperand Operand::as_label() const {
 
 struct ValueOperandPrinter {
     std::string operator()(StringOperand value) {
-        return fmt::format("{}", value);
+        return fmt::format("s{}", value.value.id);
     }
     std::string operator()(IntOperand value) {
         return fmt::format("{}", value);

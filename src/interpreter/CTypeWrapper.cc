@@ -24,27 +24,15 @@ class CIntWrapper : public CTypeWrapper {
 
 class CStringWrapper : public CTypeWrapper {
    public:
-    explicit CStringWrapper(std::string_view value) : CTypeWrapper(ffi_type_pointer), m_value_buffer(alloc_string(value)) {
-        m_value = m_value_buffer.get();
-        ASSERT(m_value == value);
-    }
+    explicit CStringWrapper(const StringTable* string_table, const StringTable::Key key)
+        : CTypeWrapper(ffi_type_pointer), m_value(string_table->get_at(key)->c_str()) {}
 
-    void* get_value() override {
+    void* get_value() {
         return &m_value;
     }
 
    private:
-    std::unique_ptr<char[]> alloc_string(std::string_view input) {
-        auto ptr = std::unique_ptr<char[]>(new char[input.size() + 1]);
-        for (std::size_t i = 0; i < input.size(); ++i) {
-            ptr.get()[i] = std::move(input[i]);
-        }
-        ptr.get()[input.size()] = '\0';
-        return ptr;
-    }
-
-    std::unique_ptr<char[]> m_value_buffer;
-    char* m_value;
+    const char* m_value;
 };
 
 class CRealWrapper : public CTypeWrapper {
@@ -59,10 +47,9 @@ class CRealWrapper : public CTypeWrapper {
         double m_value;
 };
 
-
 }  // namespace
 
-ptr_t<CTypeWrapper> CTypeWrapper::from(ValueOperand value_operand) {
+ptr_t<CTypeWrapper> CTypeWrapper::from(const StringTable* string_table, ValueOperand value_operand) {
     if (value_operand.is_integer()) {
         return std::make_unique<CIntWrapper>(value_operand.as_int());
     }
@@ -70,7 +57,7 @@ ptr_t<CTypeWrapper> CTypeWrapper::from(ValueOperand value_operand) {
         return std::make_unique<CRealWrapper>(value_operand.as_real());
     }
     if (value_operand.is_string()) {
-        return std::make_unique<CStringWrapper>(value_operand.as_string());
+        return std::make_unique<CStringWrapper>(string_table, value_operand.as_string());
     }
     if (value_operand.is_vector()) {
         ASSERT_NOT_REACHED_MSG("C vector type not supported yet");

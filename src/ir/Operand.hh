@@ -5,6 +5,7 @@
 
 #include "Constants.hh"
 #include "OperandType.hh"
+#include "utility/StringTable.hh"
 
 // This defines a struct with the identifier name. In addition it adds a member
 // named value of the given type, as well as an overload for that type.
@@ -22,7 +23,7 @@
 // For immediate operands
 ADD_OPERAND_TYPE(IntOperand, unsigned long)
 ADD_OPERAND_TYPE(RealOperand, double)
-ADD_OPERAND_TYPE(StringOperand, std::string_view)
+
 struct ValueOperand;
 
 struct VectorOperand {
@@ -38,6 +39,14 @@ struct VectorOperand {
     operator value_type_t() const { return value; }
 };
 
+struct StringOperand {
+    StringOperand() = delete;
+    explicit StringOperand(const StringTable::Key key) : value(key) {}
+    const StringTable::Key value;
+
+    operator StringTable::Key() const { return value; }
+};
+
 using value_operand_t =
     std::variant<IntOperand, RealOperand, StringOperand, VectorOperand>;
 
@@ -47,7 +56,7 @@ struct ValueOperand {
     VectorOperand::value_type_t as_vector() const;
     unsigned long as_int() const;
     double as_real() const;
-    std::string_view as_string() const;
+    StringTable::Key as_string() const;
 
     bool is_vector() const;
     bool is_integer() const;

@@ -2,6 +2,7 @@
 
 #include "Literal.hh"
 #include "Token.hh"
+#include "utility/StringTable.hh"
 
 class StringLiteral : public Literal {
     MAKE_NONMOVABLE(StringLiteral)
@@ -11,11 +12,11 @@ class StringLiteral : public Literal {
     AST_DUMPABLE()
 
    public:
-    StringLiteral(std::string_view value)
+    StringLiteral(StringTable::Key value)
         : Literal(Primitive::STRING), m_value { value } {}
 
     auto value() const { return m_value; }
 
    private:
-    std::string_view m_value;
+    StringTable::Key m_value;
 };

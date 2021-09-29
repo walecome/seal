@@ -16,7 +16,7 @@ ValueOperand IrFunction::create_immediate_int(unsigned long value) const {
     return create_value_operand<IntOperand>(value);
 }
 
-ValueOperand IrFunction::create_immediate_string(std::string_view value) const {
+ValueOperand IrFunction::create_immediate_string(std::string& value) const {
     return create_value_operand<StringOperand>(value);
 }
 
