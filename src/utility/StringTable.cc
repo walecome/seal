@@ -1,3 +1,6 @@
+#include <algorithm>
+
+#include "Constants.hh"
 #include <utility/StringTable.hh>
 
 StringTable::Entry StringTable::add(std::string&& s) {
@@ -9,5 +12,10 @@ StringTable::Entry StringTable::add(std::string&& s) {
 }
 
 StringTable::value_type_t StringTable::get_at(Key key) const {
+    ASSERT(contains(key));
     return m_table[key.id].get();
+}
+
+bool StringTable::contains(Key key) const {
+    return key.id < m_table.size();
 }

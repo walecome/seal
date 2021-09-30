@@ -19,8 +19,9 @@ void runtime_error(const std::string& message) {
     exit(EXIT_FAILURE);
 }
 
-Interpreter::Interpreter(const QuadCollection& quads, bool verbose)
+Interpreter::Interpreter(const QuadCollection& quads, StringTable* string_table, bool verbose)
     : m_quads { quads },
+      m_string_table { string_table },
       m_registers(std::vector<Operand>(quads.register_count)),
       m_verbose { verbose } {}
 
@@ -228,6 +229,10 @@ void Interpreter::div(const Quad& quad) {
 
 template <class Operator>
 struct CmpVisitor {
+    CmpVisitor(StringTable* string_table) : string_table(string_table) {}
+
+    StringTable* string_table;
+
     template <typename T, typename U>
     bool operator()(T, U) {
         ASSERT_NOT_REACHED();
@@ -237,41 +242,47 @@ struct CmpVisitor {
     bool operator()(T a, T b) {
         return Operator {}(a.value, b.value);
     }
+
+    template<>
+    bool operator()(StringOperand a, StringOperand b) {
+        return Operator {}(string_table->get_at(a.value), string_table->get_at(b.value));
+    }
+
 };
 
 template <class Operator>
-void cmp_helper(Interpreter* interpreter, const Quad& quad) {
+void cmp_helper(Interpreter* interpreter, StringTable* string_table, const Quad& quad) {
     ValueOperand lhs = interpreter->resolve_source(quad.src_a());
     ValueOperand rhs = interpreter->resolve_source(quad.src_b());
 
-    bool result = std::visit(CmpVisitor<Operator> {}, lhs.value, rhs.value);
+    bool result = std::visit(CmpVisitor<Operator> { string_table }, lhs.value, rhs.value);
 
     Operand ret = Operand { ValueOperand { IntOperand { result } } };
     interpreter->set_register(quad.dest().as_register(), ret);
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
-    cmp_helper<std::equal_to<>>(this, quad);
+    cmp_helper<std::equal_to<>>(this, m_string_table, quad);
 }
 
 void Interpreter::cmp_gt(const Quad& quad) {
-    cmp_helper<std::greater<>>(this, quad);
+    cmp_helper<std::greater<>>(this, m_string_table, quad);
 }
 
 void Interpreter::cmp_lt(const Quad& quad) {
-    cmp_helper<std::less<>>(this, quad);
+    cmp_helper<std::less<>>(this, m_string_table, quad);
 }
 
 void Interpreter::cmp_gteq(const Quad& quad) {
-    cmp_helper<std::greater_equal<>>(this, quad);
+    cmp_helper<std::greater_equal<>>(this, m_string_table, quad);
 }
 
 void Interpreter::cmp_lteq(const Quad& quad) {
-    cmp_helper<std::less_equal<>>(this, quad);
+    cmp_helper<std::less_equal<>>(this, m_string_table, quad);
 }
 
 void Interpreter::cmp_noteq(const Quad& quad) {
-    cmp_helper<std::not_equal_to<>>(this, quad);
+    cmp_helper<std::not_equal_to<>>(this, m_string_table, quad);
 }
 void Interpreter::jmp(const Quad& quad) {
     unsigned label_id = resolve_label(quad.dest());
@@ -361,8 +372,8 @@ void Interpreter::call_c(const Quad& quad) {
         m_arguments.pop();
     }
 
-    std::string_view lib = quad.src_a().as_value().as_string();
-    std::string_view func = quad.src_b().as_value().as_string();
+    StringTable::Key lib = quad.src_a().as_value().as_string();
+    StringTable::Key func = quad.src_b().as_value().as_string();
     std::optional<ValueOperand> return_value = call_c_func(lib, func, args, take_pending_type_id());
 
     if (return_value.has_value()) {
@@ -476,20 +487,25 @@ void Interpreter::set_pending_type_id(unsigned value) {
     m_pending_return_type = value;
 }
 
-std::optional<ValueOperand> Interpreter::call_c_func(std::string_view lib, std::string_view func, const std::vector<ValueOperand>& args, unsigned return_type_id) {
-    Result<dynlib::DynamicLibrary*> loaded_lib_or_error = dynlib::load_lib(std::string(lib));
+std::optional<ValueOperand> Interpreter::call_c_func(
+        StringTable::Key lib,
+        StringTable::Key func,
+        const std::vector<ValueOperand>& args,
+    unsigned return_type_id) {
+
+    Result<dynlib::DynamicLibrary*> loaded_lib_or_error = dynlib::load_lib(*m_string_table->get_at(lib));
     if (loaded_lib_or_error.is_error()) {
         ASSERT_NOT_REACHED_MSG("Could not load expected library");
     }
 
     dynlib::DynamicLibrary* loaded_lib = loaded_lib_or_error.get();
-    ASSERT(loaded_lib->has_symbol(std::string(func)));
-    dynlib::DynamicLibrary::Callable callable = loaded_lib->get_callable(std::string(func));
+    ASSERT(loaded_lib->has_symbol(*m_string_table->get_at(func)));
+    dynlib::DynamicLibrary::Callable callable = loaded_lib->get_callable(*m_string_table->get_at(func));
 
     std::vector<ptr_t<vm::CTypeWrapper>> wrapped_args;
 
     for (const ValueOperand& op : args) {
-        wrapped_args.push_back(vm::CTypeWrapper::from(op));
+        wrapped_args.push_back(vm::CTypeWrapper::from(m_string_table, op));
     }
 
     ctype::TypeInfo type_info = ctype::from_type_id(return_type_id);

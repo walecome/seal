@@ -40,9 +40,19 @@ struct VectorOperand {
 };
 
 struct StringOperand {
-    StringOperand() : value(StringTable::Key::from(0)) {}
+    StringOperand() = default;
     explicit StringOperand(const StringTable::Key key) : value(key) {}
-    const StringTable::Key value;
+
+    StringOperand(const StringOperand& other) {
+        value = other.value;
+    }
+
+    StringTable::Key value;
+
+    StringOperand& operator=(const StringOperand& other) {
+        value = StringTable::Key::from(other.value.id);
+        return *this;
+    }
 
     operator StringTable::Key() const { return value; }
 };

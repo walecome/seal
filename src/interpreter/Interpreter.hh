@@ -17,7 +17,7 @@ struct QuadCollection;
 
 class Interpreter {
    public:
-    Interpreter(const QuadCollection&, bool verbose);
+    Interpreter(const QuadCollection&, StringTable* string_table, bool verbose);
 
     void interpret();
     
@@ -58,8 +58,12 @@ class Interpreter {
     void interpret_or(const Quad&);
     
     unsigned resolve_label(const QuadDest& dest) const;
-    std::optional<ValueOperand> call_c_func(std::string_view lib, std::string_view func,
-                 const std::vector<ValueOperand>& args, unsigned return_type_id);
+    std::optional<ValueOperand> call_c_func(
+        StringTable::Key lib,
+        StringTable::Key func,
+        const std::vector<ValueOperand>& args,
+        unsigned return_type_id
+    );
 
     StackFrame* current_frame();
     void enter_new_frame();
@@ -69,6 +73,7 @@ class Interpreter {
     void set_pending_type_id(unsigned value);
 
     const QuadCollection& m_quads;
+    StringTable* m_string_table;
     std::vector<Operand> m_registers;
     bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
