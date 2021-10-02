@@ -47,6 +47,8 @@ public:
     // s is not usable after a call to this method.
     Entry add(std::string&& s);
 
+    Entry add(char c);
+
     value_type_t get_at(Key key) const;
 
     void dump() const;

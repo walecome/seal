@@ -11,6 +11,10 @@ StringTable::Entry StringTable::add(std::string&& s) {
     return Entry{ key, value };
 }
 
+StringTable::Entry StringTable::add(char c) {
+    return add(std::string(1, c));
+}
+
 StringTable::value_type_t StringTable::get_at(Key key) const {
     ASSERT(contains(key));
     return m_table[key.id].get();
