@@ -538,8 +538,11 @@ std::optional<ValueOperand> Interpreter::call_c_func(
             double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
             return ValueOperand { RealOperand { val } };
         }
-        case Primitive::STRING:
-            ASSERT_NOT_REACHED_MSG("We need to stop representing string as string_view");
+        case Primitive::STRING: {
+            std::string val = *(reinterpret_cast<char**>(result_wrapper.buffer()));
+            StringTable::Entry entry = m_string_table->add(std::move(val));
+            return ValueOperand { StringOperand { entry.key, m_string_table } };
+        }
         default:
             ASSERT_NOT_REACHED();
     }
