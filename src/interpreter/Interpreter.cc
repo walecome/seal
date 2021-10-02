@@ -197,6 +197,33 @@ struct BinOpVisitor {
     }
 };
 
+struct BinOpPlusVisitor {
+
+    BinOpPlusVisitor(StringTable* string_table) : string_table(string_table) {}
+
+    StringTable* string_table;
+
+    template <typename T, typename U>
+    ValueOperand operator()(T, U) {
+        ASSERT_NOT_REACHED();
+    }
+
+    ValueOperand operator()(StringOperand a, StringOperand b) {
+        std::string result = *a.resolve() + *b.resolve();
+        StringTable::Entry entry = string_table->add(std::move(result));
+        return ValueOperand { StringOperand { entry.key, string_table } };
+    }
+
+    ValueOperand operator()(VectorOperand, VectorOperand) {
+        ASSERT_NOT_REACHED();
+    }
+
+    template <typename T>
+    ValueOperand operator()(T a, T b) {
+        return ValueOperand { T { a + b } };
+    }
+};
+
 template <class Operator>
 void binop_helper(Interpreter* interpreter, const Quad& quad) {
     ValueOperand lhs = interpreter->resolve_source(quad.src_a());
@@ -208,9 +235,18 @@ void binop_helper(Interpreter* interpreter, const Quad& quad) {
     interpreter->set_register(quad.dest().as_register(), result);
 }
 
+void plus_helper(Interpreter* interpreter, const Quad& quad, StringTable* string_table) {
+    ValueOperand lhs = interpreter->resolve_source(quad.src_a());
+    ValueOperand rhs = interpreter->resolve_source(quad.src_b());
+
+    Operand result = Operand(std::visit(BinOpPlusVisitor {string_table}, lhs.value, rhs.value));
+
+    interpreter->set_register(quad.dest().as_register(), result);
+}
+
 void Interpreter::add(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::ADD);
-    binop_helper<std::plus<>>(this, quad);
+    plus_helper(this, quad, m_string_table);
 }
 
 void Interpreter::sub(const Quad& quad) {
