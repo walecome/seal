@@ -48,22 +48,29 @@ def run_one(expected_exit_code: int, source_file: str):
 
     else:
         print(f"[{GREEN}PASS{NC}] {LIGHT_GREY} {compile_command} {NC}")
+    return return_code == expected_exit_code
 
 
 def run_expect_pass():
     print("Running tests with expected success")
+    all_expected = False
     for file in glob.glob(os.path.join(CODE_DIR, "success_expected", "*.sl")):
-        run_one(0, file)
+        all_expected = run_one(0, file) or all_expected
 
 def run_expect_fail():
     print("Running tests with expected failure")
+    all_expected = False
     for file in glob.glob(os.path.join(CODE_DIR, "fail_expected", "*.sl")):
-        run_one(1, file)
+        all_expected = run_one(1, file) or all_expected
 
 
 def main():
-    run_expect_pass()
-    run_expect_fail()
+    pass_ok = run_expect_pass()
+    fail_ok = run_expect_fail()
+    if pass_ok and fail_ok:
+        exit(0)
+    else:
+        exit(1)
 
 
 if __name__ == "__main__":
