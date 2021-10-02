@@ -245,7 +245,7 @@ struct CmpVisitor {
 
     template<>
     bool operator()(StringOperand a, StringOperand b) {
-        return Operator {}(string_table->get_at(a.value), string_table->get_at(b.value));
+        return Operator {}(*a.resolve(), *b.resolve());
     }
 
 };
