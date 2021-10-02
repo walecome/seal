@@ -53,15 +53,17 @@ def run_one(expected_exit_code: int, source_file: str):
 
 def run_expect_pass():
     print("Running tests with expected success")
-    all_expected = False
+    all_expected = True
     for file in glob.glob(os.path.join(CODE_DIR, "success_expected", "*.sl")):
-        all_expected = run_one(0, file) or all_expected
+        all_expected = run_one(0, file) and all_expected
+    return all_expected
 
 def run_expect_fail():
     print("Running tests with expected failure")
-    all_expected = False
+    all_expected = True
     for file in glob.glob(os.path.join(CODE_DIR, "fail_expected", "*.sl")):
-        all_expected = run_one(1, file) or all_expected
+        all_expected = run_one(1, file) and all_expected
+    return all_expected
 
 
 def main():
