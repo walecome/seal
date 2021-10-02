@@ -512,7 +512,7 @@ ValueOperand Generate::create_float_literal(const RealLiteral *real_literal) {
 
 ValueOperand Generate::create_string_literal(
     const StringLiteral *string_literal) {
-    return ValueOperand { StringOperand { string_literal->value() } };
+    return ValueOperand { StringOperand { string_literal->value(), m_string_table } };
 }
 
 Register Generate::create_register() { return Register(m_register_count++); }

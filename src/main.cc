@@ -112,6 +112,11 @@ int main(int argc, char **argv) {
     if (verbose) {
         std::cout << "IR generation took " << ir_duration << " milliseconds"
                   << std::endl;
+
+        fmt::print("String table: \n");
+        string_table.dump();
+        fmt::print("\n");
+
         quads.dump();
     }
 

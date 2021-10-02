@@ -38,7 +38,7 @@ class QuadDest {
       return "_";
     }
     if (is_label()) {
-      return Operand{as_label()}.to_string();
+      return Operand{as_label()}.to_debug_string();
     }
     if (is_register()) {
       return as_register().to_string();

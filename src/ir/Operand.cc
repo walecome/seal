@@ -55,7 +55,7 @@ LabelOperand Operand::as_label() const {
     return std::get<LabelOperand>(m_data);
 }
 
-struct ValueOperandPrinter {
+struct ValueOperandDebugPrinter {
     std::string operator()(StringOperand value) {
         return fmt::format("s{}", value.value.id);
     }
@@ -70,7 +70,7 @@ struct ValueOperandPrinter {
         std::ostringstream oss {};
         oss << "[";
         for (ValueOperand& value : *vec.value.get()) {
-            oss << std::visit(ValueOperandPrinter {}, value.value) << ", ";
+            oss << std::visit(ValueOperandDebugPrinter {}, value.value) << ", ";
         }
         oss << "]";
 
@@ -83,12 +83,12 @@ struct ValueOperandPrinter {
     }
 };
 
-struct OperandPrinter {
+struct OperandDebugPrinter {
     const Operand* context;
     std::ostringstream oss {};
 
     std::string operator()(ValueOperand value) {
-        return std::visit(ValueOperandPrinter {}, value.value);
+        return std::visit(ValueOperandDebugPrinter {}, value.value);
     }
 
     std::string operator()(FunctionOperand function_id) {
@@ -104,18 +104,60 @@ struct OperandPrinter {
     }
 };
 
-std::string Operand::to_string() const {
-    return std::visit(OperandPrinter { this }, m_data);
+struct ValueOperandValuePrinter {
+    std::string operator()(StringOperand value) {
+        return fmt::format("{}", *value.resolve());
+    }
+    std::string operator()(IntOperand value) {
+        return fmt::format("{}", value);
+    }
+    std::string operator()(RealOperand value) {
+        return fmt::format("{:.5f}", value);
+    }
+
+    std::string operator()(VectorOperand vec) {
+        std::ostringstream oss {};
+        oss << "[";
+        for (ValueOperand& value : *vec.value.get()) {
+            oss << std::visit(ValueOperandValuePrinter {}, value.value) << ", ";
+        }
+        oss << "]";
+
+        return oss.str();
+    }
+
+    template <class T>
+    std::string operator()(T) {
+        ASSERT_NOT_REACHED();
+    }
+};
+
+struct OperandValuePrinter {
+    const Operand* context;
+    std::ostringstream oss {};
+
+    std::string operator()(ValueOperand value) {
+        return std::visit(ValueOperandValuePrinter {}, value.value);
+    }
+
+    template <class T>
+    std::string operator()(T) {
+        ASSERT_NOT_REACHED();
+    }
+};
+
+std::string Operand::to_debug_string() const {
+    return std::visit(OperandDebugPrinter { this }, m_data);
 }
 
-std::string ValueOperand::to_string() const {
-    return std::visit(ValueOperandPrinter {}, this->value);
+std::string ValueOperand::to_debug_string() const {
+    return std::visit(ValueOperandDebugPrinter {}, this->value);
 }
 
-void print_value_operand(value_operand_t value) {
-    fmt::print("{}\n", std::visit(ValueOperandPrinter {}, value));
+std::string Operand::to_value_string() const {
+    return std::visit(OperandValuePrinter { this }, m_data);
 }
 
-std::string value_operand_to_string(ValueOperand value) {
-    return std::visit(ValueOperandPrinter {}, value.value);
+std::string ValueOperand::to_value_string() const {
+    return std::visit(ValueOperandValuePrinter {}, this->value);
 }

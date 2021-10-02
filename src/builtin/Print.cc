@@ -10,7 +10,7 @@ ValueOperand print(const std::vector<ValueOperand> &args) {
     std::vector<std::string> stringified_args {};
 
     for (auto &arg : args) {
-        stringified_args.push_back(value_operand_to_string(arg));
+        stringified_args.push_back(arg.to_value_string());
     }
 
     std::string s = fmt::format("{}", fmt::join(stringified_args, ""));

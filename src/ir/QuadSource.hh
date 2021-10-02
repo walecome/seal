@@ -36,11 +36,11 @@ class QuadSource {
             return as_register().to_string();
         }
         if (is_value()) {
-            return as_value().to_string();
+            return as_value().to_debug_string();
         }
 
         if (is_function()) {
-            return Operand { as_function() }.to_string();
+            return Operand { as_function() }.to_debug_string();
         }
 
         ASSERT_NOT_REACHED();

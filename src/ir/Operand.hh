@@ -14,10 +14,6 @@
         NAME() = default;                                                    \
         TYPE value {};                                                       \
         operator TYPE() const { return value; }                              \
-        friend std::ostream& operator<<(std::ostream& os, const NAME& cls) { \
-            os << cls.value;                                                 \
-            return os;                                                       \
-        }                                                                    \
     };
 
 // For immediate operands
@@ -41,20 +37,29 @@ struct VectorOperand {
 
 struct StringOperand {
     StringOperand() = default;
-    explicit StringOperand(const StringTable::Key key) : value(key) {}
+    explicit StringOperand(const StringTable::Key key, StringTable* string_table) : value(key), m_string_table(string_table) {}
 
     StringOperand(const StringOperand& other) {
         value = other.value;
+        m_string_table = other.m_string_table;
     }
 
     StringTable::Key value;
 
     StringOperand& operator=(const StringOperand& other) {
         value = StringTable::Key::from(other.value.id);
+        m_string_table = other.m_string_table;
         return *this;
     }
 
     operator StringTable::Key() const { return value; }
+
+    StringTable::value_type_t resolve() const {
+        return m_string_table->get_at(value);
+    }
+
+    private:
+        StringTable* m_string_table {nullptr};
 };
 
 using value_operand_t =
@@ -84,7 +89,8 @@ struct ValueOperand {
         return std::get<T>(value);
     }
     
-    std::string to_string() const;
+    std::string to_debug_string() const;
+    std::string to_value_string() const;
 };
 
 // For named operands (label, variable, function)
@@ -112,7 +118,8 @@ class Operand {
     auto env() const { return m_env; }
     void set_env(const IrFunction* env) { m_env = env; }
 
-    std::string to_string() const;
+    std::string to_debug_string() const;
+    std::string to_value_string() const;
 
     ValueOperand as_value() const;
     VariableOperand as_variable() const;
@@ -131,5 +138,3 @@ class Operand {
     const IrFunction* m_env { nullptr };
 };
 
-void print_value_operand(value_operand_t);
-std::string value_operand_to_string(ValueOperand);

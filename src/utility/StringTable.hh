@@ -23,7 +23,7 @@ public:
             id = other.id;
             return *this;
         }
-        
+
         public:
         static Key from(size_t id) {
             return Key(id);
@@ -48,6 +48,8 @@ public:
     Entry add(std::string&& s);
 
     value_type_t get_at(Key key) const;
+
+    void dump() const;
 
 private:
 

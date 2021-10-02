@@ -19,3 +19,10 @@ StringTable::value_type_t StringTable::get_at(Key key) const {
 bool StringTable::contains(Key key) const {
     return key.id < m_table.size();
 }
+
+void StringTable::dump() const {
+    for (size_t i = 0; i < m_table.size(); ++i) {
+        auto& val = m_table[i];
+        fmt::print("{}: \"{}\"\n", Key::from(i).to_string(), *val);
+    }
+}
