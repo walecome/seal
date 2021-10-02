@@ -489,7 +489,7 @@ ValueOperand Generate::create_array_literal(const ArrayLiteral *array) {
 
     array->for_each_element([&](Expression *element) {
         ValueOperand element_operand = gen_expression(element).as_value();
-        vector_operand.as_vector()->push_back(element_operand);
+        vector_operand.as_vector().value->push_back(element_operand);
     });
 
     return vector_operand;

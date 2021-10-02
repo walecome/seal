@@ -10,22 +10,22 @@ bool ValueOperand::is_number() const { return is_integer() || is_real(); }
 bool ValueOperand::is_real() const { return holds<RealOperand>(); }
 bool ValueOperand::is_string() const { return holds<StringOperand>(); }
 
-VectorOperand::value_type_t ValueOperand::as_vector() const {
+VectorOperand ValueOperand::as_vector() const {
     ASSERT(is_vector());
     return get_as<VectorOperand>();
 }
 
-unsigned long ValueOperand::as_int() const {
+IntOperand ValueOperand::as_int() const {
     ASSERT(is_integer());
     return get_as<IntOperand>();
 }
 
-double ValueOperand::as_real() const {
+RealOperand ValueOperand::as_real() const {
     ASSERT(is_real());
     return get_as<RealOperand>();
 }
 
-StringTable::Key ValueOperand::as_string() const {
+StringOperand ValueOperand::as_string() const {
     ASSERT(is_string());
     return get_as<StringOperand>();
 }

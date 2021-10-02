@@ -68,10 +68,10 @@ using value_operand_t =
 struct ValueOperand {
     value_operand_t value {};
 
-    VectorOperand::value_type_t as_vector() const;
-    unsigned long as_int() const;
-    double as_real() const;
-    StringTable::Key as_string() const;
+    VectorOperand as_vector() const;
+    IntOperand    as_int() const;
+    RealOperand   as_real() const;
+    StringOperand as_string() const;
 
     bool is_vector() const;
     bool is_integer() const;
