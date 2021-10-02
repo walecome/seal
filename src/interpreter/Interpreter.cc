@@ -444,6 +444,23 @@ void Interpreter::move(const Quad& quad) {
                  Operand { resolve_source(quad.src_a()) });
 }
 
+
+void bounds_check(StringOperand s, int index) {
+    if (index < 0) {
+        runtime_error(
+            fmt::format("Cannot index string with negative index [{}]", index));
+    }
+
+    StringTable::value_type_t value = s.resolve();
+
+    if (index >= static_cast<int>(value->size())) {
+        runtime_error(
+            fmt::format("Index out-of-bounds error. Error indexing string of "
+                        "size {} with index {}",
+                        value->size(), index));
+    }
+}
+
 void bounds_check(VectorOperand::value_type_t vec, int index) {
     if (index < 0) {
         runtime_error(
@@ -460,12 +477,27 @@ void bounds_check(VectorOperand::value_type_t vec, int index) {
 
 void Interpreter::index_move(const Quad& quad) {
     int index = resolve_source(quad.src_b()).as_int();
-    VectorOperand::value_type_t indexed =
-        resolve_source(quad.src_a()).as_vector();
 
-    bounds_check(indexed, index);
+    ValueOperand operand = resolve_source(quad.src_a());
 
-    ValueOperand value = indexed->at(index);
+    ValueOperand value;
+
+    if (operand.is_string()) {
+        StringOperand indexed = operand.as_string();
+        bounds_check(indexed, index);
+        const std::string& resolved = *indexed.resolve();
+        char value_at_index = resolved[index];
+        StringTable::Entry entry = m_string_table->add(value_at_index);
+        value = ValueOperand { StringOperand { entry.key, m_string_table } };
+    } else if (operand.is_vector()) {
+        VectorOperand::value_type_t indexed = operand.as_vector().value;
+        bounds_check(indexed, index);
+        value = indexed->at(index);
+    } else {
+        ASSERT_NOT_REACHED();
+    }
+
+
     set_register(quad.dest().as_register(), Operand { value });
 }
 
