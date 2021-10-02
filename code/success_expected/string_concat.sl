@@ -6,6 +6,9 @@ fn main() -> int {
 
    println(c);
 
-
-   return 0;
+   if (c == "firstsecond") {
+       return 0;
+   } else {
+       return 1;
+   }
 }
