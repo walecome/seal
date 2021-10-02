@@ -10,6 +10,11 @@ void IndexExpression::analyze(Scope* scope) {
     m_indexed_expression->analyze(scope);
 
     m_type = m_indexed_expression->type();
+
+    if (m_type.kind() != Kind::ARRAY && (m_type.kind() == Kind::PRIMITIVE && !m_type.is_string())) {
+        error::add_semantic_error("Indexed expression needs to be of array or string type", source_ref);
+    }
+
     // @TODO: This needs to be extended to more complex types
     m_type.change_kind(Kind::PRIMITIVE);
 }
