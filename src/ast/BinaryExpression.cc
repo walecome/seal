@@ -1,3 +1,5 @@
+#include <fmt/format.h>
+
 #include "BinaryExpression.hh"
 #include "Operator.hh"
 
@@ -25,6 +27,13 @@ void BinaryExpression::analyze(Scope *scope) {
     } else {
         m_type = Type { Primitive::VOID };
         error::mismatched_type(m_left->type(), m_right->type(), source_ref);
+    }
+
+    if (!m_operator->accepts(m_type)) {
+        error::add_semantic_error(
+            fmt::format("Binary operator \"{}\" does not accept type {}\n", m_operator->to_operator_string(), m_type.to_user_string()),
+            source_ref
+        );
     }
 }
 

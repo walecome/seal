@@ -51,3 +51,19 @@ std::string Type::to_string() const {
 
     ASSERT_NOT_REACHED();
 }
+
+std::string Type::to_user_string() const {
+    switch (m_primitive) {
+        case Primitive::STRING:
+            return "string";
+        case Primitive::INT:
+            return "int";
+        case Primitive::FLOAT:
+            return "float";
+        case Primitive::BOOL:
+            return "bool";
+        default:
+            ASSERT_NOT_REACHED();
+    }
+    return "";
+}

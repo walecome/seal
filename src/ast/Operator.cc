@@ -14,3 +14,13 @@ std::string Operator::dump(unsigned indent) const {
         << from_sym(m_operator_symbol) << "}";
     return oss.str();
 }
+
+bool Operator::accepts(Type type) const {
+
+    if (type.is_string()) {
+        return symbol() == OperatorSym::PLUS;
+    }
+
+    // TODO: We just assume that all other types accepts all operators, they probably shouldn't.
+    return true;
+}

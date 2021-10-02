@@ -1,9 +1,11 @@
 #pragma once
 
+#include <unordered_map>
+#include <iterator>
+
 #include "Node.hh"
 #include "Token.hh"
-
-#include <unordered_map>
+#include "Type.hh"
 
 enum class OperatorSym {
     MULT,
@@ -41,6 +43,18 @@ static const std::unordered_map<std::string_view, OperatorSym>
         { "&&", OperatorSym::AND },    { "||", OperatorSym::OR }
     };
 
+namespace {
+    static std::unordered_map<OperatorSym, std::string_view> reverse(const std::unordered_map<std::string_view, OperatorSym> map) {
+        std::unordered_map<OperatorSym, std::string_view> result {};
+        for (auto it = map.begin(); it != map.end(); it = std::next(it)) {
+            result.insert({ it->second, it->first });
+        }
+        return result;
+    }
+}
+
+static const std::unordered_map<OperatorSym, std::string_view> op_sym_to_string = reverse(string_to_op_sym);
+
 class Operator : public Node {
     MAKE_DEFAULT_CONSTRUCTABLE(Operator)
 
@@ -55,7 +69,13 @@ class Operator : public Node {
     virtual std::string name() const override { return "Operator"; }
     virtual std::string dump(unsigned indent) const override;
 
+    std::string_view to_operator_string() const {
+        return op_sym_to_string.at(m_operator_symbol);
+    }
+
     OperatorSym symbol() const { return m_operator_symbol; }
+
+    bool accepts(Type type) const;
 
    private:
     OperatorSym m_operator_symbol;

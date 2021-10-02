@@ -55,6 +55,8 @@ class Type {
 
     std::string to_string() const;
 
+    std::string to_user_string() const;
+
    private:
     Primitive m_primitive;
     Kind m_kind;
