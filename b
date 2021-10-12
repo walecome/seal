@@ -2,7 +2,7 @@
 
 set -e
 
-SCRIPT_DIR=`dirname $0`
+SCRIPT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 BUILD_DIR="${SCRIPT_DIR}/build"
 
 function run_from {
@@ -22,11 +22,16 @@ function configure {
     mkdir -p $BUILD_DIR
     cd $BUILD_DIR
     cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -GNinja ..
+    cd $SCRIPT_DIR
 }
 
 function build {
+    if [ ! -d "$SCRIPT_DIR/build/" ]; then
+        configure
+    fi
     local core_count=$(nproc)
     echo "Using ${core_count} compilation jobs"
+    echo $(pwd)
     run_from "$BUILD_DIR" "ninja -j${core_count}"
     cd "$SCRIPT_DIR"
 }
@@ -39,7 +44,11 @@ function error_and_exit {
     echo "Invalid args: $all_args"
     exit 1
 }
-all_args=("$@")
+
+if [ -z "$1" ]; then
+    build
+    exit
+fi
 
 case "$1" in
     clean)
