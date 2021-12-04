@@ -100,6 +100,8 @@ std::string Type::to_user_string() const {
             return "float";
         case Primitive::BOOL:
             return "bool";
+        case::Primitive::VOID:
+            return "void";
         default:
             ASSERT_NOT_REACHED();
     }
