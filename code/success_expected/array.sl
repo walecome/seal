@@ -19,5 +19,15 @@ fn main() -> int {
         println(tmp);
     }
 
+    symbolic();
+
     return 0;
+}
+
+fn symbolic() -> void {
+    a := 1;
+    b := 2;
+    c := 3;
+
+    x := [a, b, c];
 }
