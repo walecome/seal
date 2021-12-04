@@ -39,7 +39,7 @@ class IrFunction {
     ValueOperand create_immediate_int(unsigned long value) const;
     ValueOperand create_immediate_string(StringTable* string_table, std::string_view value) const;
     ValueOperand create_immediate_real(double value) const;
-    ValueOperand create_vector_operand() const;
+    static ValueOperand create_vector_operand();
 
     LabelOperand create_label() const;
     template <class F>

@@ -25,7 +25,7 @@ ValueOperand IrFunction::create_immediate_real(double value) const {
     return create_value_operand<RealOperand>(value);
 }
 
-ValueOperand IrFunction::create_vector_operand() const {
+ValueOperand IrFunction::create_vector_operand() {
     return ValueOperand{ VectorOperand{} };
 }
 
