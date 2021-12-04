@@ -12,7 +12,7 @@ void VariableDecl::analyze(Scope *scope) {
     if (m_type.primitive() == Primitive::INFERRED) {
         if (m_value->type().primitive() == Primitive::DONT_CARE) {
             // @TODO: Give good error message
-            throw std::runtime_error("Cannot infer type");
+            error::add_semantic_error("Cannot infer type", source_ref);
         }
 
         m_type = m_value->type();
