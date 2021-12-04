@@ -11,6 +11,7 @@ void FunctionCall::analyze(Scope *scope) {
         if (BuiltIn::is_typechecked(identifier())) {
             // @TODO: Handle typechecking for built in
         }
+        m_type = Type { Primitive::DONT_CARE };
         return;
     }
 

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <functional>
 #include <map>
 
@@ -49,22 +50,27 @@ unsigned get_and_increment_func_id() {
 // See following link for 3rd template argument
 // https://stackoverflow.com/questions/35525777/use-of-string-view-for-map-lookup
 static const std::map<std::string, FuncInfo, std::less<>> builtin_functions {
-    BUILTIN_ENTRY(print, false), BUILTIN_ENTRY(println, false),
+    BUILTIN_ENTRY(print, false),
+    BUILTIN_ENTRY(println, false),
+    BUILTIN_ENTRY(create_array, false)
     // BUILTIN_ENTRY(input, false)
 };
 
-std::vector<FuncInfo> map_id_to_func() {
-    std::vector<FuncInfo> ret {};
+std::vector<const FuncInfo*> map_id_to_func() {
+    std::vector<const FuncInfo*> ret {};
 
-    for (auto it = builtin_functions.begin(); it != builtin_functions.end();
-         ++it) {
-        ret.push_back(it->second);
+    for (auto it = builtin_functions.begin(); it != builtin_functions.end(); ++it) {
+        ret.push_back(&(it->second));
     }
+
+    std::sort(ret.begin(), ret.end(), [] (auto a, auto b) {
+        return a->id() < b->id();
+    });
 
     return ret;
 }
 
-static const std::vector<FuncInfo> id_to_builtin = map_id_to_func();
+static const std::vector<const FuncInfo*> id_to_builtin = map_id_to_func();
 
 bool is_builtin(const std::string_view identifier) {
     return builtin_functions.find(std::string(identifier)) !=
@@ -89,7 +95,7 @@ unsigned function_id_from_identifier(std::string_view identifier) {
 
 ValueOperand call_builtin_function(unsigned function_id,
                                    const std::vector<ValueOperand>& args) {
-    return id_to_builtin.at(function_id).call(args);
+    return id_to_builtin.at(function_id)->call(args);
 }
 
 }  // namespace BuiltIn

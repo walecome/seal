@@ -22,6 +22,7 @@ class Expression : public Statement {
     };
 
     void set_primitive(const Primitive primitive);
+    void set_type(Type type);
 
     const auto &type() const { return m_type; }
 

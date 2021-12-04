@@ -29,5 +29,6 @@ unsigned function_id_from_identifier(std::string_view);
 ValueOperand print(const std::vector<ValueOperand>&);
 ValueOperand println(const std::vector<ValueOperand>&);
 ValueOperand input(const std::vector<ValueOperand>&);
+ValueOperand create_array(const std::vector<ValueOperand>&);
 
 }  // namespace BuiltIn

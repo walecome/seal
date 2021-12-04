@@ -19,7 +19,7 @@ void VariableDecl::analyze(Scope *scope) {
     }
 
     if (m_value->type().primitive() == Primitive::DONT_CARE) {
-        m_value->set_primitive(m_type.primitive());
+        m_value->set_type(m_type);
     }
 
     if (m_type != m_value->type()) {
