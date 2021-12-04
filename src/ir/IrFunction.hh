@@ -36,9 +36,9 @@ class IrFunction {
     // @FIXME: Should not take by value
     void add_quad(OPCode, QuadDest, QuadSource, QuadSource);
 
-    ValueOperand create_immediate_int(unsigned long value) const;
-    ValueOperand create_immediate_string(StringTable* string_table, std::string_view value) const;
-    ValueOperand create_immediate_real(double value) const;
+    static ValueOperand create_immediate_int(unsigned long value);
+    static ValueOperand create_immediate_string(StringTable* string_table, std::string_view value);
+    static ValueOperand create_immediate_real(double value);
     static ValueOperand create_vector_operand();
 
     LabelOperand create_label() const;
