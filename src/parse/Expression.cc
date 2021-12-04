@@ -173,7 +173,7 @@ ptr_t<Expression> Parser::parse_unary(TokenBuffer& tokens) {
     } else {
         expression = Parser::parse_primary(tokens);
 
-        if (is_index(tokens.top())) {
+        while (is_index(tokens.top())) {
             expression = parse_index_expression(tokens, expression);
         }
     }
