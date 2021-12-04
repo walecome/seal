@@ -2,7 +2,9 @@ fn main() -> int {
    a := "first";
    b := "second";
 
+   d : mut string = "";
    c := a + b;
+   d = c;
 
    println(c);
 
