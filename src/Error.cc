@@ -41,7 +41,7 @@ void error::mismatched_type(const Type &a, const Type &b,
     auto tokens = TokenBuffer::source_tokens(source_ref);
 
     oss << line_text(source_ref) << ": ";
-    oss << "Mismatched types, got " << a.to_string() << " and " << b.to_string()
+    oss << "Mismatched types, got " << a.to_user_string() << " and " << b.to_user_string()
         << std::endl;
     oss << "\t" << tokens.as_source();
     add_semantic_error(oss.str());
