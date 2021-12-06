@@ -4,8 +4,10 @@
 
 namespace BuiltIn {
 
+// fn get_length(iterable: string | []) -> int
 ValueOperand get_length(const std::vector<ValueOperand>& args) {
-    ASSERT(args.size() == 1 && (args[0].is_vector() || args[0].is_string()));
+    ASSERT(args.size() == 1);
+    ASSERT(args[0].is_vector() || args[0].is_string());
 
     const ValueOperand& operand = args[0];
 
