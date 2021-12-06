@@ -100,8 +100,12 @@ std::string Type::to_user_string() const {
             return "float";
         case Primitive::BOOL:
             return "bool";
-        case::Primitive::VOID:
+        case Primitive::VOID:
             return "void";
+        case Primitive::DONT_CARE:
+            return "dontcare";
+        case Primitive::INFERRED:
+            return "inferred";
         default:
             ASSERT_NOT_REACHED();
     }
