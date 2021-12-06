@@ -14,4 +14,16 @@ ValueOperand create_array(const std::vector<ValueOperand>& args) {
     return arr;
 }
 
+ValueOperand add_element(const std::vector<ValueOperand>& args) {
+    ASSERT(args.size() == 2);
+    ASSERT(args[0].is_vector());
+
+    VectorOperand vec = args[0].as_vector();
+    ValueOperand element = args[1];
+
+    vec.value->push_back(element);
+
+    return IrFunction::create_immediate_int(vec.value->size());
+}
+
 }

@@ -30,6 +30,7 @@ ValueOperand print(const std::vector<ValueOperand>&);
 ValueOperand println(const std::vector<ValueOperand>&);
 ValueOperand input(const std::vector<ValueOperand>&);
 ValueOperand create_array(const std::vector<ValueOperand>&);
+ValueOperand add_element(const std::vector<ValueOperand>&);
 ValueOperand get_length(const std::vector<ValueOperand>&);
 
 }  // namespace BuiltIn

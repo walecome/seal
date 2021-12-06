@@ -53,6 +53,7 @@ static const std::map<std::string, FuncInfo, std::less<>> builtin_functions {
     BUILTIN_ENTRY(print, false),
     BUILTIN_ENTRY(println, false),
     BUILTIN_ENTRY(create_array, false),
+    BUILTIN_ENTRY(add_element, false),
     BUILTIN_ENTRY(get_length, false),
     // BUILTIN_ENTRY(input, false)
 };
