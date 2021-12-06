@@ -91,23 +91,28 @@ std::string Type::to_string() const {
 }
 
 std::string Type::to_user_string() const {
-    switch (m_primitive) {
-        case Primitive::STRING:
-            return "string";
-        case Primitive::INT:
-            return "int";
-        case Primitive::FLOAT:
-            return "float";
-        case Primitive::BOOL:
-            return "bool";
-        case Primitive::VOID:
-            return "void";
-        case Primitive::DONT_CARE:
-            return "dontcare";
-        case Primitive::INFERRED:
-            return "inferred";
-        default:
-            ASSERT_NOT_REACHED();
+    std::string type_str = [=]() {
+        switch (m_primitive) {
+            case Primitive::STRING:
+                return "string";
+            case Primitive::INT:
+                return "int";
+            case Primitive::FLOAT:
+                return "float";
+            case Primitive::BOOL:
+                return "bool";
+            case Primitive::VOID:
+                return "void";
+            case Primitive::DONT_CARE:
+                return "dontcare";
+            case Primitive::INFERRED:
+                return "inferred";
+            default:
+                ASSERT_NOT_REACHED();
+        }
+    }();
+    if (m_kind == Kind::ARRAY) {
+        return fmt::format("[{}]", type_str);
     }
-    return "";
+    return type_str;
 }
