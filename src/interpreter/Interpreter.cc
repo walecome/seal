@@ -440,8 +440,11 @@ void Interpreter::ret(const Quad& quad) {
 
 void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
-    set_register(quad.dest().as_register(),
-                 Operand { resolve_source(quad.src_a()) });
+    ValueOperand source = resolve_source(quad.src_a());
+    if (source.is_vector()) {
+        source = ValueOperand{ source.as_vector().copy() };
+    }
+    set_register(quad.dest().as_register(), Operand { source });
 }
 
 

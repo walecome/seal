@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iterator>
 #include <variant>
 #include <vector>
 
@@ -29,6 +30,12 @@ struct VectorOperand {
    public:
     using value_type_t = std::shared_ptr<vector_type_t>;
     VectorOperand() : value { std::make_shared<vector_type_t>() } {}
+
+    VectorOperand copy() {
+        VectorOperand copy {};
+        std::copy(value->begin(), value->end(), std::back_inserter(*copy.value));
+        return copy;
+    }
 
     value_type_t value;
 
