@@ -24,6 +24,7 @@ add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
     Error.cc
     Lexer.cc
     main.cc
+    SourceRef.cc
     Token.cc
     TokenBuffer.cc
     Util.cc
