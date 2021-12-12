@@ -9,6 +9,7 @@ add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
     Parser.cc
     ReturnStatement.cc
     Statement.cc
+    Struct.cc
     Type.cc
     VariableDecl.cc
     While.cc

@@ -20,11 +20,13 @@ add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
     IntegerLiteral.cc
     Literal.cc
     LogicalExpression.cc
+    MemberFunctionDecl.cc
     Operator.cc
     ParameterList.cc
     RealLiteral.cc
     ReturnStatement.cc
     StringLiteral.cc
+    StructDecl.cc
     Type.cc
     UnaryExpression.cc
     VariableDecl.cc

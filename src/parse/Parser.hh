@@ -24,11 +24,13 @@ class FunctionDeclC;
 class FunctionDeclUser;
 class IfStatement;
 class IntegerLiteral;
+class MemberFunctionDecl;
 class Node;
 class ParameterList;
 class ReturnStatement;
 class Statement;
 class StringLiteral;
+class StructDecl;
 class Type;
 class VariableDecl;
 class VariableExpression;
@@ -64,6 +66,8 @@ class Parser {
     ptr_t<FunctionDeclUser> parse_user_function_decl(
         TokenBuffer &tokens, TokenBuffer::Iterator begin, std::string_view identifier,
         ptr_t<ParameterList> &parameters, Type type);
+    ptr_t<StructDecl> parse_struct(TokenBuffer& tokens);
+    ptr_t<MemberFunctionDecl> parse_member_function(TokenBuffer& tokens);
     ptr_t<IfStatement> parse_if_statement(TokenBuffer &tokens);
     ptr_t<ParameterList> parse_parameter_list(TokenBuffer &tokens);
     ptr_t<ReturnStatement> parse_return_statement(TokenBuffer &tokens);
