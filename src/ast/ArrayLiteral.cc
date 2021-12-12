@@ -22,7 +22,7 @@ void ArrayLiteral::analyze(Scope *scope) {
             error::add_semantic_error("Array literals require literal values", source_ref);
         }
         if (current->type() != first) {
-            throw std::runtime_error("Mismatched types in array literal");
+            error::add_semantic_error("Mismatched types in array literal", source_ref);
         }
     }
 
