@@ -24,6 +24,8 @@ class Expression : public Statement {
     void set_primitive(const Primitive primitive);
     void set_type(Type type);
 
+    virtual bool is_literal() const { return false; }
+
     const auto &type() const { return m_type; }
 
    protected:

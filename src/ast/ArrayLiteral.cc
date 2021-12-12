@@ -18,6 +18,9 @@ void ArrayLiteral::analyze(Scope *scope) {
     for (unsigned i = 1; i < m_expressions.size(); ++i) {
         auto &current = m_expressions.at(i);
         current->analyze(scope);
+        if (!current->is_literal()) {
+            error::add_semantic_error("Array literals require literal values", source_ref);
+        }
         if (current->type() != first) {
             throw std::runtime_error("Mismatched types in array literal");
         }
