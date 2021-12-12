@@ -27,13 +27,14 @@ std::string TokenBuffer::dump() const {
     return oss.str();
 }
 
-bool TokenBuffer::eat(const TokenType token_type) {
-    if (tokens.at(index).type == token_type) {
+std::optional<Token> TokenBuffer::eat(const TokenType token_type) {
+    Token target = tokens.at(index);
+    if (target.type == token_type) {
         ++index;
-        return true;
+        return target;
     }
 
-    return false;
+    return {};
 }
 
 bool TokenBuffer::eat(const std::initializer_list<TokenType> eatable_tokens) {
@@ -52,14 +53,15 @@ bool TokenBuffer::accept(TokenType token_type) const {
     return top().type == token_type;
 }
 
-void TokenBuffer::expect(TokenType token_type) {
-    if (top().type != token_type) {
+Token TokenBuffer::expect(TokenType token_type) {
+    auto token_or_empty = eat(token_type);
+    if (!token_or_empty) {
         std::cout << reconstruct_row(top().row) << std::endl;
         util::print_col_indication(top().col);
         error::syntax(token_type, top());
+        return top();
     }
-
-    eat(token_type);
+    return token_or_empty.value();
 }
 
 bool TokenBuffer::can_pop(TokenType type, int offset) {

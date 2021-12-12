@@ -2,6 +2,7 @@
 
 #include <initializer_list>
 #include <iterator>
+#include <optional>
 #include <sstream>
 #include <unordered_map>
 #include <vector>
@@ -19,7 +20,7 @@ class TokenBuffer {
 
     bool accept(TokenType token_type) const;
     bool can_pop(TokenType type, int offset = 0);
-    bool eat(const TokenType token_type);
+    std::optional<Token> eat(const TokenType token_type);
     bool eat(const std::initializer_list<TokenType> eatable_tokens);
     bool empty() const;
 
@@ -34,7 +35,7 @@ class TokenBuffer {
 
     void add_token(const Token token);
     void backtrack(unsigned steps);
-    void expect(TokenType token_type);
+    Token expect(TokenType token_type);
     void print_tokens() const;
     std::string reconstruct_row(unsigned row) const;
 
