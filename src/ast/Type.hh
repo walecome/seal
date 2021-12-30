@@ -6,7 +6,7 @@
 
 #include "Util.hh"
 
-enum class Primitive { STRING, INT, FLOAT, VOID, BOOL, DONT_CARE, INFERRED };
+enum class Primitive { STRING, INT, FLOAT, VOID, BOOL, USER_IDENTIFIER, DONT_CARE, INFERRED };
 enum class Kind { PRIMITIVE, ARRAY, STRUCT, NONE };
 
 class Operator;
@@ -20,7 +20,6 @@ static std::unordered_map<std::string_view, Primitive> string_to_type {
     { "float", Primitive::FLOAT },
     { "void", Primitive::VOID },
     { "bool", Primitive::BOOL }
-
 };
 
 Primitive from_string(const std::string_view s);

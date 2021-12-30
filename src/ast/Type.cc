@@ -21,6 +21,8 @@ std::string to_debug_string(Primitive primitive) {
             return "DONT_CARE";
         case Primitive::INFERRED:
             return "INFERRED";
+        case Primitive::USER_IDENTIFIER:
+            return "USER_IDENTIFIER";
     }
     ASSERT_NOT_REACHED();
 }
@@ -38,7 +40,7 @@ std::string to_debug_string(Kind kind) {
     }
     ASSERT_NOT_REACHED();
 }
-}
+}  // namespace
 
 Primitive TypeUtil::from_string(const std::string_view s) {
     auto it = string_to_type.find(s);
