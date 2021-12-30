@@ -11,6 +11,7 @@ bool print_assert_message(const std::string& message);
 #define ASSERT_NOT_REACHED() assert(false)
 #define ASSERT_NOT_REACHED_MSG(message) assert(print_assert_message(message) && false)
 #define ASSERT assert
+#define NOT_IMPLEMENTED() assert("Not implemented" && false)
 
 static std::ostringstream out {};
 
