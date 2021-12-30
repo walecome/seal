@@ -13,8 +13,7 @@ ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
         return nullptr;
     }
 
-    std::string_view identifier = tokens.top().value;
-    tokens.expect(IDENTIFIER);
+    Token identifier = tokens.expect(IDENTIFIER);
 
     ptr_t<ParameterList> parameters = parse_parameter_list(tokens);
 
@@ -23,9 +22,9 @@ ptr_t<FunctionDecl> Parser::parse_function_decl(TokenBuffer &tokens) {
     Type type = parse_type(tokens);
 
     if (tokens.can_pop(TokenType::IN_KEYWORD)) {
-        return parse_c_function_decl(tokens, begin, identifier, parameters, type);
+        return parse_c_function_decl(tokens, begin, identifier.value, parameters, type);
     } else {
-        return parse_user_function_decl(tokens, begin, identifier, parameters, type);
+        return parse_user_function_decl(tokens, begin, identifier.value, parameters, type);
     }
 }
 
@@ -59,7 +58,9 @@ ptr_t<FunctionDeclUser> Parser::parse_user_function_decl(
 
     ptr_t<Block> body = parse_block(tokens);
     // @TODO: Probably throw an error here
-    if (!body) return nullptr;
+    if (!body) {
+        return nullptr;
+    }
 
     auto end = tokens.top_iterator();
     auto function_decl =
