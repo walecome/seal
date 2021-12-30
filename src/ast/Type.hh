@@ -31,6 +31,7 @@ class Type {
     Type() : m_primitive { Primitive::VOID }, m_kind { Kind::NONE } {}
     Type(const std::string_view s, Kind kind)
         : m_primitive { TypeUtil::from_string(s) }, m_kind { kind } {}
+    Type(Primitive primitive, Kind kind) : m_primitive(primitive), m_kind(kind) {}
 
     Type(Primitive primitive)
         : m_primitive { primitive }, m_kind { Kind::PRIMITIVE } {}

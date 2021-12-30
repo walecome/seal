@@ -15,6 +15,12 @@ Type Parser::parse_type(TokenBuffer& tokens) {
         return { Primitive::INFERRED };
     }
 
+    if (tokens.accept(IDENTIFIER)) {
+        tokens.eat(IDENTIFIER);
+        // TODO: Not sure if we should assume that an identifier is a struct.
+        return { Primitive::USER_IDENTIFIER, Kind::STRUCT };
+    }
+
     tokens.expect(TYPE);
 
     return { tokens.previous().value, Kind::PRIMITIVE };
