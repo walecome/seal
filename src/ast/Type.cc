@@ -1,8 +1,8 @@
 #include <fmt/format.h>
 
-#include "Type.hh"
 #include "Expression.hh"
 #include "Operator.hh"
+#include "Type.hh"
 
 namespace {
 std::string to_debug_string(Primitive primitive) {
@@ -49,7 +49,8 @@ Primitive TypeUtil::from_string(const std::string_view s) {
 }
 
 bool Type::operator==(const Type &other) const {
-    bool check_kind = m_primitive != Primitive::DONT_CARE && other.m_primitive != Primitive::DONT_CARE;
+    bool check_kind = m_primitive != Primitive::DONT_CARE &&
+                      other.m_primitive != Primitive::DONT_CARE;
 
     if (m_primitive != other.m_primitive) {
         return false;
@@ -89,7 +90,8 @@ std::string Type::dump(unsigned) const {
 }
 
 std::string Type::to_string() const {
-    return fmt::format("{{ Primitive::{}, Kind::{} }}", to_debug_string(m_primitive), to_debug_string(m_kind));
+    return fmt::format("{{ Primitive::{}, Kind::{} }}",
+                       to_debug_string(m_primitive), to_debug_string(m_kind));
 }
 
 std::string Type::to_user_string() const {
