@@ -18,11 +18,13 @@ class ArrayLiteral;
 class BinaryExpression;
 class Block;
 class Expression;
+class For;
 class FunctionCall;
 class FunctionDecl;
 class FunctionDeclC;
 class FunctionDeclUser;
 class IfStatement;
+class IndexExpression;
 class IntegerLiteral;
 class MemberFunctionDecl;
 class Node;
@@ -32,12 +34,10 @@ class Statement;
 class StringLiteral;
 class StructDecl;
 class Type;
+class UnaryExpression;
 class VariableDecl;
 class VariableExpression;
 class While;
-class UnaryExpression;
-class IndexExpression;
-class For;
 
 class Parser {
    public:
