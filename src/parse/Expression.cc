@@ -1,4 +1,3 @@
-#include "ast/Expression.hh"
 #include "Parser.hh"
 #include "ast/ArrayLiteral.hh"
 #include "ast/AssignExpression.hh"
@@ -6,6 +5,7 @@
 #include "ast/BooleanLiteral.hh"
 #include "ast/CompareExpression.hh"
 #include "ast/EqualityExpression.hh"
+#include "ast/Expression.hh"
 #include "ast/FunctionCall.hh"
 #include "ast/IndexExpression.hh"
 #include "ast/IntegerLiteral.hh"
