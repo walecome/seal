@@ -76,7 +76,7 @@ void Generate::gen_block(const Block *block) {
             gen_statement(x);
 
         else if (auto x = dynamic_cast<FunctionDecl *>(node)) {
-            gen_function_decl(x);
+            ASSERT_NOT_REACHED();
         }
 
         else
