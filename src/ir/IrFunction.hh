@@ -45,16 +45,20 @@ class IrFunction {
 
     template <class F>
     inline Register create_variable(const std::string_view name,
-                                    F create_register) {
-        auto it = m_variables.find(name);
-        if (it == m_variables.end()) {
-            Register reg = create_register();
-            m_variables.insert({ name, reg });
-            return reg;
-        } else {
-            return it->second;
+                                    F create_register,
+                                    bool traverse_parent = true) {
+        std::optional<Register> existing_reg = find_variable(name, traverse_parent);
+        if (existing_reg) {
+            return existing_reg.value();
         }
+        auto reg = create_register();
+        m_variables.back().insert({ name, reg });
+        return reg;
     }
+
+    std::optional<Register> find_variable(std::string_view name, bool recursive) const;
+    static std::optional<Register> find_variable(const std::map<std::string_view, Register>& vars, const std::string_view name);
+
     FunctionOperand create_function_from_id(unsigned) const;
 
     LabelOperand create_and_queue_label();
@@ -90,6 +94,9 @@ class IrFunction {
         return m_epilogue_label;
     }
 
+    void enter_block();
+    void exit_block();
+
    private:
     // Bind the given label id to the given quad
     void bind_label(LabelOperand, size_t);
@@ -98,7 +105,7 @@ class IrFunction {
     const LabelOperand m_epilogue_label { create_label() };
 
     std::vector<ptr_t<Quad>> m_quads {};
-    std::map<std::string_view, Register> m_variables {};
+    std::vector<std::map<std::string_view, Register>> m_variables {};
     std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
 };

@@ -71,6 +71,7 @@ QuadCollection Generate::generate() {
 }
 
 void Generate::gen_block(const Block *block) {
+    env()->enter_block();
     block->for_each_node([this](Node *node) {
         if (auto x = dynamic_cast<Statement *>(node))
             gen_statement(x);
@@ -82,11 +83,14 @@ void Generate::gen_block(const Block *block) {
         else
             ASSERT_NOT_REACHED();
     });
+    env()->exit_block();
 }
 
 void Generate::gen_function_decl(const FunctionDecl *function_decl) {
     env()->add_quad(OPCode::SAVE, {}, {}, {});
     Register first_register = current_register();
+
+    env()->enter_block();
 
     function_decl->parameter_list()->for_each_parameter([this](auto param) {
         Register reg = env()->create_variable(
@@ -102,6 +106,7 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
     env()->add_quad(OPCode::RESTORE, {}, QuadSource { first_register },
                     QuadSource { previous_register() });
     env()->add_quad(OPCode::RET, {}, {}, {});
+    env()->exit_block();
 }
 
 void Generate::gen_user_function_decl(const FunctionDeclUser *decl) {
@@ -113,7 +118,8 @@ void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
         auto value = gen_expression(variable_decl->value());
         auto dest = QuadDest { env()->create_variable(
             variable_decl->identifier(),
-            [this] { return create_register(); }) };
+            [this] { return create_register(); },
+            false) };
         env()->add_quad(OPCode::MOVE, dest, value, {});
     }
 }

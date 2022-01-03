@@ -88,3 +88,38 @@ unsigned IrFunction::id() const { return declaration()->function_id(); }
 size_t IrFunction::quad_idx(const LabelOperand label) const {
     return m_labels.at(label);
 }
+
+void IrFunction::enter_block() {
+    m_variables.push_back({});
+}
+
+void IrFunction::exit_block() {
+    m_variables.pop_back();
+}
+
+std::optional<Register> IrFunction::find_variable(const std::map<std::string_view, Register>& vars, const std::string_view name) {
+        auto it = vars.find(name);
+        if (it == vars.end()) {
+            return {};
+        } else {
+            return it->second;
+        }
+}
+
+std::optional<Register> IrFunction::find_variable(std::string_view name, bool recursive) const {
+    ASSERT(!m_variables.empty());
+
+    if (!recursive) {
+        return find_variable(m_variables.back(), name);
+    }
+
+    for (int i = m_variables.size() - 1; i >= 0; --i) {
+        const auto& vars = m_variables.at(i);
+        auto reg = find_variable(vars, name);
+        if (reg) {
+            return reg;
+        }
+    }
+
+    return {};
+}
