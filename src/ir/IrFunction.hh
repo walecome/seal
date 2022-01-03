@@ -26,7 +26,7 @@ class IrFunction {
     MAKE_NONMOVABLE(IrFunction)
 
    public:
-    IrFunction(const FunctionDecl *decl) : m_decl { decl } {}
+    IrFunction(const FunctionDecl *decl) : m_decl { decl } { }
 
     void replace_prologue(QuadSource start, QuadSource end);
 
@@ -42,6 +42,7 @@ class IrFunction {
     static ValueOperand create_vector_operand();
 
     LabelOperand create_label() const;
+
     template <class F>
     inline Register create_variable(const std::string_view name,
                                     F create_register) {
