@@ -8,6 +8,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-g -O2 -fPIC -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
 SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -ldl")
 
+find_program(MOLD_LINKER mold)
+
+if (MOLD_LINKER)
+    message("Using mold linker: ${MOLD_LINKER}")
+    SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=mold")
+endif()
+
+
 include(CMakeParseArguments)
 macro(add_source_files)
     cmake_parse_arguments(
