@@ -2,7 +2,7 @@
 
 #include "Literal.hh"
 
-class ArrayLiteral : public Literal {
+class ArrayLiteral final : public Literal {
     MAKE_DEFAULT_CONSTRUCTABLE(ArrayLiteral)
     MAKE_NONMOVABLE(ArrayLiteral)
     MAKE_NONCOPYABLE(ArrayLiteral)

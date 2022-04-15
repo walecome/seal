@@ -10,7 +10,7 @@
 #include "Scope.hh"
 #include "Token.hh"
 
-class FunctionDeclC : public FunctionDecl {
+class FunctionDeclC final : public FunctionDecl {
     MAKE_NONMOVABLE(FunctionDeclC)
     MAKE_NONCOPYABLE(FunctionDeclC)
 
@@ -20,12 +20,12 @@ class FunctionDeclC : public FunctionDecl {
 
    public:
     FunctionDeclC(const std::string_view identifier,
-                     ptr_t<ParameterList>& parameters, const Type type,
-                     const std::string_view lib_name)
+                  ptr_t<ParameterList>& parameters, const Type type,
+                  const std::string_view lib_name)
         : FunctionDecl(identifier, parameters, type), m_lib_name(lib_name) {}
 
     std::string_view lib_name() const;
 
    private:
-   const std::string_view m_lib_name;
+    const std::string_view m_lib_name;
 };

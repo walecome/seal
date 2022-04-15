@@ -6,7 +6,7 @@
 #include <sstream>
 #include <vector>
 
-class Block : public Statement {
+class Block final : public Statement {
     MAKE_DEFAULT_CONSTRUCTABLE(Block)
     MAKE_NONMOVABLE(Block)
     MAKE_NONCOPYABLE(Block)

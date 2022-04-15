@@ -5,7 +5,7 @@
 
 #include <vector>
 
-class ParameterList : public Node {
+class ParameterList final : public Node {
     MAKE_DEFAULT_CONSTRUCTABLE(ParameterList)
     MAKE_NONMOVABLE(ParameterList)
     MAKE_NONCOPYABLE(ParameterList)
@@ -26,7 +26,7 @@ class ParameterList : public Node {
             callback(param.get());
         }
     }
-    
+
     template <class Function>
     void enumerate_paramters(Function callback) const {
         for (size_t i = 0; i < m_parameters.size(); ++i) {

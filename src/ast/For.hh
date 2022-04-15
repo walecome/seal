@@ -5,7 +5,7 @@
 #include "Statement.hh"
 #include "VariableDecl.hh"
 
-class For : public Statement {
+class For final : public Statement {
     AST_NODE_NAME(For)
     MAKE_NONCOPYABLE(For)
     MAKE_NONMOVABLE(For)

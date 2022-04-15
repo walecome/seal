@@ -3,7 +3,7 @@
 #include "Expression.hh"
 #include "Statement.hh"
 
-class ReturnStatement : public Statement {
+class ReturnStatement final : public Statement {
     MAKE_NONMOVABLE(ReturnStatement)
     MAKE_NONCOPYABLE(ReturnStatement)
 

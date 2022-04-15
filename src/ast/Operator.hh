@@ -1,7 +1,7 @@
 #pragma once
 
-#include <unordered_map>
 #include <iterator>
+#include <unordered_map>
 
 #include "Node.hh"
 #include "Token.hh"
@@ -44,18 +44,20 @@ static const std::unordered_map<std::string_view, OperatorSym>
     };
 
 namespace {
-    static std::unordered_map<OperatorSym, std::string_view> reverse(const std::unordered_map<std::string_view, OperatorSym> map) {
-        std::unordered_map<OperatorSym, std::string_view> result {};
-        for (auto it = map.begin(); it != map.end(); it = std::next(it)) {
-            result.insert({ it->second, it->first });
-        }
-        return result;
+static std::unordered_map<OperatorSym, std::string_view> reverse(
+    const std::unordered_map<std::string_view, OperatorSym> map) {
+    std::unordered_map<OperatorSym, std::string_view> result {};
+    for (auto it = map.begin(); it != map.end(); it = std::next(it)) {
+        result.insert({ it->second, it->first });
     }
+    return result;
 }
+}  // namespace
 
-static const std::unordered_map<OperatorSym, std::string_view> op_sym_to_string = reverse(string_to_op_sym);
+static const std::unordered_map<OperatorSym, std::string_view>
+    op_sym_to_string = reverse(string_to_op_sym);
 
-class Operator : public Node {
+class Operator final : public Node {
     MAKE_DEFAULT_CONSTRUCTABLE(Operator)
 
     Operator(const Token &token)

@@ -8,7 +8,7 @@
 #include "Scope.hh"
 #include "Token.hh"
 
-class FunctionDeclUser : public FunctionDecl {
+class FunctionDeclUser final : public FunctionDecl {
     MAKE_NONMOVABLE(FunctionDeclUser)
     MAKE_NONCOPYABLE(FunctionDeclUser)
 

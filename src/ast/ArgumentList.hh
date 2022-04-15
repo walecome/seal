@@ -5,7 +5,7 @@
 #include "Expression.hh"
 #include "Node.hh"
 
-class ArgumentList : public Node {
+class ArgumentList final : public Node {
     MAKE_DEFAULT_CONSTRUCTABLE(ArgumentList)
     MAKE_NONMOVABLE(ArgumentList)
     MAKE_NONCOPYABLE(ArgumentList)

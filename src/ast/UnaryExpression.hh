@@ -2,7 +2,7 @@
 
 #include "Expression.hh"
 
-class UnaryExpression : public Expression {
+class UnaryExpression final : public Expression {
     MAKE_NONMOVABLE(UnaryExpression)
     MAKE_NONCOPYABLE(UnaryExpression)
 
