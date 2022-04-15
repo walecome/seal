@@ -4,7 +4,7 @@
 #include "Expression.hh"
 #include "Statement.hh"
 
-class IfStatement : public Statement {
+class IfStatement final : public Statement {
     MAKE_NONMOVABLE(IfStatement)
     MAKE_NONCOPYABLE(IfStatement)
 

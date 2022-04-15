@@ -7,7 +7,7 @@
 #include "FunctionDecl.hh"
 #include "Token.hh"
 
-class FunctionCall : public Expression {
+class FunctionCall final : public Expression {
     MAKE_NONCOPYABLE(FunctionCall)
     MAKE_NONMOVABLE(FunctionCall)
 

@@ -2,7 +2,7 @@
 
 #include "Expression.hh"
 
-class IndexExpression : public Expression {
+class IndexExpression final : public Expression {
     MAKE_NONMOVABLE(IndexExpression)
     MAKE_NONCOPYABLE(IndexExpression)
 

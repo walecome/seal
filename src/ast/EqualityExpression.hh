@@ -2,7 +2,7 @@
 
 #include "BinaryExpression.hh"
 
-class EqualityExpression : public BinaryExpression {
+class EqualityExpression final : public BinaryExpression {
     MAKE_NONMOVABLE(EqualityExpression)
     MAKE_NONCOPYABLE(EqualityExpression)
 

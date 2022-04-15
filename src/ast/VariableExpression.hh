@@ -3,7 +3,7 @@
 #include "Expression.hh"
 #include "Token.hh"
 
-class VariableExpression : public Expression {
+class VariableExpression final : public Expression {
     MAKE_NONMOVABLE(VariableExpression)
     MAKE_NONCOPYABLE(VariableExpression)
 

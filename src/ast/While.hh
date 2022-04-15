@@ -4,7 +4,7 @@
 #include "Expression.hh"
 #include "Statement.hh"
 
-class While : public Statement {
+class While final : public Statement {
     MAKE_NONMOVABLE(While)
     MAKE_NONCOPYABLE(While)
 

@@ -4,7 +4,7 @@
 #include "Token.hh"
 #include "utility/StringTable.hh"
 
-class StringLiteral : public Literal {
+class StringLiteral final : public Literal {
     MAKE_NONMOVABLE(StringLiteral)
     MAKE_NONCOPYABLE(StringLiteral)
 

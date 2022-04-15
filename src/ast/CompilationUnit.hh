@@ -6,7 +6,7 @@
 #include <iostream>
 #include <vector>
 
-class CompilationUnit : public Node {
+class CompilationUnit final : public Node {
    public:
     void add_function(ptr_t<FunctionDecl>& function);
 

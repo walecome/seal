@@ -5,7 +5,7 @@
 #include "Token.hh"
 #include "Type.hh"
 
-class VariableDecl : public Decl {
+class VariableDecl final : public Decl {
     MAKE_NONMOVABLE(VariableDecl)
     MAKE_NONCOPYABLE(VariableDecl)
 

@@ -3,7 +3,7 @@
 #include "Literal.hh"
 #include "Token.hh"
 
-class RealLiteral : public Literal {
+class RealLiteral final : public Literal {
     MAKE_NONMOVABLE(RealLiteral)
     MAKE_NONCOPYABLE(RealLiteral)
 
