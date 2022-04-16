@@ -14,6 +14,8 @@ class RealLiteral final : public Literal {
 
     auto value() const { return m_value; }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     double m_value;
 };

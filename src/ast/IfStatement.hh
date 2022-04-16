@@ -23,6 +23,8 @@ class IfStatement final : public Statement {
     auto if_body() const { return m_if_body.get(); }
     auto else_body() const { return m_else_body.get(); }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     ptr_t<Expression> m_condition;
     ptr_t<Block> m_if_body;

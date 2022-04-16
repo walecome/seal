@@ -1,4 +1,6 @@
-#include "IndexExpression.hh"
+#include "ast/IndexExpression.hh"
+
+#include "ast/AstVisitor.hh"
 
 void IndexExpression::analyze(Scope* scope) {
     m_index->analyze(scope);
@@ -11,8 +13,11 @@ void IndexExpression::analyze(Scope* scope) {
 
     m_type = m_indexed_expression->type();
 
-    if (m_type.kind() != Kind::ARRAY && (m_type.kind() == Kind::PRIMITIVE && !m_type.is_string())) {
-        error::add_semantic_error("Indexed expression needs to be of array or string type", source_ref);
+    if (m_type.kind() != Kind::ARRAY &&
+        (m_type.kind() == Kind::PRIMITIVE && !m_type.is_string())) {
+        error::add_semantic_error(
+            "Indexed expression needs to be of array or string type",
+            source_ref);
     }
 
     // @TODO: This needs to be extended to more complex types
@@ -28,4 +33,8 @@ std::string IndexExpression::dump(unsigned indent) const {
     oss << util::indent(indent) << ")";
 
     return oss.str();
+}
+
+void IndexExpression::accept(const AstVisitor& visitor) {
+    visitor.visit(*this);
 }

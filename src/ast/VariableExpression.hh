@@ -17,6 +17,8 @@ class VariableExpression final : public Expression {
 
     auto identifier() const { return m_identifier; }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     const std::string_view m_identifier;
 };

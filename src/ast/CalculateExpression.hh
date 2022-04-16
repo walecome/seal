@@ -14,6 +14,8 @@ class CalculateExpression final : public BinaryExpression {
                         ptr_t<Expression>& right)
         : BinaryExpression(left, op, right) {}
 
+    void accept(const AstVisitor& visitor) override;
+
    protected:
     ptr_t<Expression> m_left;
     ptr_t<Operator> m_operator;

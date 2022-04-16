@@ -1,5 +1,7 @@
-#include "VariableExpression.hh"
-#include "VariableDecl.hh"
+#include "ast/VariableExpression.hh"
+
+#include "ast/AstVisitor.hh"
+#include "ast/VariableDecl.hh"
 
 void VariableExpression::analyze(Scope *scope) {
     if (!scope->has_variable(m_identifier, true)) {
@@ -14,4 +16,8 @@ std::string VariableExpression::dump(unsigned indent) const {
     std::ostringstream oss {};
     oss << util::indent(indent) << "{" << name() << ", " << m_identifier << "}";
     return oss.str();
+}
+
+void VariableExpression::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
 }

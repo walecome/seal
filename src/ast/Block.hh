@@ -26,6 +26,8 @@ class Block final : public Statement {
     void add_node(ptr_t<Node> &node);
     const auto &nodes() const { return m_nodes; }
 
+    void accept(const AstVisitor &visitor) override;
+
    private:
     std::vector<ptr_t<Node>> m_nodes {};
 };

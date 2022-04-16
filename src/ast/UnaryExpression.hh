@@ -18,6 +18,8 @@ class UnaryExpression final : public Expression {
     auto op() const { return m_operator.get(); }
     auto expression() const { return m_expression.get(); }
 
+    void accept(const AstVisitor &visitor) override;
+
    private:
     ptr_t<Operator> m_operator;
     ptr_t<Expression> m_expression;

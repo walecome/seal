@@ -1,6 +1,7 @@
-#include "FunctionCall.hh"
-#include "FunctionDecl.hh"
+#include "ast/FunctionCall.hh"
 
+#include "ast/AstVisitor.hh"
+#include "ast/FunctionDecl.hh"
 #include "builtin/BuiltIn.hh"
 
 void FunctionCall::analyze(Scope *scope) {
@@ -56,3 +57,5 @@ std::string FunctionCall::dump(unsigned indent) const {
 
     return oss.str();
 }
+
+void FunctionCall::accept(const AstVisitor &visitor) { visitor.visit(*this); }

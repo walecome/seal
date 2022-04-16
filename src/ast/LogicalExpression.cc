@@ -1,5 +1,7 @@
 #include "ast/LogicalExpression.hh"
 
+#include "ast/AstVisitor.hh"
+
 void LogicalExpression::analyze(Scope *scope) {
     BinaryExpression::analyze(scope);
 
@@ -12,4 +14,8 @@ void LogicalExpression::analyze(Scope *scope) {
         error::add_semantic_error(
             "Right hand side of logical expression is not bool", source_ref);
     }
+}
+
+void LogicalExpression::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
 }

@@ -19,6 +19,8 @@ class IndexExpression final : public Expression {
     auto indexed_expression() const { return m_indexed_expression.get(); }
     auto index() const { return m_index.get(); }
 
+    void accept(const AstVisitor &visitor) override;
+
    private:
     ptr_t<Expression> m_indexed_expression;
     ptr_t<Expression> m_index;

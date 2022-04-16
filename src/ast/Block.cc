@@ -1,4 +1,6 @@
-#include "Block.hh"
+#include "ast/Block.hh"
+
+#include "ast/AstVisitor.hh"
 
 void Block::add_node(ptr_t<Node> &statement) {
     m_nodes.push_back(std::move(statement));
@@ -23,3 +25,6 @@ std::string Block::dump(unsigned indent) const {
     oss << util::indent(indent) << "]";
     return oss.str();
 }
+
+void Block::accept(const AstVisitor &visitor) { visitor.visit(*this); }
+

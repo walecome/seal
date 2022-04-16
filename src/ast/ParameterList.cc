@@ -1,4 +1,6 @@
-#include "ParameterList.hh"
+#include "ast/ParameterList.hh"
+
+#include "ast/AstVisitor.hh"
 
 void ParameterList::add_parameter(ptr_t<VariableDecl>& parameter) {
     m_parameters.push_back(std::move(parameter));
@@ -22,4 +24,8 @@ std::string ParameterList::dump(unsigned indent) const {
     oss << util::indent(indent) << "]";
 
     return oss.str();
+}
+
+void ParameterList::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
 }

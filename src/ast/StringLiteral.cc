@@ -1,8 +1,12 @@
+#include "ast/StringLiteral.hh"
+
 #include <iomanip>
 
-#include "StringLiteral.hh"
+#include "ast/AstVisitor.hh"
 
 std::string StringLiteral::dump(unsigned indent) const {
-    return fmt::format("{} {{{}, {}}}\n", util::indent(indent), name(), m_value.to_string());
-
+    return fmt::format("{} {{{}, {}}}\n", util::indent(indent), name(),
+                       m_value.to_string());
 }
+
+void StringLiteral::accept(const AstVisitor& visitor) { visitor.visit(*this); }

@@ -17,6 +17,8 @@ class StringLiteral final : public Literal {
 
     auto value() const { return m_value; }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     StringTable::Key m_value;
 };

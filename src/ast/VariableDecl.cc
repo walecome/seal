@@ -1,6 +1,8 @@
-#include "VariableDecl.hh"
+#include "ast/VariableDecl.hh"
 
-void VariableDecl::analyze(Scope *scope) {
+#include "ast/AstVisitor.hh"
+
+void VariableDecl::analyze(Scope* scope) {
     scope->add_variable(this);
 
     // Parameters don't have values
@@ -38,3 +40,5 @@ std::string VariableDecl::dump(unsigned indent) const {
     oss << util::indent(indent) << ")";
     return oss.str();
 }
+
+void VariableDecl::accept(const AstVisitor& visitor) { visitor.visit(*this); }

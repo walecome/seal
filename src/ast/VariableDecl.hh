@@ -34,6 +34,8 @@ class VariableDecl final : public Decl {
     std::string_view identifier() const { return m_identifier; }
     Expression* value() const { return m_value.get(); }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     const std::string_view m_identifier;
     Type m_type;

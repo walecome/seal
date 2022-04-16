@@ -17,6 +17,8 @@ class ReturnStatement final : public Statement {
 
     auto return_value() const { return m_return_value.get(); }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     ptr_t<Expression> m_return_value;
 };

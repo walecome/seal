@@ -19,6 +19,8 @@ class While final : public Statement {
     auto condition() const { return m_condition.get(); }
     auto body() const { return m_body.get(); }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     ptr_t<Expression> m_condition;
     ptr_t<Block> m_body;

@@ -8,6 +8,8 @@
 #include "SourceRef.hh"
 #include "Util.hh"
 
+class AstVisitor;
+
 #define AST_NODE_NAME(node_name) \
    private:                      \
     virtual std::string name() const override { return #node_name; }
@@ -28,6 +30,8 @@ class Node {
 
     virtual std::string name() const { return "Node"; }
     virtual std::string dump(unsigned) const { return "Node"; }
+
+    virtual void accept(const AstVisitor &visitor) = 0;
 
     SourceRef source_ref {};
 };

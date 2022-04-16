@@ -1,7 +1,9 @@
-#include "AssignExpression.hh"
-#include "IndexExpression.hh"
-#include "VariableDecl.hh"
-#include "VariableExpression.hh"
+#include "ast/AssignExpression.hh"
+
+#include "ast/AstVisitor.hh"
+#include "ast/IndexExpression.hh"
+#include "ast/VariableDecl.hh"
+#include "ast/VariableExpression.hh"
 
 void AssignExpression::analyze(Scope* scope) {
     auto variable_expr = dynamic_cast<VariableExpression*>(m_left.get());
@@ -37,3 +39,5 @@ void AssignExpression::analyze(Scope* scope) {
 
     BinaryExpression::analyze(scope);
 }
+
+void AssignExpression::accept(const AstVisitor &visitor) { visitor.visit(*this); }

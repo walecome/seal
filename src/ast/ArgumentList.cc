@@ -1,4 +1,6 @@
-#include "ArgumentList.hh"
+#include "ast/ArgumentList.hh"
+
+#include "ast/AstVisitor.hh"
 
 void ArgumentList::add_argument(ptr_t<Expression> &expression) {
     m_arguments.push_back(std::move(expression));
@@ -23,3 +25,5 @@ std::string ArgumentList::dump(unsigned indent) const {
 
     return oss.str();
 }
+
+void ArgumentList::accept(const AstVisitor &visitor) { visitor.visit(*this); }

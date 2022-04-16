@@ -79,6 +79,8 @@ class Operator final : public Node {
 
     bool accepts(Type type) const;
 
+    void accept(const AstVisitor &visitor) override;
+
    private:
     OperatorSym m_operator_symbol;
 };

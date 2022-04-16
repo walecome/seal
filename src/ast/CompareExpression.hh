@@ -14,4 +14,6 @@ class CompareExpression final : public BinaryExpression {
         : BinaryExpression(left, op, right) {
         m_type = Type(Primitive::BOOL);
     }
+
+    void accept(const AstVisitor &visitor) override;
 };

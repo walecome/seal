@@ -1,4 +1,6 @@
-#include "For.hh"
+#include "ast/For.hh"
+
+#include "ast/AstVisitor.hh"
 
 void For::analyze(Scope *scope) {
     auto inner_scope = std::make_unique<Scope>(scope);
@@ -18,4 +20,8 @@ std::string For::dump(unsigned indent) const {
     oss << m_body->dump(indent + 1) << std::endl;
     oss << util::indent(indent) << ")";
     return oss.str();
+}
+
+void For::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
 }

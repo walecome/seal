@@ -34,6 +34,8 @@ class ParameterList final : public Node {
         }
     }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     std::vector<ptr_t<VariableDecl>> m_parameters {};
 };

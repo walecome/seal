@@ -22,6 +22,8 @@ class ArrayLiteral final : public Literal {
         }
     };
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     std::vector<ptr_t<Expression>> m_expressions {};
 };

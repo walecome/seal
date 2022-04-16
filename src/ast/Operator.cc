@@ -1,4 +1,6 @@
-#include "Operator.hh"
+#include "ast/Operator.hh"
+
+#include "ast/AstVisitor.hh"
 
 static std::string_view from_sym(OperatorSym op_sym) {
     for (auto x : string_to_op_sym) {
@@ -16,11 +18,13 @@ std::string Operator::dump(unsigned indent) const {
 }
 
 bool Operator::accepts(Type type) const {
-
     if (type.is_string()) {
         return symbol() == OperatorSym::PLUS || symbol() == OperatorSym::ASSIGN;
     }
 
-    // TODO: We just assume that all other types accepts all operators, they probably shouldn't.
+    // TODO: We just assume that all other types accepts all operators, they
+    // probably shouldn't.
     return true;
 }
+
+void Operator::accept(const AstVisitor& visitor) { visitor.visit(*this); }

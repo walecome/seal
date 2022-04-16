@@ -5,6 +5,8 @@
 #include "Expression.hh"
 #include "Node.hh"
 
+class AstVisitor;
+
 class ArgumentList final : public Node {
     MAKE_DEFAULT_CONSTRUCTABLE(ArgumentList)
     MAKE_NONMOVABLE(ArgumentList)
@@ -33,6 +35,8 @@ class ArgumentList final : public Node {
             callback(m_arguments[i].get(), i);
         }
     }
+
+    void accept(const AstVisitor& visitor) override;
 
    private:
     std::vector<ptr_t<Expression>> m_arguments {};

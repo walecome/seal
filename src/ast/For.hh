@@ -29,6 +29,8 @@ class For final : public Statement {
     }
     auto body() const { return m_body.get(); }
 
+    void accept(const AstVisitor &visitor) override;
+
    private:
     // This should be something else than a variable declaration
     ptr_t<VariableDecl> m_initial_expression;

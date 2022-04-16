@@ -8,3 +8,7 @@
 void CalculateExpression::analyze(Scope* scope) {
     BinaryExpression::analyze(scope);
 }
+
+void CalculateExpression::accept(const AstVisitor& visitor) {
+    visitor.visit(*this);
+}

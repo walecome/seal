@@ -15,6 +15,8 @@ class IntegerLiteral final : public Literal {
    public:
     IntegerLiteral(int value) : Literal(Primitive::INT), m_value { value } {}
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     int m_value;
 };

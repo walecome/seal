@@ -1,6 +1,8 @@
-#include "UnaryExpression.hh"
-#include "VariableDecl.hh"
-#include "VariableExpression.hh"
+#include "ast/UnaryExpression.hh"
+
+#include "ast/AstVisitor.hh"
+#include "ast/VariableDecl.hh"
+#include "ast/VariableExpression.hh"
 
 void UnaryExpression::analyze(Scope* scope) {
     m_expression->analyze(scope);
@@ -31,4 +33,8 @@ std::string UnaryExpression::dump(unsigned indent) const {
     oss << util::indent(indent) << ")";
 
     return oss.str();
+}
+
+void UnaryExpression::accept(const AstVisitor& visitor) {
+    visitor.visit(*this);
 }

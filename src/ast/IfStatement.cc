@@ -1,4 +1,6 @@
-#include "IfStatement.hh"
+#include "ast/IfStatement.hh"
+
+#include "ast/AstVisitor.hh"
 
 void IfStatement::analyze(Scope* scope) {
     m_condition->analyze(scope);
@@ -22,4 +24,8 @@ std::string IfStatement::dump(unsigned indent) const {
     }
     oss << util::indent(indent) << ")";
     return oss.str();
+}
+
+void IfStatement::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
 }

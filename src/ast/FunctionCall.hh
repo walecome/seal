@@ -29,6 +29,8 @@ class FunctionCall final : public Expression {
         return m_decl;
     }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     const std::string_view m_identifier;
     ptr_t<ArgumentList> m_argument_list;

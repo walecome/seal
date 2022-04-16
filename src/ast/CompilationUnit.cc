@@ -1,4 +1,6 @@
-#include "CompilationUnit.hh"
+#include "ast/CompilationUnit.hh"
+
+#include "ast/AstVisitor.hh"
 
 void CompilationUnit::add_function(ptr_t<FunctionDecl> &function) {
     m_functions.push_back(std::move(function));
@@ -26,3 +28,8 @@ std::string CompilationUnit::dump(unsigned indent) const {
     }
     return oss.str();
 }
+
+void CompilationUnit::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
+}
+

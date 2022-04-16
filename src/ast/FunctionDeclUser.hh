@@ -25,6 +25,8 @@ class FunctionDeclUser final : public FunctionDecl {
 
     auto* body() const { return m_body.get(); }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     ptr_t<Block> m_body;
 };

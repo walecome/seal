@@ -1,5 +1,7 @@
-#include "ReturnStatement.hh"
-#include "FunctionDecl.hh"
+#include "ast/ReturnStatement.hh"
+
+#include "ast/AstVisitor.hh"
+#include "ast/FunctionDecl.hh"
 
 void ReturnStatement::analyze(Scope *scope) {
     m_return_value->analyze(scope);
@@ -16,4 +18,8 @@ std::string ReturnStatement::dump(unsigned indent) const {
     oss << m_return_value->dump(indent + 1) << std::endl;
     oss << util::indent(indent) << ")";
     return oss.str();
+}
+
+void ReturnStatement::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
 }

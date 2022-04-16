@@ -26,6 +26,8 @@ class CompilationUnit final : public Node {
         }
     }
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     std::vector<ptr_t<FunctionDecl>> m_functions {};
 };

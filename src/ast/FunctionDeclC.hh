@@ -26,6 +26,8 @@ class FunctionDeclC final : public FunctionDecl {
 
     std::string_view lib_name() const;
 
+    void accept(const AstVisitor& visitor) override;
+
    private:
     const std::string_view m_lib_name;
 };

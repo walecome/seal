@@ -1,12 +1,14 @@
+#include "ast/FunctionDeclC.hh"
+
 #include <fmt/format.h>
 #include <string_view>
 
 #include "Error.hh"
-#include "FunctionDeclC.hh"
 #include "Scope.hh"
+#include "ast/AstVisitor.hh"
 #include "builtin/BuiltIn.hh"
-#include "dynlib/DynLibLoader.hh"
 #include "dynlib/DynLib.hh"
+#include "dynlib/DynLibLoader.hh"
 
 void FunctionDeclC::analyze(Scope* scope) {
     if (!scope->is_top_level()) {
@@ -52,4 +54,8 @@ std::string FunctionDeclC::dump(unsigned indent) const {
     oss << util::indent(indent) << ")";
     
     return oss.str();
+}
+
+void FunctionDeclC::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
 }

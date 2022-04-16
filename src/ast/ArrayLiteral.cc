@@ -1,4 +1,6 @@
-#include "ArrayLiteral.hh"
+#include "ast/ArrayLiteral.hh"
+
+#include "ast/AstVisitor.hh"
 
 void ArrayLiteral::add_expression(ptr_t<Expression> &expression) {
     m_expressions.push_back(std::move(expression));
@@ -19,10 +21,12 @@ void ArrayLiteral::analyze(Scope *scope) {
         auto &current = m_expressions.at(i);
         current->analyze(scope);
         if (!current->is_literal()) {
-            error::add_semantic_error("Array literals require literal values", source_ref);
+            error::add_semantic_error("Array literals require literal values",
+                                      source_ref);
         }
         if (current->type() != first) {
-            error::add_semantic_error("Mismatched types in array literal", source_ref);
+            error::add_semantic_error("Mismatched types in array literal",
+                                      source_ref);
         }
     }
 
@@ -41,3 +45,5 @@ std::string ArrayLiteral::dump(unsigned indent) const {
 
     return oss.str();
 }
+
+void ArrayLiteral::accept(const AstVisitor &visitor) { visitor.visit(*this); }

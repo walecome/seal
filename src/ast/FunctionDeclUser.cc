@@ -1,12 +1,15 @@
+#include "ast/FunctionDeclUser.hh"
+
 #include <fmt/format.h>
 
-#include "FunctionDeclUser.hh"
+#include "ast/AstVisitor.hh"
 #include "builtin/BuiltIn.hh"
 
 void FunctionDeclUser::analyze(Scope *scope) {
     if (!scope->is_top_level()) {
         error::add_semantic_error(
-            fmt::format("Nested function \"{}\" not allowed", identifier()), source_ref);
+            fmt::format("Nested function \"{}\" not allowed", identifier()),
+            source_ref);
     }
 
     ptr_t<Scope> inner_scope = std::make_unique<Scope>(scope, this);
@@ -31,4 +34,8 @@ std::string FunctionDeclUser::dump(unsigned indent) const {
     oss << util::indent(indent) << ")";
 
     return oss.str();
+}
+
+void FunctionDeclUser::accept(const AstVisitor& visitor) {
+  visitor.visit(*this);
 }
