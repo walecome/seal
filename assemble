@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+from argparse import ArgumentParser
+import os
+from contextlib import contextmanager
+from subprocess import check_call, CalledProcessError
+from pathlib import Path
+import sys
+
+SCRIPT_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
+
+DEBUG = False
+
+class Color:
+    RED = "\033[0;31m"
+    GREEN = "\033[0;32m"
+    YELLOW = "\033[0;33m"
+    RESET = "\033[0m"
+
+def print_colored(message, color):
+    print(f"{color}{message}{Color.RESET}")
+    
+
+@contextmanager
+def pushd(target_dir):
+    current_dir = os.getcwd()
+    os.chdir(target_dir)
+    try:
+        yield
+    finally:
+        os.chdir(current_dir)
+
+def run_in_dir(cmd, target_dir=Path(".")):
+    with pushd(target_dir):
+        if DEBUG:
+            print(f"Current working dir: {os.getcwd()}")
+            print(f"Running \"{cmd}\"")
+        check_call(cmd, shell=True)
+
+def parse_args():
+    parser = ArgumentParser()
+    subparsers = parser.add_subparsers()
+    run_parser = subparsers.add_parser("run", help="Run sealc on a file after building")
+    run_parser.add_argument("file_to_run", type=Path, help="The file to run sealc with")
+
+    return parser.parse_args()
+
+def configure_if_needed():
+    build_dir = Path("build")
+    if build_dir.exists():
+        return
+    build_dir.mkdir()
+    print_colored("Configuring project...", Color.YELLOW)
+    try:
+        run_in_dir("cmake -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -GNinja ..", build_dir)
+        print_colored("Configuration succeeded", Color.GREEN)
+    except CalledProcessError:
+        print_colored("Configuration failed", Color.RED)
+        sys.exit(1)
+
+def assemble():
+    print_colored("Building project...", Color.YELLOW)
+    try:
+        run_in_dir("cmake --build ./build")
+        print_colored("Build succeeded", Color.GREEN)
+    except CalledProcessError:
+        print_colored("Build failed", Color.RED)
+        sys.exit(1)
+
+def run(program_path, file_to_run: Path):
+    print_colored(f"Running '{program_path} --source {file_to_run}'...", Color.YELLOW)
+
+    try:
+        run_in_dir(f"{program_path} --source {file_to_run}")
+        print_colored("Run succeeded", Color.GREEN)
+    except CalledProcessError as ex:
+        print_colored(f"Run failed with exit code {ex.returncode}", Color.RED)
+        sys.exit(ex.returncode)
+
+def main_in_project_dir():
+    args = parse_args()
+    configure_if_needed()
+    assemble()
+
+    try:
+        target_file = args.file_to_run
+    except AttributeError:
+        target_file = None
+
+    if target_file is not None:
+        run("build/sealc", args.file_to_run)
+
+def main():
+    with pushd(SCRIPT_DIR):
+        main_in_project_dir()
+
+if __name__ == "__main__":
+    main()
