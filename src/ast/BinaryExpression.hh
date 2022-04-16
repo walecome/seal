@@ -10,13 +10,14 @@ class BinaryExpression : public Expression {
     AST_DUMPABLE()
     AST_ANALYZABLE()
 
-   public:
+   protected:
     BinaryExpression(ptr_t<Expression>& left, ptr_t<Operator>& op,
                      ptr_t<Expression>& right)
         : m_left { std::move(left) },
           m_operator { std::move(op) },
           m_right { std::move(right) } {}
 
+   public:
     auto left() const { return m_left.get(); }
     auto op() const { return m_operator.get(); }
     auto right() const { return m_right.get(); }

@@ -7,6 +7,7 @@ add_source_files(
   Block.cc
   BooleanLiteral.cc
   CMakeLists.txt
+  CalculateExpression.cc
   CompareExpression.cc
   CompilationUnit.cc
   EqualityExpression.cc
