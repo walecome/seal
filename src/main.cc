@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     bool verbose { argument_parser.get<bool>("verbose") };
 
     if (!std::filesystem::exists(source_file)) {
-        fmt::print("The file \"{}\" doesn't exit\n", source_file);
+        fmt::print("The input file \"{}\" doesn't exist\n", source_file);
         exit(1);
     }
 
