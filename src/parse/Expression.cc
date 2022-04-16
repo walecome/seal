@@ -4,6 +4,7 @@
 #include "ast/AssignExpression.hh"
 #include "ast/BinaryExpression.hh"
 #include "ast/BooleanLiteral.hh"
+#include "ast/CalculateExpression.hh"
 #include "ast/CompareExpression.hh"
 #include "ast/EqualityExpression.hh"
 #include "ast/FunctionCall.hh"
@@ -104,7 +105,7 @@ ptr_t<Expression> Parser::parse_add_sub(TokenBuffer& tokens) {
     while (tokens.eat({ PLUS, MINUS })) {
         ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
         ptr_t<Expression> second = parse_mult_div(tokens);
-        first = std::make_unique<BinaryExpression>(first, op, second);
+        first = std::make_unique<CalculateExpression>(first, op, second);
     }
 
     auto end = tokens.top_iterator();
@@ -121,7 +122,7 @@ ptr_t<Expression> Parser::parse_mult_div(TokenBuffer& tokens) {
     while (tokens.eat({ STAR, SLASH })) {
         ptr_t<Operator> op = std::make_unique<Operator>(tokens.previous());
         ptr_t<Expression> second = parse_unary(tokens);
-        first = std::make_unique<BinaryExpression>(first, op, second);
+        first = std::make_unique<CalculateExpression>(first, op, second);
     }
 
     auto end = tokens.top_iterator();
@@ -213,7 +214,8 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
         std::string_view quotes_removed = current.value;
         quotes_removed.remove_prefix(1);
         quotes_removed.remove_suffix(1);
-        StringTable::Entry created_string = m_string_table->add(std::string(quotes_removed));
+        StringTable::Entry created_string =
+            m_string_table->add(std::string(quotes_removed));
         primary = std::make_unique<StringLiteral>(created_string.key);
     } else if (current.type == LPARENS) {
         primary = parse_expression(tokens);

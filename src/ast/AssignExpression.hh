@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BinaryExpression.hh"
+#include "ast/BinaryExpression.hh"
 
 class AssignExpression final : public BinaryExpression {
     MAKE_NONMOVABLE(AssignExpression)
@@ -10,5 +10,7 @@ class AssignExpression final : public BinaryExpression {
     AST_ANALYZABLE()
 
    public:
-    using BinaryExpression::BinaryExpression;
+    AssignExpression(ptr_t<Expression>& left, ptr_t<Operator>& op,
+                     ptr_t<Expression>& right)
+        : BinaryExpression(left, op, right) {}
 };
