@@ -1,45 +1,55 @@
-# (WIP) Seal programming language
+# Seal Programming :anguage
 
-### A work in progress compiler for the Seal programming language.
+Seal is a programming language featuring a hand-written recursive descent parser, infer-based type system, C-bindings, and register-based virtual machine. This is an ongoing project, which in practise means that the feature list is constantly changing, but the backlog looks something like:
 
-Current working:
+- Compilation (JIT and AOT) using LLVM
+- A more complete set of built-ins and a standard library
+- A language server compatible with the LSP (Language Server Protocol)
+- A debugger
 
-- Lexing
-- Parsing (Recursive descent)
-- Semantic analysis (type checking, etc...)
+### How to build
 
-Partially working:
-
-- Tree walk interpreter (slow)
-- Quad generation
-
-To be implemented:
-
-- LLVM IR generation
-- Register or stack based interpreter
-- LLVM integration for generating machine code
-
-### Building:
-
-```
+```sh
 git clone --recursive https://github.com/walecome/seal
-cd seal && mkdir build && cd build
-cmake ..
-make
+cd seal
+./assemble # Outputs 'build/sealc' if successful
 ```
 
-#### Fibonacci:
+### Running
 
+```sh
+./assemble run mysealfile.sl # Run using 'assemble', performs build step on new changes
+build/sealc --source mysealfile.sl # Run using 'sealc' directly, requires build step
 ```
+
+### Examples
+
+#### Fibonacci
+
+```rust
 fn fib(n : int) -> int {
-    if (n == 0) {
-        return 0;
-    }
-    if (n == 1) {
-        return 1;
-    }
+  if (n == 0) {
+    return 0;
+  }
+  if (n == 1) {
+    return 1;
+  }
 
-    return fib(n - 1) + fib(n - 2);
+  return fib(n - 1) + fib(n - 2);
 }
 
+fn main() -> int {
+  println("Hello world!");
+
+  limit := 20;
+  n : mut = 0; // 'mut' specifier needed for mutability
+
+  while (n <= limit) {
+    result := fib(n);
+    println(result);
+    n = n + 1;
+  }
+
+  return 0;
+}
 ```
