@@ -1,4 +1,4 @@
-# Seal Programming :anguage
+# Seal Programming Language
 
 Seal is a programming language featuring a hand-written recursive descent parser, infer-based type system, C-bindings, and register-based virtual machine. This is an ongoing project, which in practise means that the feature list is constantly changing, but the backlog looks something like:
 
