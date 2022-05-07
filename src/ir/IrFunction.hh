@@ -5,12 +5,11 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
+#include <optional>
 
 #include "Constants.hh"
 #include "Operand.hh"
 #include "Quad.hh"
-#include "QuadDest.hh"
-#include "QuadSource.hh"
 #include "Register.hh"
 #include "utility/StringTable.hh"
 
@@ -28,13 +27,13 @@ class IrFunction {
    public:
     IrFunction(const FunctionDecl *decl) : m_decl { decl } { }
 
-    void replace_prologue(QuadSource start, QuadSource end);
+    void replace_prologue(Operand start, Operand end);
 
     // Construct a quad with the given opcode and operands, placing it in
     // the m_quads vector. Also binds any queued lables to the quad and
     // clears the label queue.
     // @FIXME: Should not take by value
-    void add_quad(OPCode, QuadDest, QuadSource, QuadSource);
+    void add_quad(OPCode, Operand, Operand, Operand);
 
     static ValueOperand create_immediate_int(unsigned long value);
     static ValueOperand create_immediate_string(StringTable* string_table, std::string_view value);

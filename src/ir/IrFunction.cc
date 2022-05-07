@@ -43,14 +43,14 @@ LabelOperand IrFunction::create_and_queue_label() {
     return label;
 }
 
-void IrFunction::replace_prologue(QuadSource start, QuadSource end) {
+void IrFunction::replace_prologue(Operand start, Operand end) {
     ASSERT(m_quads.at(0)->opcode() == OPCode::SAVE);
-    ptr_t<Quad> quad = std::make_unique<Quad>(OPCode::SAVE, QuadDest {}, start, end);
+    ptr_t<Quad> quad = std::make_unique<Quad>(OPCode::SAVE, Operand::create_empty(), start, end);
     m_quads.at(0) = std::move(quad);
 }
 
-void IrFunction::add_quad(OPCode op_code, QuadDest dest, QuadSource src_a,
-                          QuadSource src_b) {
+void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
+                          Operand src_b) {
     m_quads.push_back(std::make_unique<Quad>(op_code, dest, src_a, src_b));
     bind_queued_labels(m_quads.size() - 1);
 }

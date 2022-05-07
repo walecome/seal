@@ -102,6 +102,10 @@ struct OperandDebugPrinter {
     std::string operator()(LabelOperand label_id) {
         return fmt::format("L#{}", label_id);
     }
+
+    std::string operator()(Register reg) {
+      return reg.to_string();
+    }
 };
 
 struct ValueOperandValuePrinter {

@@ -44,13 +44,13 @@ std::string Quad::to_string() const {
     ASSERT(indent_steps <= 8);
 
     oss << util::indent_spaces(indent_steps) << "("
-        << opcode_to_string(m_op_code) << ", " << m_dest.to_string() << ", ";
+        << opcode_to_string(m_op_code) << ", " << m_dest.to_debug_string() << ", ";
 
-    oss << m_src_a.to_string();
+    oss << m_src_a.to_debug_string();
 
     oss << ", ";
 
-    oss << m_src_b.to_string();
+    oss << m_src_b.to_debug_string();
 
     oss << ")";
 
@@ -69,8 +69,8 @@ Quad::to_string_segments() const {
 
     std::string labels = oss.str();
     std::string opcode = opcode_to_string(m_op_code);
-    std::string dest = m_dest.to_string();
-    std::string src_a = m_src_a.to_string();
-    std::string src_b = m_src_b.to_string();
+    std::string dest = m_dest.to_debug_string();
+    std::string src_a = m_src_a.to_debug_string();
+    std::string src_b = m_src_b.to_debug_string();
     return { labels, opcode, dest, src_a, src_b };
 }

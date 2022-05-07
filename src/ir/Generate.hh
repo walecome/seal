@@ -63,15 +63,15 @@ class Generate {
     void gen_return(const ReturnStatement*);
     void gen_for(const For*);
 
-    QuadSource gen_function_call(const FunctionCall*);
-    QuadSource gen_expression(const Expression*);
-    QuadSource gen_binary_expression(const BinaryExpression*);
-    QuadSource gen_assign_expression(const AssignExpression*);
-    QuadSource gen_equality_expression(const EqualityExpression*);
-    QuadSource gen_compare_expression(const CompareExpression*);
-    QuadSource gen_variable_expression(const VariableExpression*);
-    QuadSource gen_index_expression(const IndexExpression*);
-    QuadSource gen_unary_expression(const UnaryExpression*);
+    Operand gen_function_call(const FunctionCall*);
+    Operand gen_expression(const Expression*);
+    Operand gen_binary_expression(const BinaryExpression*);
+    Operand gen_assign_expression(const AssignExpression*);
+    Operand gen_equality_expression(const EqualityExpression*);
+    Operand gen_compare_expression(const CompareExpression*);
+    Operand gen_variable_expression(const VariableExpression*);
+    Operand gen_index_expression(const IndexExpression*);
+    Operand gen_unary_expression(const UnaryExpression*);
 
     auto env() const { return m_current_ir_function.get(); }
 
