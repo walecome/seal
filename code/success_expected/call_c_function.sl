@@ -1,12 +1,9 @@
 fn puts(text: string) -> void in "libc.so.6"
-fn printf(fmt: string, arg: string) -> void in "libc.so.6"
 fn basename(env: string) -> string in "libc.so.6"
 fn atoi(str: string) -> int in "libc.so.6"
 
 fn main() -> int {
-  // printf("%s\n", "This is from printf!");
   puts("This is from puts");
-  puts("This is another line from puts!");
 
   x := basename("/this/is/a/path");
   if (x != "path") {
@@ -14,9 +11,12 @@ fn main() -> int {
   }
   println(x);
 
-  asd := atoi("3");
-  println(asd + 5);
+  forty := atoi("40");
 
+  if (forty + 2 != 42) {
+      return 1;
+  }
+  println("The answer is 42!");
 
   return 0;
 }
