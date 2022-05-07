@@ -1,0 +1,1 @@
+Will return 6
