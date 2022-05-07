@@ -4,6 +4,8 @@ import subprocess
 import os
 import sys
 import glob
+import re
+import difflib
 
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -65,15 +67,61 @@ def run_expect_fail():
         all_expected = run_one(1, file) and all_expected
     return all_expected
 
+# https://stackoverflow.com/questions/14693701/how-can-i-remove-the-ansi-escape-sequences-from-a-string-in-python
+ansi_escape = re.compile(r'''
+    \x1B  # ESC
+    (?:   # 7-bit C1 Fe (except CSI)
+        [@-Z\\-_]
+    |     # or [ for CSI, followed by a control sequence
+        \[
+        [0-?]*  # Parameter bytes
+        [ -/]*  # Intermediate bytes
+        [@-~]   # Final byte
+    )
+''', re.VERBOSE)
 
-def main():
-    pass_ok = run_expect_pass()
-    fail_ok = run_expect_fail()
-    if pass_ok and fail_ok:
+def strip_colors(text):
+    return ansi_escape.sub('', text)
+
+def run_file(path):
+    byte_output = subprocess.run(f"{SCRIPT_DIR}/build/sealc --source {path}", shell=True, capture_output=True).stdout
+    return strip_colors(byte_output.decode('utf-8'))
+
+def read_expected(test_file):
+    target = SCRIPT_DIR + "/expected_output/" + os.path.relpath(test_file, SCRIPT_DIR)
+    with open(target, 'r') as f:
+        return f.read()
+
+def check_diffs():
+    target_files = glob.glob(os.path.join(CODE_DIR, "**", "*.sl"))
+    failed_diffs = []
+    for file in target_files:
+        actual_output = run_file(file)
+        expected_output = read_expected(file)
+        diff = difflib.context_diff(actual_output, expected_output)
+        if len(list(diff)) != 0:
+            failed_diffs.append(file)
+    return failed_diffs
+
+def print_status_and_exit(success):
+    if success:
+        print(f"{GREEN}All tests succeeded!{NC}")
         exit(0)
     else:
+        print(f"{RED}Tests failed!{NC}")
         exit(1)
 
+
+def main():
+    files_with_failed_diff = check_diffs()
+    if files_with_failed_diff:
+        print("The following files failed diff check:")
+        for file in files_with_failed_diff:
+            print(f"\t{file}")
+    diff_ok = len(files_with_failed_diff) == 0
+    pass_ok = run_expect_pass()
+    fail_ok = run_expect_fail()
+    print_status_and_exit(pass_ok and fail_ok and diff_ok)
 
 if __name__ == "__main__":
     main()
