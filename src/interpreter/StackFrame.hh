@@ -4,20 +4,15 @@
 #include <optional>
 #include <vector>
 
-#include "ir/Operand.hh"
+#include "Constants.hh"
+
+#include "interpreter/Value.hh"
 
 class StackFrame {
    public:
     StackFrame() = delete;
     StackFrame(unsigned program_counter, StackFrame* parent)
         : m_program_counter { program_counter }, m_parent { parent } {}
-
-    inline ValueOperand get_variable(VariableOperand var) const {
-        return m_variables.at(var);
-    }
-
-    // Decays an Operand to ValueOperand
-    ValueOperand resolve_operand(Operand) const;
 
     inline unsigned program_counter() const { return m_program_counter; }
     inline void increment_program_counter() { ++m_program_counter; }
@@ -30,15 +25,12 @@ class StackFrame {
         m_parent->set_program_counter(value);
     }
 
-    std::optional<VariableOperand> return_variable() const {
+    std::optional<Value> return_value() const {
         return m_return_variable;
     }
-    void set_return_variable(VariableOperand value) {
-        m_return_variable = std::move(value);
-    }
 
-    const std::map<std::string_view, ValueOperand>& get_variables() const {
-        return m_variables;
+    void set_return_value(Value value) {
+        m_return_variable = std::move(value);
     }
 
     bool jump_performed() const { return m_jump_performed; }
@@ -62,5 +54,5 @@ struct ArgumentWrapper {
         : identifier(identifier), value(std::move(value)) {}
 
     const std::optional<std::string_view> identifier;
-    const ValueOperand value;
+    const Value value;
 };
