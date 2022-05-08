@@ -1,28 +1,43 @@
-#include <array>
 #include <fmt/format.h>
+#include <array>
 #include <string_view>
 #include <vector>
 
-#include "Constants.hh"
 #include "CTypeWrapper.hh"
+#include "Constants.hh"
 #include "Interpreter.hh"
 #include "OPCode.hh"
 #include "builtin/BuiltIn.hh"
-#include "dynlib/DynLibLoader.hh"
 #include "dynlib/DynLib.hh"
+#include "dynlib/DynLibLoader.hh"
 #include "fmt/core.h"
 #include "ir/QuadCollection.hh"
 #include "types/CType.hh"
+
+namespace {
 
 void runtime_error(const std::string& message) {
     fmt::print("{}\n", message);
     exit(EXIT_FAILURE);
 }
 
-Interpreter::Interpreter(const QuadCollection& quads, StringTable* string_table, bool verbose)
+Value create_from_value_operand(const ValueOperand& value_operand) {
+  // TODO: Implement
+    ASSERT_NOT_REACHED();
+}
+
+Value create_from_string(String value) {
+  // TODO: Implement
+  ASSERT_NOT_REACHED();
+}
+
+}  // namespace
+
+Interpreter::Interpreter(const QuadCollection& quads, StringTable* string_table,
+                         bool verbose)
     : m_quads { quads },
       m_string_table { string_table },
-      m_registers(std::vector<Operand>(quads.register_count)),
+      m_registers(std::vector<Value>(quads.register_count)),
       m_verbose { verbose } {}
 
 void Interpreter::interpret() {
@@ -149,31 +164,32 @@ void Interpreter::interpret_function(unsigned function_id) {
     }
 }
 
-Operand Interpreter::resolve_register(Register reg) const {
+Value Interpreter::resolve_register(Register reg) const {
     return m_registers[reg.index()];
 }
 
-void Interpreter::set_register(Register reg, Operand operand) {
-    m_registers[reg.index()] = std::move(operand);
+void Interpreter::set_register(Register reg, Value value) {
+    m_registers[reg.index()] = std::move(value);
 }
 
-unsigned Interpreter::resolve_label(const QuadDest& dest) const {
+unsigned Interpreter::resolve_label(const Operand& dest) const {
     return dest.as_label().value;
 }
 
-ValueOperand Interpreter::resolve_source(const QuadSource& source) const {
+Value Interpreter::resolve_to_value(const Operand& source) const {
     // TODO: Support functions
     ASSERT(!source.is_function());
     if (source.is_value()) {
-        return source.as_value();
+        return create_from_value_operand(source.as_value());
     }
 
     if (source.is_register()) {
-        return resolve_register(source.as_register()).as_value();
+        return resolve_register(source.as_register());
     }
 
     ASSERT_NOT_REACHED_MSG(
-        fmt::format("Invalid QuadSource type: {}", source.to_string()).c_str());
+        fmt::format("Invalid QuadSource type: {}", source.to_debug_string())
+            .c_str());
 }
 
 template <class BinaryOperator>
@@ -198,48 +214,47 @@ struct BinOpVisitor {
 };
 
 struct BinOpPlusVisitor {
-
     BinOpPlusVisitor(StringTable* string_table) : string_table(string_table) {}
 
     StringTable* string_table;
 
     template <typename T, typename U>
-    ValueOperand operator()(T, U) {
+    Value operator()(T, U) {
         ASSERT_NOT_REACHED();
     }
 
-    ValueOperand operator()(StringOperand a, StringOperand b) {
-        std::string result = *a.resolve() + *b.resolve();
+    Value operator()(String a, String b) {
+        std::string result = a.resolve(string_table) + b.resolve(string_table);
+        // TODO: Resulting String should not be inserted in string table.
         StringTable::Entry entry = string_table->add(std::move(result));
-        return ValueOperand { StringOperand { entry.key, string_table } };
+        return create_from_string(String {entry});
     }
 
-    ValueOperand operator()(VectorOperand, VectorOperand) {
-        ASSERT_NOT_REACHED();
-    }
+    Value operator()(Vector, Vector) { ASSERT_NOT_REACHED(); }
 
     template <typename T>
-    ValueOperand operator()(T a, T b) {
-        return ValueOperand { T { a + b } };
+    Value operator()(T a, T b) {
+        return Value { T { a + b } };
     }
 };
 
 template <class Operator>
 void binop_helper(Interpreter* interpreter, const Quad& quad) {
-    ValueOperand lhs = interpreter->resolve_source(quad.src_a());
-    ValueOperand rhs = interpreter->resolve_source(quad.src_b());
+    Value lhs = interpreter->resolve_to_value(quad.src_a());
+    Value rhs = interpreter->resolve_to_value(quad.src_b());
 
-    Operand result =
-        Operand(std::visit(BinOpVisitor<Operator> {}, lhs.value, rhs.value));
+    Value result =
+        std::visit(BinOpVisitor<Operator> {}, lhs.data(), rhs.data());
 
     interpreter->set_register(quad.dest().as_register(), result);
 }
 
-void plus_helper(Interpreter* interpreter, const Quad& quad, StringTable* string_table) {
-    ValueOperand lhs = interpreter->resolve_source(quad.src_a());
-    ValueOperand rhs = interpreter->resolve_source(quad.src_b());
+void plus_helper(Interpreter* interpreter, const Quad& quad,
+                 StringTable* string_table) {
+    Value lhs = interpreter->resolve_to_value(quad.src_a());
+    Value rhs = interpreter->resolve_to_value(quad.src_b());
 
-    Operand result = Operand(std::visit(BinOpPlusVisitor {string_table}, lhs.value, rhs.value));
+    Value result = std::visit(BinOpPlusVisitor { string_table }, lhs.data(), rhs.data());
 
     interpreter->set_register(quad.dest().as_register(), result);
 }
@@ -270,31 +285,29 @@ struct CmpVisitor {
     StringTable* string_table;
 
     template <typename T, typename U>
-    bool operator()(T, U) {
+    Value operator()(T, U) {
         ASSERT_NOT_REACHED();
     }
 
     template <typename T>
-    bool operator()(T a, T b) {
+    Value operator()(T a, T b) {
         return Operator {}(a.value, b.value);
     }
 
-    template<>
-    bool operator()(StringOperand a, StringOperand b) {
+    template <>
+    Value operator()(StringOperand a, StringOperand b) {
         return Operator {}(*a.resolve(), *b.resolve());
     }
-
 };
 
 template <class Operator>
-void cmp_helper(Interpreter* interpreter, StringTable* string_table, const Quad& quad) {
-    ValueOperand lhs = interpreter->resolve_source(quad.src_a());
-    ValueOperand rhs = interpreter->resolve_source(quad.src_b());
+void cmp_helper(Interpreter* interpreter, StringTable* string_table,
+                const Quad& quad) {
+    Value lhs = interpreter->resolve_to_value(quad.src_a());
+    Value rhs = interpreter->resolve_to_value(quad.src_b());
 
-    bool result = std::visit(CmpVisitor<Operator> { string_table }, lhs.value, rhs.value);
-
-    Operand ret = Operand { ValueOperand { IntOperand { result } } };
-    interpreter->set_register(quad.dest().as_register(), ret);
+    Value result = std::visit(CmpVisitor<Operator> { string_table }, lhs.data(), rhs.data());
+    interpreter->set_register(quad.dest().as_register(), result);
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
@@ -330,14 +343,14 @@ void Interpreter::jmp(const Quad& quad) {
 }
 
 void Interpreter::jmp_z(const Quad& quad) {
-    ValueOperand condition = resolve_source(quad.src_a());
+    Value condition = resolve_to_value(quad.src_a());
     if (condition.as_int() == 0) {
         jmp(quad);
     }
 }
 
 void Interpreter::jmp_nz(const Quad& quad) {
-    ValueOperand condition = resolve_source(quad.src_a());
+    Value condition = resolve_to_value(quad.src_a());
     if (condition.as_int() != 0) {
         jmp(quad);
     }
@@ -346,7 +359,7 @@ void Interpreter::jmp_nz(const Quad& quad) {
 void Interpreter::push_arg(const Quad& quad) {
     // TODO: Built-ins will break from this as they do not have parameter names
 
-    ValueOperand value = resolve_source(quad.src_a());
+    Value value = resolve_to_value(quad.src_a());
     m_arguments.push(ArgumentWrapper { value });
 }
 
@@ -401,7 +414,7 @@ void Interpreter::call(const Quad& quad) {
 
 void Interpreter::call_c(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL_C);
-    
+
     std::vector<ValueOperand> args {};
     while (!m_arguments.empty()) {
         args.push_back(m_arguments.front().value);
@@ -410,10 +423,12 @@ void Interpreter::call_c(const Quad& quad) {
 
     StringTable::Key lib = quad.src_a().as_value().as_string();
     StringTable::Key func = quad.src_b().as_value().as_string();
-    std::optional<ValueOperand> return_value = call_c_func(lib, func, args, take_pending_type_id());
+    std::optional<ValueOperand> return_value =
+        call_c_func(lib, func, args, take_pending_type_id());
 
     if (return_value.has_value()) {
-        set_register(quad.dest().as_register(), Operand { return_value.value() });
+        set_register(quad.dest().as_register(),
+                     Operand { return_value.value() });
     }
 }
 
@@ -430,7 +445,7 @@ void Interpreter::ret(const Quad& quad) {
         exit(value.as_int());
     }
 
-    if (current_frame()->return_variable()) {
+    if (current_frame()->return_value()) {
         exit_frame();
         set_register(Register(0), Operand { resolve_source(source) });
     } else {
@@ -442,11 +457,10 @@ void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
     ValueOperand source = resolve_source(quad.src_a());
     if (source.is_vector()) {
-        source = ValueOperand{ source.as_vector().copy() };
+        source = ValueOperand { source.as_vector().copy() };
     }
     set_register(quad.dest().as_register(), Operand { source });
 }
-
 
 void bounds_check(StringOperand s, int index) {
     if (index < 0) {
@@ -499,7 +513,6 @@ void Interpreter::index_move(const Quad& quad) {
     } else {
         ASSERT_NOT_REACHED();
     }
-
 
     set_register(quad.dest().as_register(), Operand { value });
 }
@@ -559,19 +572,18 @@ void Interpreter::set_pending_type_id(unsigned value) {
 }
 
 std::optional<ValueOperand> Interpreter::call_c_func(
-        StringTable::Key lib,
-        StringTable::Key func,
-        const std::vector<ValueOperand>& args,
-    unsigned return_type_id) {
-
-    Result<dynlib::DynamicLibrary*> loaded_lib_or_error = dynlib::load_lib(*m_string_table->get_at(lib));
+    StringTable::Key lib, StringTable::Key func,
+    const std::vector<ValueOperand>& args, unsigned return_type_id) {
+    Result<dynlib::DynamicLibrary*> loaded_lib_or_error =
+        dynlib::load_lib(*m_string_table->get_at(lib));
     if (loaded_lib_or_error.is_error()) {
         ASSERT_NOT_REACHED_MSG("Could not load expected library");
     }
 
     dynlib::DynamicLibrary* loaded_lib = loaded_lib_or_error.get();
     ASSERT(loaded_lib->has_symbol(*m_string_table->get_at(func)));
-    dynlib::DynamicLibrary::Callable callable = loaded_lib->get_callable(*m_string_table->get_at(func));
+    dynlib::DynamicLibrary::Callable callable =
+        loaded_lib->get_callable(*m_string_table->get_at(func));
 
     std::vector<ptr_t<vm::CTypeWrapper>> wrapped_args;
 
@@ -594,7 +606,9 @@ std::optional<ValueOperand> Interpreter::call_c_func(
             break;
 
         default:
-            ASSERT_NOT_REACHED_MSG(fmt::format("Unsupported number of arguments passed to C function: {}", wrapped_args.size()));
+            ASSERT_NOT_REACHED_MSG(fmt::format(
+                "Unsupported number of arguments passed to C function: {}",
+                wrapped_args.size()));
     }
 
     switch (type_info.seal_type.primitive()) {
@@ -602,15 +616,17 @@ std::optional<ValueOperand> Interpreter::call_c_func(
             return {};
         }
         case Primitive::INT: {
-            unsigned long val = *(static_cast<unsigned long*>(result_wrapper.buffer()));
-            return ValueOperand { IntOperand {val} };
+            unsigned long val =
+                *(static_cast<unsigned long*>(result_wrapper.buffer()));
+            return ValueOperand { IntOperand { val } };
         }
         case Primitive::FLOAT: {
             double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
             return ValueOperand { RealOperand { val } };
         }
         case Primitive::STRING: {
-            std::string val = *(reinterpret_cast<char**>(result_wrapper.buffer()));
+            std::string val =
+                *(reinterpret_cast<char**>(result_wrapper.buffer()));
             StringTable::Entry entry = m_string_table->add(std::move(val));
             return ValueOperand { StringOperand { entry.key, m_string_table } };
         }

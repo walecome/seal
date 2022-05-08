@@ -7,11 +7,10 @@
 #include <queue>
 
 #include "interpreter/StackFrame.hh"
+#include "interpreter/Value.hh"
 #include "ir/Operand.hh"
 
 class Quad;
-class QuadDest;
-class QuadSource;
 class Register;
 struct QuadCollection;
 
@@ -21,11 +20,9 @@ class Interpreter {
 
     void interpret();
 
-    // FIXME: Should not point to an Operand, should point to some Value class.
-    Operand resolve_register(Register reg) const;
-    // FIXME: Should not point to an Operand, should point to some Value class.
-    ValueOperand resolve_source(const QuadSource& source) const;
-    void set_register(Register reg, Operand operand);
+    Value resolve_register(Register reg) const;
+    Value resolve_to_value(const Operand& source) const;
+    void set_register(Register reg, Value value);
 
    private:
     void interpret_function(unsigned function_id);
@@ -59,12 +56,11 @@ class Interpreter {
     void interpret_and(const Quad&);
     void interpret_or(const Quad&);
     
-    unsigned resolve_label(const QuadDest& dest) const;
-    // FIXME: Should no return a ValueOperand, should return some other Interpreter-specific Value wrapper.
-    std::optional<ValueOperand> call_c_func(
+    unsigned resolve_label(const Operand& dest) const;
+    std::optional<Value> call_c_func(
         StringTable::Key lib,
         StringTable::Key func,
-        const std::vector<ValueOperand>& args,
+        const std::vector<Value>& args,
         unsigned return_type_id
     );
 
@@ -77,12 +73,10 @@ class Interpreter {
 
     const QuadCollection& m_quads;
     StringTable* m_string_table;
-    // FIXME: Should not point to an Operand, should point to some Value class.
-    std::vector<Operand> m_registers;
+    std::vector<Value> m_registers;
     bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
     std::queue<ArgumentWrapper> m_arguments { };
-    // FIXME: Should not point to an Operand, should point to some Value class.
-    std::stack<Operand> m_stack {};
+    std::stack<Register> m_stack {};
     std::optional<unsigned> m_pending_return_type {};
 };
