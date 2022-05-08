@@ -14,29 +14,15 @@ class StackFrame {
     StackFrame(unsigned program_counter, StackFrame* parent)
         : m_program_counter { program_counter }, m_parent { parent } {}
 
-    inline unsigned program_counter() const { return m_program_counter; }
-    inline void increment_program_counter() { ++m_program_counter; }
-    inline void set_program_counter(unsigned value) {
-        m_program_counter = value;
-    }
+    unsigned program_counter() const;
+    void increment_program_counter();
+    void set_program_counter(unsigned value);
+    void set_parent_program_counter(unsigned value);
 
-    inline void set_parent_program_counter(unsigned value) {
-        ASSERT(m_parent != nullptr);
-        m_parent->set_program_counter(value);
-    }
+    bool jump_performed() const;
+    void set_jump_performed(bool value);
 
-    std::optional<Value> return_value() const {
-        return m_return_variable;
-    }
-
-    void set_return_value(Value value) {
-        m_return_variable = std::move(value);
-    }
-
-    bool jump_performed() const { return m_jump_performed; }
-    void set_jump_performed(bool value) { m_jump_performed = value; }
-
-    bool is_main_frame() const { return m_parent == nullptr; }
+    bool is_main_frame() const;
 
    private:
     unsigned m_program_counter;
