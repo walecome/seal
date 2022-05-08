@@ -33,7 +33,6 @@ def build_output_path(path, output_dir):
 def main():
 
     target_files = list(glob(f"{SCRIPT_DIR}/code/**/*.sl"))
-    print(glob(SCRIPT_DIR + "/code/**/*.sl"))
     check_call(f"{SCRIPT_DIR}/assemble", shell=True)
 
     output_dir = f"{SCRIPT_DIR}/expected_output"
