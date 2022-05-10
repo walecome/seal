@@ -3,13 +3,13 @@
 #include "ffi.h"
 
 #include "Constants.hh"
-#include "Operand.hh"
+#include "interpreter/Value.hh"
 #include "utility/StringTable.hh"
 
 namespace vm {
 class CTypeWrapper {
    public:
-    static ptr_t<CTypeWrapper> from(const StringTable* string_table, ValueOperand value_operand);
+    static ptr_t<CTypeWrapper> from(const StringTable* string_table, Value value);
     virtual ~CTypeWrapper() = default;
 
     ffi_type& get_type() {

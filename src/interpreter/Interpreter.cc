@@ -23,12 +23,31 @@ void runtime_error(const std::string& message) {
 
 Value create_from_value_operand(const ValueOperand& value_operand) {
   // TODO: Implement
-    ASSERT_NOT_REACHED();
+  ASSERT_NOT_REACHED_MSG("create_from_value_operand()");
 }
 
 Value create_from_string(String value) {
   // TODO: Implement
-  ASSERT_NOT_REACHED();
+  ASSERT_NOT_REACHED_MSG("create_from_string()");
+}
+
+Value create_from_boolean(Boolean value) {
+  // TODO: Implement
+  ASSERT_NOT_REACHED_MSG("create_from_boolean()");
+}
+
+Value create_from_integer(Integer value) {
+  // TODO: Implement
+  ASSERT_NOT_REACHED_MSG("create_from_integer()");
+}
+
+Value create_from_real(Real value) {
+  // TODO: Implement
+  ASSERT_NOT_REACHED_MSG("create_from_real()");
+}
+
+Register return_register() {
+  return Register(0);
 }
 
 }  // namespace
@@ -344,32 +363,30 @@ void Interpreter::jmp(const Quad& quad) {
 
 void Interpreter::jmp_z(const Quad& quad) {
     Value condition = resolve_to_value(quad.src_a());
-    if (condition.as_int() == 0) {
+    if (condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
 void Interpreter::jmp_nz(const Quad& quad) {
     Value condition = resolve_to_value(quad.src_a());
-    if (condition.as_int() != 0) {
+    if (!condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
 void Interpreter::push_arg(const Quad& quad) {
-    // TODO: Built-ins will break from this as they do not have parameter names
-
     Value value = resolve_to_value(quad.src_a());
-    m_arguments.push(ArgumentWrapper { value });
+    m_arguments.push(value);
 }
 
 void Interpreter::pop_arg(const Quad& quad) {
     ASSERT(!m_arguments.empty());
 
-    ArgumentWrapper argument = m_arguments.front();
+    Value argument = m_arguments.front();
     m_arguments.pop();
 
-    set_register(quad.dest().as_register(), Operand { argument.value });
+    set_register(quad.dest().as_register(), argument );
 }
 
 void Interpreter::save(const Quad& quad) {
@@ -396,13 +413,13 @@ void Interpreter::call(const Quad& quad) {
     FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
-        std::vector<ValueOperand> args {};
+        std::vector<Value> args {};
         while (!m_arguments.empty()) {
-            args.push_back(m_arguments.front().value);
+            args.push_back(m_arguments.front());
             m_arguments.pop();
         }
-        ValueOperand ret = BuiltIn::call_builtin_function(func, args);
-        set_register(quad.dest().as_register(), Operand { ret });
+        Value ret = BuiltIn::call_builtin_function(func, args);
+        set_register(quad.dest().as_register(), ret);
         return;
     }
 
@@ -415,20 +432,19 @@ void Interpreter::call(const Quad& quad) {
 void Interpreter::call_c(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL_C);
 
-    std::vector<ValueOperand> args {};
+    std::vector<Value> args {};
     while (!m_arguments.empty()) {
-        args.push_back(m_arguments.front().value);
+        args.push_back(m_arguments.front());
         m_arguments.pop();
     }
 
     StringTable::Key lib = quad.src_a().as_value().as_string();
     StringTable::Key func = quad.src_b().as_value().as_string();
-    std::optional<ValueOperand> return_value =
+    std::optional<Value> return_value =
         call_c_func(lib, func, args, take_pending_type_id());
 
     if (return_value.has_value()) {
-        set_register(quad.dest().as_register(),
-                     Operand { return_value.value() });
+        set_register(quad.dest().as_register(), *return_value);
     }
 }
 
@@ -441,111 +457,116 @@ void Interpreter::ret(const Quad& quad) {
     auto source = quad.src_a();
 
     if (current_frame()->is_main_frame()) {
-        ValueOperand value = resolve_source(QuadSource { Register(0) });
-        exit(value.as_int());
+        Value value = resolve_register(return_register());
+        exit(value.as_integer().value());
     }
 
-    if (current_frame()->return_value()) {
-        exit_frame();
-        set_register(Register(0), Operand { resolve_source(source) });
-    } else {
-        exit_frame();
-    }
+    exit_frame();
 }
 
 void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
-    ValueOperand source = resolve_source(quad.src_a());
+    Value source = resolve_to_value(quad.src_a());
     if (source.is_vector()) {
-        source = ValueOperand { source.as_vector().copy() };
+        // TODO: Need to figure out if we want to copy here or not. It bascially comes down to
+        //       which type of value semantics we for objects like array (possible string).
+        //       Currently leaning towards a Python style, which would mean we need to add
+        //       copy functionality to the language.
+        ASSERT_NOT_REACHED_MSG("TODO: Interpreter::move array");
+        // source = source.as_vector();
     }
-    set_register(quad.dest().as_register(), Operand { source });
+    set_register(quad.dest().as_register(), source);
 }
 
-void bounds_check(StringOperand s, int index) {
+void bounds_check(std::string_view s, int index) {
     if (index < 0) {
         runtime_error(
             fmt::format("Cannot index string with negative index [{}]", index));
     }
 
-    StringTable::value_type_t value = s.resolve();
-
-    if (index >= static_cast<int>(value->size())) {
+    int size = static_cast<int>(s.size());
+    if (index >= size) {
         runtime_error(
             fmt::format("Index out-of-bounds error. Error indexing string of "
                         "size {} with index {}",
-                        value->size(), index));
+                        size, index));
     }
 }
 
-void bounds_check(VectorOperand::value_type_t vec, int index) {
+void bounds_check(Vector vec, int index) {
     if (index < 0) {
         runtime_error(
             fmt::format("Cannot index vector with negative index [{}]", index));
     }
 
-    if (index >= static_cast<int>(vec->size())) {
+    auto& values = vec.values();
+
+    int size = static_cast<int>(values.size());
+    if (index >= size) {
         runtime_error(
             fmt::format("Index out-of-bounds error. Error indexing vector of "
                         "size {} with index {}",
-                        vec->size(), index));
+                        size, index));
     }
 }
 
+String bounds_checked_index(String target, int index, StringTable* string_table) {
+  std::string_view resolved = target.resolve(string_table);
+  bounds_check(resolved, index);
+
+  char value_at_index = resolved[index];
+  // FIXME: We really shouldn't add runtime strings to the string table.
+  StringTable::Entry entry = string_table->add(value_at_index);
+  return String(entry);
+}
+
+Value bounds_checked_index(Vector target, int index) {
+    bounds_check(target, index);
+    return target.values().at(index);
+}
+
 void Interpreter::index_move(const Quad& quad) {
-    int index = resolve_source(quad.src_b()).as_int();
+    int index = resolve_to_value(quad.src_b()).as_integer().value();
 
-    ValueOperand operand = resolve_source(quad.src_a());
+    Value target = resolve_to_value(quad.src_a());
 
-    ValueOperand value;
+    Value value;
 
-    if (operand.is_string()) {
-        StringOperand indexed = operand.as_string();
-        bounds_check(indexed, index);
-        const std::string& resolved = *indexed.resolve();
-        char value_at_index = resolved[index];
-        StringTable::Entry entry = m_string_table->add(value_at_index);
-        value = ValueOperand { StringOperand { entry.key, m_string_table } };
-    } else if (operand.is_vector()) {
-        VectorOperand::value_type_t indexed = operand.as_vector().value;
-        bounds_check(indexed, index);
-        value = indexed->at(index);
+    if (target.is_string()) {
+      value = create_from_string(bounds_checked_index(target.as_string(), index, m_string_table));
+    } else if (target.is_vector()) {
+      value = bounds_checked_index(target.as_vector(), index);
     } else {
         ASSERT_NOT_REACHED();
     }
 
-    set_register(quad.dest().as_register(), Operand { value });
+    set_register(quad.dest().as_register(), value);
 }
 
 void Interpreter::index_assign(const Quad& quad) {
-    int index = resolve_source(quad.src_a()).as_int();
-    VectorOperand::value_type_t indexed =
-        resolve_source(QuadSource { quad.dest().as_register() }).as_vector();
+    int index = resolve_to_value(quad.src_a()).as_integer().value();
+    Vector indexed = resolve_to_value(quad.dest()).as_vector();
 
-    ValueOperand value = resolve_source(quad.src_b());
+    Value value = resolve_to_value(quad.src_b());
 
     bounds_check(indexed, index);
-    indexed->at(index) = value;
+    indexed.mutable_values().at(index) = value;
 }
 
 void Interpreter::interpret_and(const Quad& quad) {
-    ValueOperand lhs = resolve_source(quad.src_a());
-    ValueOperand rhs = resolve_source(quad.src_b());
+    Value lhs = resolve_to_value(quad.src_a());
+    Value rhs = resolve_to_value(quad.src_b());
 
-    Operand result = Operand { ValueOperand {
-        IntOperand { lhs.as_int() && rhs.as_int() } } };
-
-    set_register(quad.dest().as_register(), result);
+    Boolean result = Boolean(lhs.as_boolean().value() && rhs.as_boolean().value());
+    set_register(quad.dest().as_register(), create_from_boolean(result));
 }
 
 void Interpreter::interpret_or(const Quad& quad) {
-    ValueOperand lhs = resolve_source(quad.src_a());
-    ValueOperand rhs = resolve_source(quad.src_b());
+    Value lhs = resolve_to_value(quad.src_a());
+    Value rhs = resolve_to_value(quad.src_b());
 
-    Operand result = Operand { ValueOperand {
-        IntOperand { lhs.as_int() || rhs.as_int() } } };
-
-    set_register(quad.dest().as_register(), result);
+    Boolean result = Boolean(lhs.as_boolean().value() || rhs.as_boolean().value());
+    set_register(quad.dest().as_register(), create_from_boolean(result));
 }
 
 StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
@@ -571,9 +592,9 @@ void Interpreter::set_pending_type_id(unsigned value) {
     m_pending_return_type = value;
 }
 
-std::optional<ValueOperand> Interpreter::call_c_func(
+std::optional<Value> Interpreter::call_c_func(
     StringTable::Key lib, StringTable::Key func,
-    const std::vector<ValueOperand>& args, unsigned return_type_id) {
+    const std::vector<Value>& args, unsigned return_type_id) {
     Result<dynlib::DynamicLibrary*> loaded_lib_or_error =
         dynlib::load_lib(*m_string_table->get_at(lib));
     if (loaded_lib_or_error.is_error()) {
@@ -587,7 +608,7 @@ std::optional<ValueOperand> Interpreter::call_c_func(
 
     std::vector<ptr_t<vm::CTypeWrapper>> wrapped_args;
 
-    for (const ValueOperand& op : args) {
+    for (const Value& op : args) {
         wrapped_args.push_back(vm::CTypeWrapper::from(m_string_table, op));
     }
 
@@ -618,17 +639,18 @@ std::optional<ValueOperand> Interpreter::call_c_func(
         case Primitive::INT: {
             unsigned long val =
                 *(static_cast<unsigned long*>(result_wrapper.buffer()));
-            return ValueOperand { IntOperand { val } };
+            return create_from_integer(Integer(val));
         }
         case Primitive::FLOAT: {
             double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
-            return ValueOperand { RealOperand { val } };
+            return create_from_real(Real(val));
         }
         case Primitive::STRING: {
             std::string val =
                 *(reinterpret_cast<char**>(result_wrapper.buffer()));
+            // FIXME: Should avoid adding runtime strings to the string table.
             StringTable::Entry entry = m_string_table->add(std::move(val));
-            return ValueOperand { StringOperand { entry.key, m_string_table } };
+            return create_from_string(String(entry));
         }
         default:
             ASSERT_NOT_REACHED();

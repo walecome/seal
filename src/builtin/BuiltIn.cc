@@ -7,7 +7,7 @@
 namespace BuiltIn {
 
 using builtin_func_t =
-    std::function<ValueOperand(const std::vector<ValueOperand>&)>;
+    std::function<Value(const std::vector<Value>&)>;
 
 class FuncInfo {
    public:
@@ -20,7 +20,7 @@ class FuncInfo {
 
     bool typechecked() const { return m_is_typechecked; }
 
-    ValueOperand call(const std::vector<ValueOperand>& args) const {
+    Value call(const std::vector<Value>& args) const {
         return m_func(args);
     }
 
@@ -96,8 +96,8 @@ unsigned function_id_from_identifier(std::string_view identifier) {
     return builtin_functions.find(identifier)->second.id();
 }
 
-ValueOperand call_builtin_function(unsigned function_id,
-                                   const std::vector<ValueOperand>& args) {
+Value call_builtin_function(unsigned function_id,
+                                   const std::vector<Value>& args) {
     return id_to_builtin.at(function_id)->call(args);
 }
 
