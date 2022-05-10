@@ -24,8 +24,8 @@ class CIntWrapper : public CTypeWrapper {
 
 class CStringWrapper : public CTypeWrapper {
    public:
-    explicit CStringWrapper(const StringTable* string_table, const StringTable::Key key)
-        : CTypeWrapper(ffi_type_pointer), m_value(string_table->get_at(key)->c_str()) {}
+    explicit CStringWrapper(const std::string& value)
+        : CTypeWrapper(ffi_type_pointer), m_value(value.c_str()) {}
 
     void* get_value() {
         return &m_value;
@@ -49,21 +49,17 @@ class CRealWrapper : public CTypeWrapper {
 
 }  // namespace
 
-ptr_t<CTypeWrapper> CTypeWrapper::from(const StringTable* string_table, ValueOperand value_operand) {
-    if (value_operand.is_integer()) {
-        return std::make_unique<CIntWrapper>(value_operand.as_int());
+ptr_t<CTypeWrapper> CTypeWrapper::from(const StringTable* string_table, Value value) {
+    if (value.is_integer()) {
+        return std::make_unique<CIntWrapper>(value.as_integer().value());
     }
-    if (value_operand.is_real()) {
-        return std::make_unique<CRealWrapper>(value_operand.as_real());
+    if (value.is_real()) {
+        return std::make_unique<CRealWrapper>(value.as_real().value());
     }
-    if (value_operand.is_string()) {
-        return std::make_unique<CStringWrapper>(string_table, value_operand.as_string());
+    if (value.is_string()) {
+        return std::make_unique<CStringWrapper>(value.as_string().resolve(string_table));
     }
-    if (value_operand.is_vector()) {
-        ASSERT_NOT_REACHED_MSG("C vector type not supported yet");
-    }
-
-    ASSERT_NOT_REACHED();
+    ASSERT_NOT_REACHED_MSG("Unsupported value type");
 }
 
 }  // namespace vm

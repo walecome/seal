@@ -27,18 +27,6 @@ class StackFrame {
    private:
     unsigned m_program_counter;
     StackFrame* m_parent;
-    std::map<std::string_view, ValueOperand> m_variables {};
-    std::optional<VariableOperand> m_return_variable {};
     bool m_jump_performed { false };
 };
 
-struct ArgumentWrapper {
-    ArgumentWrapper() = delete;
-    explicit ArgumentWrapper(ValueOperand value)
-        : identifier(std::nullopt), value(std::move(value)) {}
-    explicit ArgumentWrapper(std::string_view identifier, ValueOperand value)
-        : identifier(identifier), value(std::move(value)) {}
-
-    const std::optional<std::string_view> identifier;
-    const Value value;
-};

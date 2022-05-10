@@ -76,7 +76,7 @@ class Interpreter {
     std::vector<Value> m_registers;
     bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
-    std::queue<ArgumentWrapper> m_arguments { };
-    std::stack<Register> m_stack {};
+    std::queue<Value> m_arguments { };
+    std::stack<Value> m_stack {};
     std::optional<unsigned> m_pending_return_type {};
 };
