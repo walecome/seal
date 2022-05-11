@@ -56,6 +56,8 @@ class Value {
     Value() = default;
     virtual ~Value() = default;
 
+    bool is_same_type(const Value& other) const;
+
     bool is_vector() const;
     bool is_string() const;
     bool is_integer() const;
@@ -67,6 +69,8 @@ class Value {
     Integer as_integer() const;
     Real as_real() const;
     Boolean as_boolean() const;
+
+    bool operator==(const Value& other) const;
 
     std::variant<Integer, Real, String, Vector, Boolean>& data() const;
 };

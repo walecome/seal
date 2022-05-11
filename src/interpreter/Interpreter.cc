@@ -26,22 +26,22 @@ Value create_from_value_operand(const ValueOperand& value_operand) {
   ASSERT_NOT_REACHED_MSG("create_from_value_operand()");
 }
 
-Value create_from_string(String value) {
+Value create_from(String value) {
   // TODO: Implement
   ASSERT_NOT_REACHED_MSG("create_from_string()");
 }
 
-Value create_from_boolean(Boolean value) {
+Value create_from(Boolean value) {
   // TODO: Implement
   ASSERT_NOT_REACHED_MSG("create_from_boolean()");
 }
 
-Value create_from_integer(Integer value) {
+Value create_from(Integer value) {
   // TODO: Implement
   ASSERT_NOT_REACHED_MSG("create_from_integer()");
 }
 
-Value create_from_real(Real value) {
+Value create_from(Real value) {
   // TODO: Implement
   ASSERT_NOT_REACHED_MSG("create_from_real()");
 }
@@ -214,21 +214,22 @@ Value Interpreter::resolve_to_value(const Operand& source) const {
 template <class BinaryOperator>
 struct BinOpVisitor {
     template <typename T, typename U>
-    ValueOperand operator()(T, U) {
+    Value operator()(T, U) {
         ASSERT_NOT_REACHED();
     }
 
-    ValueOperand operator()(StringOperand, StringOperand) {
+    Value operator()(String, String) {
         ASSERT_NOT_REACHED();
     }
 
-    ValueOperand operator()(VectorOperand, VectorOperand) {
+    Value operator()(Vector, Vector) {
         ASSERT_NOT_REACHED();
     }
 
     template <typename T>
-    ValueOperand operator()(T a, T b) {
-        return ValueOperand { T { BinaryOperator {}(a, b) } };
+    Value operator()(T a, T b) {
+        auto result = BinaryOperator{}(a.value(), b.value());
+        return create_from(T(result));
     }
 };
 
@@ -246,14 +247,15 @@ struct BinOpPlusVisitor {
         std::string result = a.resolve(string_table) + b.resolve(string_table);
         // TODO: Resulting String should not be inserted in string table.
         StringTable::Entry entry = string_table->add(std::move(result));
-        return create_from_string(String {entry});
+        return create_from(String {entry});
     }
 
     Value operator()(Vector, Vector) { ASSERT_NOT_REACHED(); }
 
     template <typename T>
     Value operator()(T a, T b) {
-        return Value { T { a + b } };
+        auto result =  a.value() + b.value();
+        return create_from(T(result));
     }
 };
 
@@ -310,12 +312,20 @@ struct CmpVisitor {
 
     template <typename T>
     Value operator()(T a, T b) {
-        return Operator {}(a.value, b.value);
+        bool result = Operator {}(a.value(), b.value());
+        return create_from(Boolean(result));
     }
 
     template <>
-    Value operator()(StringOperand a, StringOperand b) {
-        return Operator {}(*a.resolve(), *b.resolve());
+    Value operator()(String a, String b) {
+        bool result = Operator {}(a.resolve(string_table), b.resolve(string_table));
+        return create_from(Boolean(result));
+    }
+
+    template <>
+    Value operator()(Vector a, Vector b) {
+        bool result = a.values() == b.values();
+        return create_from(Boolean(result));
     }
 };
 
@@ -533,7 +543,7 @@ void Interpreter::index_move(const Quad& quad) {
     Value value;
 
     if (target.is_string()) {
-      value = create_from_string(bounds_checked_index(target.as_string(), index, m_string_table));
+      value = create_from(bounds_checked_index(target.as_string(), index, m_string_table));
     } else if (target.is_vector()) {
       value = bounds_checked_index(target.as_vector(), index);
     } else {
@@ -558,7 +568,7 @@ void Interpreter::interpret_and(const Quad& quad) {
     Value rhs = resolve_to_value(quad.src_b());
 
     Boolean result = Boolean(lhs.as_boolean().value() && rhs.as_boolean().value());
-    set_register(quad.dest().as_register(), create_from_boolean(result));
+    set_register(quad.dest().as_register(), create_from(result));
 }
 
 void Interpreter::interpret_or(const Quad& quad) {
@@ -566,7 +576,7 @@ void Interpreter::interpret_or(const Quad& quad) {
     Value rhs = resolve_to_value(quad.src_b());
 
     Boolean result = Boolean(lhs.as_boolean().value() || rhs.as_boolean().value());
-    set_register(quad.dest().as_register(), create_from_boolean(result));
+    set_register(quad.dest().as_register(), create_from(result));
 }
 
 StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
@@ -639,18 +649,18 @@ std::optional<Value> Interpreter::call_c_func(
         case Primitive::INT: {
             unsigned long val =
                 *(static_cast<unsigned long*>(result_wrapper.buffer()));
-            return create_from_integer(Integer(val));
+            return create_from(Integer(val));
         }
         case Primitive::FLOAT: {
             double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
-            return create_from_real(Real(val));
+            return create_from(Real(val));
         }
         case Primitive::STRING: {
             std::string val =
                 *(reinterpret_cast<char**>(result_wrapper.buffer()));
             // FIXME: Should avoid adding runtime strings to the string table.
             StringTable::Entry entry = m_string_table->add(std::move(val));
-            return create_from_string(String(entry));
+            return create_from(String(entry));
         }
         default:
             ASSERT_NOT_REACHED();
