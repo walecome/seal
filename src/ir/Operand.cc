@@ -110,7 +110,7 @@ struct OperandDebugPrinter {
 
 struct ValueOperandValuePrinter {
     std::string operator()(StringOperand value) {
-        return fmt::format("{}", *value.resolve());
+        return fmt::format("{}", value.resolve());
     }
     std::string operator()(IntOperand value) {
         return fmt::format("{}", value);

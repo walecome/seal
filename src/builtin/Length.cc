@@ -12,7 +12,7 @@ ValueOperand get_length(const std::vector<ValueOperand>& args) {
     const ValueOperand& operand = args[0];
 
     if (operand.is_string()) {
-        return IrFunction::create_immediate_int(operand.as_string().resolve()->size());
+        return IrFunction::create_immediate_int(operand.as_string().resolve().size());
     }
 
     if (operand.is_vector()) {

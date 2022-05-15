@@ -63,7 +63,7 @@ struct StringOperand {
 
     operator StringTable::Key() const { return value; }
 
-    StringTable::value_type_t resolve() const {
+    std::string_view resolve() const {
         return m_string_table->get_at(value);
     }
 

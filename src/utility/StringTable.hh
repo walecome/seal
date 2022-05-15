@@ -5,11 +5,10 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <string_view>
 
 class StringTable {
    public:
-    using value_type_t = std::string const*;
-
     struct Key {
         Key() : id(0) {}
         Key(size_t id) : id(id) {}
@@ -30,7 +29,7 @@ class StringTable {
 
     struct Entry {
         const Key key;
-        const value_type_t value;
+        const std::string_view value;
     };
 
     StringTable() = default;
@@ -42,7 +41,7 @@ class StringTable {
 
     Entry add(char c);
 
-    value_type_t get_at(Key key) const;
+    std::string_view get_at(Key key) const;
 
     void dump() const;
 

@@ -608,15 +608,15 @@ std::optional<Value> Interpreter::call_c_func(
     StringTable::Key lib, StringTable::Key func,
     const std::vector<Value>& args, unsigned return_type_id) {
     Result<dynlib::DynamicLibrary*> loaded_lib_or_error =
-        dynlib::load_lib(*m_string_table->get_at(lib));
+        dynlib::load_lib(m_string_table->get_at(lib));
     if (loaded_lib_or_error.is_error()) {
         ASSERT_NOT_REACHED_MSG("Could not load expected library");
     }
 
     dynlib::DynamicLibrary* loaded_lib = loaded_lib_or_error.get();
-    ASSERT(loaded_lib->has_symbol(*m_string_table->get_at(func)));
+    ASSERT(loaded_lib->has_symbol(m_string_table->get_at(func)));
     dynlib::DynamicLibrary::Callable callable =
-        loaded_lib->get_callable(*m_string_table->get_at(func));
+        loaded_lib->get_callable(m_string_table->get_at(func));
 
     std::vector<ptr_t<vm::CTypeWrapper>> wrapped_args;
 
