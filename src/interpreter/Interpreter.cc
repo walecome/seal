@@ -249,7 +249,7 @@ struct BinOpPlusVisitor {
         std::string result = std::string(resolved_a) + std::string(resolved_b);
         // TODO: Resulting String should not be inserted in string table.
         StringTable::Entry entry = string_table->add(std::move(result));
-        return create_from(String {entry});
+        return create_from(String {entry.key});
     }
 
     Value operator()(Vector, Vector) { ASSERT_NOT_REACHED(); }
@@ -529,7 +529,7 @@ String bounds_checked_index(String target, int index, StringTable* string_table)
   char value_at_index = resolved[index];
   // FIXME: We really shouldn't add runtime strings to the string table.
   StringTable::Entry entry = string_table->add(value_at_index);
-  return String(entry);
+  return String(entry.key);
 }
 
 Value bounds_checked_index(Vector target, int index) {
@@ -662,7 +662,7 @@ std::optional<Value> Interpreter::call_c_func(
                 *(reinterpret_cast<char**>(result_wrapper.buffer()));
             // FIXME: Should avoid adding runtime strings to the string table.
             StringTable::Entry entry = m_string_table->add(std::move(val));
-            return create_from(String(entry));
+            return create_from(String(entry.key));
         }
         default:
             ASSERT_NOT_REACHED();
