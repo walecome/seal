@@ -8,9 +8,9 @@
 
 #include "ffi.h"
 
+#include "CTypeWrapper.hh"
 #include "Constants.hh"
 #include "Result.hh"
-#include "CTypeWrapper.hh"
 
 namespace dynlib {
 class DynamicLibrary {
@@ -21,25 +21,25 @@ class DynamicLibrary {
     ~DynamicLibrary() { dlclose(m_handle); }
 
     class Callable {
-    public:
+       public:
         Callable() = default;
 
-        void call() {
-            throw 1;
-        }
+        void call() { throw 1; }
 
         template <std::size_t N>
-        void call(vm::CResultWrapper& wrapper, std::vector<ptr_t<vm::CTypeWrapper>>& values) {
+        void call(vm::CResultWrapper& wrapper,
+                  std::vector<ptr_t<vm::CTypeWrapper>>& values) {
             ffi_cif cif;
-            ffi_type *arg_types[N];
-            void *arg_values[N];
+            ffi_type* arg_types[N];
+            void* arg_values[N];
 
             for (std::size_t i = 0; i < N; ++i) {
                 arg_types[i] = &values[i]->get_type();
                 arg_values[i] = values[i]->get_value();
             }
 
-            ffi_status status = ffi_prep_cif(&cif, FFI_DEFAULT_ABI, N, &wrapper.type(), arg_types);
+            ffi_status status = ffi_prep_cif(&cif, FFI_DEFAULT_ABI, N,
+                                             &wrapper.type(), arg_types);
             if (status != FFI_OK) {
                 throw 1;
             }
@@ -63,7 +63,7 @@ class DynamicLibrary {
 
         CFunctionType f;
         *(void**)(&f) = dlsym(m_handle, func.c_str());
-        Callable callable =  Callable(f);
+        Callable callable = Callable(f);
         m_cached_callables[func] = callable;
         return callable;
     }
@@ -76,7 +76,7 @@ class DynamicLibrary {
 
    private:
     void* const m_handle;
-    
+
     std::unordered_map<std::string, Callable> m_cached_callables {};
 };
 }  // namespace dynlib
