@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <variant>
 #include <string_view>
+#include <variant>
 
 #include "utility/StringTable.hh"
 
@@ -11,26 +11,43 @@ class Boolean {
     explicit Boolean(bool value);
 
     bool value() const;
+
+    bool operator==(const Boolean& other) const;
+
+   private:
+    const bool m_value;
 };
 
 class Integer {
    public:
     explicit Integer(int value);
 
+    bool operator==(const Integer& other) const;
+
     int value() const;
+
+   private:
+    const int m_value;
 };
 
 class Real {
    public:
     explicit Real(double value);
 
+    bool operator==(const Real& other) const;
+
     double value() const;
+
+   private:
+    const double m_value;
 };
 
 class String {
    public:
     explicit String(std::string runtime_string);
     explicit String(StringTable::Key compiletime_string);
+
+    bool operator==(const String& other) const;
 
     std::string_view resolve(const StringTable& string_table) const;
 
@@ -44,14 +61,19 @@ class Vector {
    public:
     explicit Vector(std::vector<Value> values);
 
+    bool operator==(const Vector& other) const;
+
     const std::vector<Value>& values() const;
     std::vector<Value>& mutable_values();
 
    private:
-    std::vector<Value> m_values;
+    // std::vector<Value> m_values;
 };
 
 class Value {
+  private:
+    using value_type_t = std::variant<Integer, Real, String, Vector, Boolean>;
+
    public:
     Value();
 
@@ -60,6 +82,8 @@ class Value {
 
     Value(Value&& other);
     Value& operator=(Value&& other);
+
+    bool operator==(const Value& other) const;
 
     Value copy() const;
 
@@ -77,8 +101,8 @@ class Value {
     Real as_real() const;
     Boolean as_boolean() const;
 
-    bool operator==(const Value& other) const;
+    const value_type_t& data() const;
 
-    std::variant<Integer, Real, String, Vector, Boolean>& data() const;
+   private:
+    std::unique_ptr<value_type_t> m_data;
 };
-
