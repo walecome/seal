@@ -244,7 +244,9 @@ struct BinOpPlusVisitor {
     }
 
     Value operator()(String a, String b) {
-        std::string result = a.resolve(string_table) + b.resolve(string_table);
+        std::string_view resolved_a = a.resolve(*string_table);
+        std::string_view resolved_b = b.resolve(*string_table);
+        std::string result = std::string(resolved_a) + std::string(resolved_b);
         // TODO: Resulting String should not be inserted in string table.
         StringTable::Entry entry = string_table->add(std::move(result));
         return create_from(String {entry});
@@ -318,7 +320,7 @@ struct CmpVisitor {
 
     template <>
     Value operator()(String a, String b) {
-        bool result = Operator {}(a.resolve(string_table), b.resolve(string_table));
+        bool result = Operator {}(a.resolve(*string_table), b.resolve(*string_table));
         return create_from(Boolean(result));
     }
 
@@ -521,7 +523,7 @@ void bounds_check(Vector vec, int index) {
 }
 
 String bounds_checked_index(String target, int index, StringTable* string_table) {
-  std::string_view resolved = target.resolve(string_table);
+  std::string_view resolved = target.resolve(*string_table);
   bounds_check(resolved, index);
 
   char value_at_index = resolved[index];
