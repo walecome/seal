@@ -30,12 +30,13 @@ DynamicLibrary* get_lib(const std::string name, void* handle) {
     return it->second.get();
 }
 
-Result<DynamicLibrary*> load_lib(const std::string& filename, bool verbose) {
-    void* handle = dlopen(filename.c_str(), RTLD_LAZY);
+Result<DynamicLibrary*> load_lib(std::string_view filename, bool verbose) {
+    std::string null_terminated_filename = std::string(filename);
+    void* handle = dlopen(null_terminated_filename.c_str(), RTLD_LAZY);
     if (!handle) {
         if (verbose) {
-            fmt::print("Failed to load shared library \"{}\": {}\n", filename,
-                       dlerror());
+            fmt::print("Failed to load shared library \"{}\": {}\n",
+                       null_terminated_filename, dlerror());
         }
         return Result<DynamicLibrary*>::error();
     }
@@ -44,10 +45,11 @@ Result<DynamicLibrary*> load_lib(const std::string& filename, bool verbose) {
     dlerror();
 
     if (verbose) {
-        fmt::print("Successfully loaded \"{}\"\n", filename);
+        fmt::print("Successfully loaded \"{}\"\n", null_terminated_filename);
     }
 
-    return Result<DynamicLibrary*>::result(get_lib(filename, handle));
+    return Result<DynamicLibrary*>::result(
+        get_lib(null_terminated_filename, handle));
 }
 
 }  // namespace dynlib

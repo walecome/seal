@@ -55,28 +55,30 @@ class DynamicLibrary {
         friend DynamicLibrary;
     };
 
-    Callable get_callable(const std::string& func) {
+    Callable get_callable(std::string_view func) {
         auto it = m_cached_callables.find(func);
         if (it != m_cached_callables.end()) {
             return it->second;
         }
 
         CFunctionType f;
-        *(void**)(&f) = dlsym(m_handle, func.c_str());
+        std::string null_terminated_func_name = std::string(func);
+        *(void**)(&f) = dlsym(m_handle, null_terminated_func_name.c_str());
         Callable callable = Callable(f);
         m_cached_callables[func] = callable;
         return callable;
     }
 
-    bool has_symbol(const std::string& func) {
+    bool has_symbol(std::string_view func) {
+        std::string null_terminated_func_name = std::string(func);
         void* (*f)(...);
-        *(void**)(&f) = dlsym(m_handle, func.c_str());
+        *(void**)(&f) = dlsym(m_handle, null_terminated_func_name.c_str());
         return f != NULL;
     }
 
    private:
     void* const m_handle;
 
-    std::unordered_map<std::string, Callable> m_cached_callables {};
+    std::unordered_map<std::string_view, Callable> m_cached_callables {};
 };
 }  // namespace dynlib

@@ -6,16 +6,16 @@
 StringTable::Entry StringTable::add(std::string&& s) {
     StringTable::Key key = Key::from(m_table.size());
     auto allocated = std::make_unique<const std::string>(s);
-    value_type_t value = allocated.get();
+    std::string_view value = *allocated;
     m_table.push_back(std::move(allocated));
     return Entry { key, value };
 }
 
 StringTable::Entry StringTable::add(char c) { return add(std::string(1, c)); }
 
-StringTable::value_type_t StringTable::get_at(Key key) const {
+std::string_view StringTable::get_at(Key key) const {
     ASSERT(contains(key));
-    return m_table[key.id].get();
+    return *m_table[key.id];
 }
 
 bool StringTable::contains(Key key) const { return key.id < m_table.size(); }
