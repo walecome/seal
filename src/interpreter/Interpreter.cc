@@ -184,7 +184,8 @@ void Interpreter::interpret_function(unsigned function_id) {
 }
 
 Value Interpreter::resolve_register(Register reg) const {
-    return m_registers[reg.index()];
+    // FIXME: Figure out of we always need to copy here.
+    return m_registers[reg.index()].copy();
 }
 
 void Interpreter::set_register(Register reg, Value value) {
@@ -269,7 +270,7 @@ void binop_helper(Interpreter* interpreter, const Quad& quad) {
     Value result =
         std::visit(BinOpVisitor<Operator> {}, lhs.data(), rhs.data());
 
-    interpreter->set_register(quad.dest().as_register(), result);
+    interpreter->set_register(quad.dest().as_register(), std::move(result));
 }
 
 void plus_helper(Interpreter* interpreter, const Quad& quad,
@@ -279,7 +280,7 @@ void plus_helper(Interpreter* interpreter, const Quad& quad,
 
     Value result = std::visit(BinOpPlusVisitor { string_table }, lhs.data(), rhs.data());
 
-    interpreter->set_register(quad.dest().as_register(), result);
+    interpreter->set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::add(const Quad& quad) {
@@ -338,7 +339,7 @@ void cmp_helper(Interpreter* interpreter, StringTable* string_table,
     Value rhs = interpreter->resolve_to_value(quad.src_b());
 
     Value result = std::visit(CmpVisitor<Operator> { string_table }, lhs.data(), rhs.data());
-    interpreter->set_register(quad.dest().as_register(), result);
+    interpreter->set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
@@ -388,17 +389,16 @@ void Interpreter::jmp_nz(const Quad& quad) {
 }
 
 void Interpreter::push_arg(const Quad& quad) {
-    Value value = resolve_to_value(quad.src_a());
-    m_arguments.push(value);
+    m_arguments.push(resolve_to_value(quad.src_a()));
 }
 
 void Interpreter::pop_arg(const Quad& quad) {
     ASSERT(!m_arguments.empty());
 
-    Value argument = m_arguments.front();
+    Value argument = std::move(m_arguments.front());
     m_arguments.pop();
 
-    set_register(quad.dest().as_register(), argument );
+    set_register(quad.dest().as_register(), std::move(argument) );
 }
 
 void Interpreter::save(const Quad& quad) {
@@ -406,7 +406,7 @@ void Interpreter::save(const Quad& quad) {
     int end_index = quad.src_b().as_register().index();
 
     for (int i = start_idx; i <= end_index; ++i) {
-        m_stack.push(m_registers.at(i));
+        m_stack.push(m_registers.at(i).copy());
     }
 }
 
@@ -414,7 +414,7 @@ void Interpreter::restore(const Quad& quad) {
     int start_idx = quad.src_a().as_register().index();
     int end_index = quad.src_b().as_register().index();
     for (int i = end_index; i >= start_idx; --i) {
-        set_register(Register(i), m_stack.top());
+        set_register(Register(i), std::move(m_stack.top()));
         m_stack.pop();
     }
 }
@@ -427,11 +427,11 @@ void Interpreter::call(const Quad& quad) {
     if (BuiltIn::is_builtin(func)) {
         std::vector<Value> args {};
         while (!m_arguments.empty()) {
-            args.push_back(m_arguments.front());
+            args.push_back(std::move(m_arguments.front()));
             m_arguments.pop();
         }
         Value ret = BuiltIn::call_builtin_function(func, args);
-        set_register(quad.dest().as_register(), ret);
+        set_register(quad.dest().as_register(), std::move(ret));
         return;
     }
 
@@ -446,7 +446,7 @@ void Interpreter::call_c(const Quad& quad) {
 
     std::vector<Value> args {};
     while (!m_arguments.empty()) {
-        args.push_back(m_arguments.front());
+        args.push_back(std::move(m_arguments.front()));
         m_arguments.pop();
     }
 
@@ -456,7 +456,7 @@ void Interpreter::call_c(const Quad& quad) {
         call_c_func(lib, func, args, take_pending_type_id());
 
     if (return_value.has_value()) {
-        set_register(quad.dest().as_register(), *return_value);
+        set_register(quad.dest().as_register(), std::move(*return_value));
     }
 }
 
@@ -487,7 +487,7 @@ void Interpreter::move(const Quad& quad) {
         ASSERT_NOT_REACHED_MSG("TODO: Interpreter::move array");
         // source = source.as_vector();
     }
-    set_register(quad.dest().as_register(), source);
+    set_register(quad.dest().as_register(), std::move(source));
 }
 
 void bounds_check(std::string_view s, int index) {
@@ -534,7 +534,7 @@ String bounds_checked_index(String target, int index, StringTable* string_table)
 
 Value bounds_checked_index(Vector target, int index) {
     bounds_check(target, index);
-    return target.values().at(index);
+    return target.values().at(index).copy();
 }
 
 void Interpreter::index_move(const Quad& quad) {
@@ -552,7 +552,7 @@ void Interpreter::index_move(const Quad& quad) {
         ASSERT_NOT_REACHED();
     }
 
-    set_register(quad.dest().as_register(), value);
+    set_register(quad.dest().as_register(), std::move(value));
 }
 
 void Interpreter::index_assign(const Quad& quad) {
@@ -562,7 +562,7 @@ void Interpreter::index_assign(const Quad& quad) {
     Value value = resolve_to_value(quad.src_b());
 
     bounds_check(indexed, index);
-    indexed.mutable_values().at(index) = value;
+    indexed.mutable_values().at(index) = std::move(value);
 }
 
 void Interpreter::interpret_and(const Quad& quad) {

@@ -49,7 +49,7 @@ class CRealWrapper : public CTypeWrapper {
 
 }  // namespace
 
-ptr_t<CTypeWrapper> CTypeWrapper::from(const StringTable* string_table, Value value) {
+ptr_t<CTypeWrapper> CTypeWrapper::from(const StringTable* string_table, const Value& value) {
     if (value.is_integer()) {
         return std::make_unique<CIntWrapper>(value.as_integer().value());
     }

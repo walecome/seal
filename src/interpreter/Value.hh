@@ -53,8 +53,15 @@ class Vector {
 
 class Value {
    public:
-    Value() = default;
-    virtual ~Value() = default;
+    Value();
+
+    Value(const Value& other) = delete;
+    Value& operator=(const Value& other) = delete;
+
+    Value(Value&& other);
+    Value& operator=(Value&& other);
+
+    Value copy() const;
 
     bool is_same_type(const Value& other) const;
 
@@ -74,3 +81,4 @@ class Value {
 
     std::variant<Integer, Real, String, Vector, Boolean>& data() const;
 };
+
