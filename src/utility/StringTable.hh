@@ -2,37 +2,30 @@
 
 #include <fmt/format.h>
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 class StringTable {
-
-public:
-    using value_type_t = std::string const *;
+   public:
+    using value_type_t = std::string const*;
 
     struct Key {
         Key() : id(0) {}
         Key(size_t id) : id(id) {}
 
-        Key(const Key& other) {
-            id = other.id;
-        }
+        Key(const Key& other) { id = other.id; }
 
         Key& operator=(const Key& other) {
             id = other.id;
             return *this;
         }
 
-        public:
-        static Key from(size_t id) {
-            return Key(id);
-        }
+       public:
+        static Key from(size_t id) { return Key(id); }
         size_t id;
 
-        std::string to_string() const {
-            return fmt::format("s{}", id);
-        }
+        std::string to_string() const { return fmt::format("s{}", id); }
     };
 
     struct Entry {
@@ -53,9 +46,8 @@ public:
 
     void dump() const;
 
-private:
-
+   private:
     bool contains(Key key) const;
 
-    std::vector<std::unique_ptr<const std::string>> m_table{};
+    std::vector<std::unique_ptr<const std::string>> m_table {};
 };
