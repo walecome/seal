@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <variant>
+#include <string_view>
 
 #include "utility/StringTable.hh"
 
@@ -31,8 +32,7 @@ class String {
     explicit String(std::string runtime_string);
     explicit String(StringTable::Entry compiletime_string);
 
-    // TODO: Return a std::string_view. Data is either owned by the String class or the string table.
-    const std::string& resolve(const StringTable* string_table) const;
+    std::string_view resolve(const StringTable& string_table) const;
 
    private:
     std::variant<std::string, StringTable::Entry> m_data;

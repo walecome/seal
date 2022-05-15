@@ -24,15 +24,15 @@ class CIntWrapper : public CTypeWrapper {
 
 class CStringWrapper : public CTypeWrapper {
    public:
-    explicit CStringWrapper(const std::string& value)
-        : CTypeWrapper(ffi_type_pointer), m_value(value.c_str()) {}
+    explicit CStringWrapper(std::string value)
+        : CTypeWrapper(ffi_type_pointer), m_value(std::move(value)) {}
 
     void* get_value() {
-        return &m_value;
+        return m_value.data();
     }
 
    private:
-    const char* m_value;
+    std::string m_value;
 };
 
 class CRealWrapper : public CTypeWrapper {
@@ -57,7 +57,8 @@ ptr_t<CTypeWrapper> CTypeWrapper::from(const StringTable* string_table, Value va
         return std::make_unique<CRealWrapper>(value.as_real().value());
     }
     if (value.is_string()) {
-        return std::make_unique<CStringWrapper>(value.as_string().resolve(string_table));
+        std::string resolved = std::string(value.as_string().resolve(*string_table));
+        return std::make_unique<CStringWrapper>(std::move(resolved));
     }
     ASSERT_NOT_REACHED_MSG("Unsupported value type");
 }
