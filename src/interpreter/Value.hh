@@ -30,12 +30,12 @@ class Real {
 class String {
    public:
     explicit String(std::string runtime_string);
-    explicit String(StringTable::Entry compiletime_string);
+    explicit String(StringTable::Key compiletime_string);
 
     std::string_view resolve(const StringTable& string_table) const;
 
    private:
-    std::variant<std::string, StringTable::Entry> m_data;
+    std::variant<std::string, StringTable::Key> m_data;
 };
 
 class Value;
