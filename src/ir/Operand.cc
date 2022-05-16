@@ -4,11 +4,21 @@
 #include "ir/IrFunction.hh"
 #include "ir/Operand.hh"
 
-bool ValueOperand::is_vector() const { return holds<VectorOperand>(); }
-bool ValueOperand::is_integer() const { return holds<IntOperand>(); }
-bool ValueOperand::is_number() const { return is_integer() || is_real(); }
-bool ValueOperand::is_real() const { return holds<RealOperand>(); }
-bool ValueOperand::is_string() const { return holds<StringOperand>(); }
+bool ValueOperand::is_vector() const {
+    return holds<VectorOperand>();
+}
+bool ValueOperand::is_integer() const {
+    return holds<IntOperand>();
+}
+bool ValueOperand::is_number() const {
+    return is_integer() || is_real();
+}
+bool ValueOperand::is_real() const {
+    return holds<RealOperand>();
+}
+bool ValueOperand::is_string() const {
+    return holds<StringOperand>();
+}
 
 VectorOperand ValueOperand::as_vector() const {
     ASSERT(is_vector());
@@ -30,10 +40,18 @@ StringOperand ValueOperand::as_string() const {
     return get_as<StringOperand>();
 }
 
-bool Operand::is_function() const { return holds<FunctionOperand>(); }
-bool Operand::is_label() const { return holds<LabelOperand>(); }
-bool Operand::is_value() const { return holds<ValueOperand>(); }
-bool Operand::is_variable() const { return holds<VariableOperand>(); }
+bool Operand::is_function() const {
+    return holds<FunctionOperand>();
+}
+bool Operand::is_label() const {
+    return holds<LabelOperand>();
+}
+bool Operand::is_value() const {
+    return holds<ValueOperand>();
+}
+bool Operand::is_variable() const {
+    return holds<VariableOperand>();
+}
 
 ValueOperand Operand::as_value() const {
     ASSERT(is_value());
@@ -104,7 +122,7 @@ struct OperandDebugPrinter {
     }
 
     std::string operator()(Register reg) {
-      return reg.to_string();
+        return reg.to_string();
     }
 };
 
