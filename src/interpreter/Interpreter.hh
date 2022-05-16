@@ -6,6 +6,7 @@
 #include <vector>
 #include <queue>
 
+#include "interpreter/Context.hh"
 #include "interpreter/StackFrame.hh"
 #include "interpreter/Value.hh"
 #include "ir/Operand.hh"
@@ -71,6 +72,8 @@ class Interpreter {
     unsigned take_pending_type_id();
     void set_pending_type_id(unsigned value);
 
+    const Context& context() const;
+
     const QuadCollection& m_quads;
     StringTable* m_string_table;
     std::vector<Value> m_registers;
@@ -79,4 +82,5 @@ class Interpreter {
     std::queue<Value> m_arguments { };
     std::stack<Value> m_stack {};
     std::optional<unsigned> m_pending_return_type {};
+    const Context m_context {};
 };

@@ -13,7 +13,6 @@
 #include "fmt/core.h"
 #include "ir/QuadCollection.hh"
 #include "types/CType.hh"
-
 namespace {
 
 void runtime_error(const std::string& message) {
@@ -21,33 +20,11 @@ void runtime_error(const std::string& message) {
     exit(EXIT_FAILURE);
 }
 
-Value create_from_value_operand(const ValueOperand& value_operand) {
-  // TODO: Implement
-  ASSERT_NOT_REACHED_MSG("create_from_value_operand()");
-}
-
-Value create_from(String value) {
-  // TODO: Implement
-  ASSERT_NOT_REACHED_MSG("create_from_string()");
-}
-
-Value create_from(Boolean value) {
-  // TODO: Implement
-  ASSERT_NOT_REACHED_MSG("create_from_boolean()");
-}
-
-Value create_from(Integer value) {
-  // TODO: Implement
-  ASSERT_NOT_REACHED_MSG("create_from_integer()");
-}
-
-Value create_from(Real value) {
-  // TODO: Implement
-  ASSERT_NOT_REACHED_MSG("create_from_real()");
-}
+Value create_from_value_operand(const ValueOperand& value_operand,
+                                const Context& context);
 
 Register return_register() {
-  return Register(0);
+    return Register(0);
 }
 
 }  // namespace
@@ -57,7 +34,8 @@ Interpreter::Interpreter(const QuadCollection& quads, StringTable* string_table,
     : m_quads { quads },
       m_string_table { string_table },
       m_registers(std::vector<Value>(quads.register_count)),
-      m_verbose { verbose } {}
+      m_verbose { verbose } {
+}
 
 void Interpreter::interpret() {
     m_stack_frames.push(StackFrame { 0, nullptr });
@@ -200,7 +178,7 @@ Value Interpreter::resolve_to_value(const Operand& source) const {
     // TODO: Support functions
     ASSERT(!source.is_function());
     if (source.is_value()) {
-        return create_from_value_operand(source.as_value());
+        return create_from_value_operand(source.as_value(), context());
     }
 
     if (source.is_register()) {
@@ -214,6 +192,10 @@ Value Interpreter::resolve_to_value(const Operand& source) const {
 
 template <class BinaryOperator>
 struct BinOpVisitor {
+    BinOpVisitor(const Context& context) : context(context) {
+    }
+    const Context& context;
+
     template <typename T, typename U>
     Value operator()(T, U) {
         ASSERT_NOT_REACHED();
@@ -229,15 +211,18 @@ struct BinOpVisitor {
 
     template <typename T>
     Value operator()(T a, T b) {
-        auto result = BinaryOperator{}(a.value(), b.value());
-        return create_from(T(result));
+        auto result = BinaryOperator {}(a.value(), b.value());
+        return context.create_value_from(T(result));
     }
 };
 
 struct BinOpPlusVisitor {
-    BinOpPlusVisitor(StringTable* string_table) : string_table(string_table) {}
+    BinOpPlusVisitor(StringTable* string_table, const Context& context)
+        : string_table(string_table), context(context) {
+    }
 
     StringTable* string_table;
+    const Context& context;
 
     template <typename T, typename U>
     Value operator()(T, U) {
@@ -250,63 +235,70 @@ struct BinOpPlusVisitor {
         std::string result = std::string(resolved_a) + std::string(resolved_b);
         // TODO: Resulting String should not be inserted in string table.
         StringTable::Entry entry = string_table->add(std::move(result));
-        return create_from(String {entry.key});
+        return context.create_value_from(String { entry.key });
     }
 
-    Value operator()(Vector, Vector) { ASSERT_NOT_REACHED(); }
+    Value operator()(Vector, Vector) {
+        ASSERT_NOT_REACHED();
+    }
 
     template <typename T>
     Value operator()(T a, T b) {
-        auto result =  a.value() + b.value();
-        return create_from(T(result));
+        auto result = a.value() + b.value();
+        return context.create_value_from(T(result));
     }
 };
 
 template <class Operator>
-void binop_helper(Interpreter* interpreter, const Quad& quad) {
+void binop_helper(Interpreter* interpreter, const Quad& quad,
+                  const Context& context) {
     Value lhs = interpreter->resolve_to_value(quad.src_a());
     Value rhs = interpreter->resolve_to_value(quad.src_b());
 
     Value result =
-        std::visit(BinOpVisitor<Operator> {}, lhs.data(), rhs.data());
+        std::visit(BinOpVisitor<Operator> { context }, lhs.data(), rhs.data());
 
     interpreter->set_register(quad.dest().as_register(), std::move(result));
 }
 
 void plus_helper(Interpreter* interpreter, const Quad& quad,
-                 StringTable* string_table) {
+                 StringTable* string_table, const Context& context) {
     Value lhs = interpreter->resolve_to_value(quad.src_a());
     Value rhs = interpreter->resolve_to_value(quad.src_b());
 
-    Value result = std::visit(BinOpPlusVisitor { string_table }, lhs.data(), rhs.data());
+    Value result = std::visit(BinOpPlusVisitor { string_table, context },
+                              lhs.data(), rhs.data());
 
     interpreter->set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::add(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::ADD);
-    plus_helper(this, quad, m_string_table);
+    plus_helper(this, quad, m_string_table, context());
 }
 
 void Interpreter::sub(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::SUB);
-    binop_helper<std::minus<>>(this, quad);
+    binop_helper<std::minus<>>(this, quad, context());
 }
 void Interpreter::mult(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MULT);
-    binop_helper<std::multiplies<>>(this, quad);
+    binop_helper<std::multiplies<>>(this, quad, context());
 }
 
 void Interpreter::div(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::DIV);
-    binop_helper<std::divides<>>(this, quad);
+    binop_helper<std::divides<>>(this, quad, context());
 }
 
 template <class Operator>
 struct CmpVisitor {
-    CmpVisitor(StringTable* string_table) : string_table(string_table) {}
+    CmpVisitor(StringTable* string_table, const Context& context)
+        : string_table(string_table), context(context) {
+    }
 
     StringTable* string_table;
+    const Context& context;
 
     template <typename T, typename U>
     Value operator()(T, U) {
@@ -316,54 +308,56 @@ struct CmpVisitor {
     template <typename T>
     Value operator()(T a, T b) {
         bool result = Operator {}(a.value(), b.value());
-        return create_from(Boolean(result));
+        return context.create_value_from(Boolean(result));
     }
 
     template <>
     Value operator()(String a, String b) {
-        bool result = Operator {}(a.resolve(*string_table), b.resolve(*string_table));
-        return create_from(Boolean(result));
+        bool result =
+            Operator {}(a.resolve(*string_table), b.resolve(*string_table));
+        return context.create_value_from(Boolean(result));
     }
 
     template <>
     Value operator()(Vector a, Vector b) {
         bool result = a.values() == b.values();
-        return create_from(Boolean(result));
+        return context.create_value_from(Boolean(result));
     }
 };
 
 template <class Operator>
 void cmp_helper(Interpreter* interpreter, StringTable* string_table,
-                const Quad& quad) {
+                const Quad& quad, const Context& context) {
     Value lhs = interpreter->resolve_to_value(quad.src_a());
     Value rhs = interpreter->resolve_to_value(quad.src_b());
 
-    Value result = std::visit(CmpVisitor<Operator> { string_table }, lhs.data(), rhs.data());
+    Value result = std::visit(CmpVisitor<Operator> { string_table, context },
+                              lhs.data(), rhs.data());
     interpreter->set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
-    cmp_helper<std::equal_to<>>(this, m_string_table, quad);
+    cmp_helper<std::equal_to<>>(this, m_string_table, quad, context());
 }
 
 void Interpreter::cmp_gt(const Quad& quad) {
-    cmp_helper<std::greater<>>(this, m_string_table, quad);
+    cmp_helper<std::greater<>>(this, m_string_table, quad, context());
 }
 
 void Interpreter::cmp_lt(const Quad& quad) {
-    cmp_helper<std::less<>>(this, m_string_table, quad);
+    cmp_helper<std::less<>>(this, m_string_table, quad, context());
 }
 
 void Interpreter::cmp_gteq(const Quad& quad) {
-    cmp_helper<std::greater_equal<>>(this, m_string_table, quad);
+    cmp_helper<std::greater_equal<>>(this, m_string_table, quad, context());
 }
 
 void Interpreter::cmp_lteq(const Quad& quad) {
-    cmp_helper<std::less_equal<>>(this, m_string_table, quad);
+    cmp_helper<std::less_equal<>>(this, m_string_table, quad, context());
 }
 
 void Interpreter::cmp_noteq(const Quad& quad) {
-    cmp_helper<std::not_equal_to<>>(this, m_string_table, quad);
+    cmp_helper<std::not_equal_to<>>(this, m_string_table, quad, context());
 }
 void Interpreter::jmp(const Quad& quad) {
     unsigned label_id = resolve_label(quad.dest());
@@ -398,7 +392,7 @@ void Interpreter::pop_arg(const Quad& quad) {
     Value argument = std::move(m_arguments.front());
     m_arguments.pop();
 
-    set_register(quad.dest().as_register(), std::move(argument) );
+    set_register(quad.dest().as_register(), std::move(argument));
 }
 
 void Interpreter::save(const Quad& quad) {
@@ -430,7 +424,7 @@ void Interpreter::call(const Quad& quad) {
             args.push_back(std::move(m_arguments.front()));
             m_arguments.pop();
         }
-        Value ret = BuiltIn::call_builtin_function(func, args);
+        Value ret = BuiltIn::call_builtin_function(func, args, context());
         set_register(quad.dest().as_register(), std::move(ret));
         return;
     }
@@ -480,10 +474,12 @@ void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
     Value source = resolve_to_value(quad.src_a());
     if (source.is_vector()) {
-        // TODO: Need to figure out if we want to copy here or not. It bascially comes down to
-        //       which type of value semantics we for objects like array (possible string).
-        //       Currently leaning towards a Python style, which would mean we need to add
-        //       copy functionality to the language.
+        // TODO: Need to figure out if we want to copy here or not. It bascially
+        // comes down to
+        //       which type of value semantics we for objects like array
+        //       (possible string). Currently leaning towards a Python style,
+        //       which would mean we need to add copy functionality to the
+        //       language.
         ASSERT_NOT_REACHED_MSG("TODO: Interpreter::move array");
         // source = source.as_vector();
     }
@@ -522,14 +518,15 @@ void bounds_check(Vector vec, int index) {
     }
 }
 
-String bounds_checked_index(String target, int index, StringTable* string_table) {
-  std::string_view resolved = target.resolve(*string_table);
-  bounds_check(resolved, index);
+String bounds_checked_index(String target, int index,
+                            StringTable* string_table) {
+    std::string_view resolved = target.resolve(*string_table);
+    bounds_check(resolved, index);
 
-  char value_at_index = resolved[index];
-  // FIXME: We really shouldn't add runtime strings to the string table.
-  StringTable::Entry entry = string_table->add(value_at_index);
-  return String(entry.key);
+    char value_at_index = resolved[index];
+    // FIXME: We really shouldn't add runtime strings to the string table.
+    StringTable::Entry entry = string_table->add(value_at_index);
+    return String(entry.key);
 }
 
 Value bounds_checked_index(Vector target, int index) {
@@ -545,9 +542,10 @@ void Interpreter::index_move(const Quad& quad) {
     Value value;
 
     if (target.is_string()) {
-      value = create_from(bounds_checked_index(target.as_string(), index, m_string_table));
+        value = context().create_value_from(
+            bounds_checked_index(target.as_string(), index, m_string_table));
     } else if (target.is_vector()) {
-      value = bounds_checked_index(target.as_vector(), index);
+        value = bounds_checked_index(target.as_vector(), index);
     } else {
         ASSERT_NOT_REACHED();
     }
@@ -569,19 +567,25 @@ void Interpreter::interpret_and(const Quad& quad) {
     Value lhs = resolve_to_value(quad.src_a());
     Value rhs = resolve_to_value(quad.src_b());
 
-    Boolean result = Boolean(lhs.as_boolean().value() && rhs.as_boolean().value());
-    set_register(quad.dest().as_register(), create_from(result));
+    Boolean result =
+        Boolean(lhs.as_boolean().value() && rhs.as_boolean().value());
+    set_register(quad.dest().as_register(),
+                 context().create_value_from(result));
 }
 
 void Interpreter::interpret_or(const Quad& quad) {
     Value lhs = resolve_to_value(quad.src_a());
     Value rhs = resolve_to_value(quad.src_b());
 
-    Boolean result = Boolean(lhs.as_boolean().value() || rhs.as_boolean().value());
-    set_register(quad.dest().as_register(), create_from(result));
+    Boolean result =
+        Boolean(lhs.as_boolean().value() || rhs.as_boolean().value());
+    set_register(quad.dest().as_register(),
+                 context().create_value_from(result));
 }
 
-StackFrame* Interpreter::current_frame() { return &m_stack_frames.top(); }
+StackFrame* Interpreter::current_frame() {
+    return &m_stack_frames.top();
+}
 
 void Interpreter::enter_new_frame() {
     m_stack_frames.emplace(current_frame()->program_counter(), current_frame());
@@ -604,9 +608,14 @@ void Interpreter::set_pending_type_id(unsigned value) {
     m_pending_return_type = value;
 }
 
-std::optional<Value> Interpreter::call_c_func(
-    StringTable::Key lib, StringTable::Key func,
-    const std::vector<Value>& args, unsigned return_type_id) {
+const Context& Interpreter::context() const {
+    return m_context;
+}
+
+std::optional<Value> Interpreter::call_c_func(StringTable::Key lib,
+                                              StringTable::Key func,
+                                              const std::vector<Value>& args,
+                                              unsigned return_type_id) {
     Result<dynlib::DynamicLibrary*> loaded_lib_or_error =
         dynlib::load_lib(m_string_table->get_at(lib));
     if (loaded_lib_or_error.is_error()) {
@@ -651,18 +660,18 @@ std::optional<Value> Interpreter::call_c_func(
         case Primitive::INT: {
             unsigned long val =
                 *(static_cast<unsigned long*>(result_wrapper.buffer()));
-            return create_from(Integer(val));
+            return context().create_value_from(Integer(val));
         }
         case Primitive::FLOAT: {
             double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
-            return create_from(Real(val));
+            return context().create_value_from(Real(val));
         }
         case Primitive::STRING: {
             std::string val =
                 *(reinterpret_cast<char**>(result_wrapper.buffer()));
             // FIXME: Should avoid adding runtime strings to the string table.
             StringTable::Entry entry = m_string_table->add(std::move(val));
-            return create_from(String(entry.key));
+            return context().create_value_from(String(entry.key));
         }
         default:
             ASSERT_NOT_REACHED();

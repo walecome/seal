@@ -71,6 +71,10 @@ std::string_view String::resolve(const StringTable& string_table) const {
 
 // VECTOR
 
+Vector::Vector()
+  // : m_values(std::vector<Value>())
+{}
+
 Vector::Vector(std::vector<Value> values)
 // : m_values(std::move(values))
 {
@@ -152,24 +156,24 @@ bool Value::is_boolean() const {
     return std::holds_alternative<Boolean>(data());
 }
 
-Vector Value::as_vector() const {
-    return std::get<Vector>(data());
+Vector& Value::as_vector() const {
+    return std::get<Vector>(mutable_data());
 }
 
-String Value::as_string() const {
-    return std::get<String>(data());
+String& Value::as_string() const {
+    return std::get<String>(mutable_data());
 }
 
-Integer Value::as_integer() const {
-    return std::get<Integer>(data());
+Integer& Value::as_integer() const {
+    return std::get<Integer>(mutable_data());
 }
 
-Real Value::as_real() const {
-    return std::get<Real>(data());
+Real& Value::as_real() const {
+    return std::get<Real>(mutable_data());
 }
 
-Boolean Value::as_boolean() const {
-    return std::get<Boolean>(data());
+Boolean& Value::as_boolean() const {
+    return std::get<Boolean>(mutable_data());
 }
 
 const Value::value_type_t& Value::data() const {
