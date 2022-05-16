@@ -21,7 +21,9 @@ void runtime_error(const std::string& message) {
 }
 
 Value create_from_value_operand(const ValueOperand& value_operand,
-                                const Context& context);
+                                const Context& context) {
+  ASSERT_NOT_REACHED_MSG("create_from_value_operand() not implemented");
+}
 
 Register return_register() {
     return Register(0);

@@ -1,5 +1,7 @@
 #include "interpreter/Value.hh"
 
+#include "interpreter/Context.hh"
+
 #include "Constants.hh"
 
 #include <utility>
@@ -67,6 +69,10 @@ std::string_view String::resolve(const StringTable& string_table) const {
         return string_table.get_at(entry);
     }
     ASSERT_NOT_REACHED();
+}
+
+std::string_view String::resolve(const Context& context) const {
+  return context.resolve(*this);
 }
 
 // VECTOR
@@ -178,6 +184,14 @@ Boolean& Value::as_boolean() const {
 
 const Value::value_type_t& Value::data() const {
     ASSERT(!!m_data);
+    return *m_data;
+}
 
+std::string Value::to_string() const {
+  ASSERT_NOT_REACHED_MSG("Value::to_string() not implemented");
+}
+
+Value::value_type_t& Value::mutable_data() const {
+    ASSERT(!!m_data);
     return *m_data;
 }
