@@ -21,3 +21,7 @@ Value Context::create_value_from(Real value) const {
 Value Context::create_value_from(Vector value) const {
   ASSERT_NOT_REACHED_MSG("Context::create_value_from(Vector) not implemented");
 }
+
+std::string_view Context::resolve(const String& string) const {
+  ASSERT_NOT_REACHED_MSG("Context::resolve(String) not implemented");
+}

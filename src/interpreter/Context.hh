@@ -9,4 +9,6 @@ class Context {
     Value create_value_from(Integer value) const;
     Value create_value_from(Real value) const;
     Value create_value_from(Vector value) const;
+
+    std::string_view resolve(const String& string) const;
 };

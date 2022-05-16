@@ -6,6 +6,8 @@
 
 #include "utility/StringTable.hh"
 
+class Context;
+
 class Boolean {
    public:
     explicit Boolean(bool value);
@@ -50,6 +52,7 @@ class String {
     bool operator==(const String& other) const;
 
     std::string_view resolve(const StringTable& string_table) const;
+    std::string_view resolve(const Context& context) const;
 
    private:
     std::variant<std::string, StringTable::Key> m_data;
