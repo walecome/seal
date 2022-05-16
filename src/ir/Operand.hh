@@ -9,14 +9,15 @@
 #include "ir/Register.hh"
 #include "utility/StringTable.hh"
 
-
 // This defines a struct with the identifier name. In addition it adds a member
 // named value of the given type, as well as an overload for that type.
-#define ADD_OPERAND_TYPE(NAME, TYPE)                                         \
-    struct NAME {                                                            \
-        NAME() = default;                                                    \
-        TYPE value {};                                                       \
-        operator TYPE() const { return value; }                              \
+#define ADD_OPERAND_TYPE(NAME, TYPE) \
+    struct NAME {                    \
+        NAME() = default;            \
+        TYPE value {};               \
+        operator TYPE() const {      \
+            return value;            \
+        }                            \
     };
 
 // For immediate operands
@@ -31,22 +32,29 @@ struct VectorOperand {
 
    public:
     using value_type_t = std::shared_ptr<vector_type_t>;
-    VectorOperand() : value { std::make_shared<vector_type_t>() } {}
+    VectorOperand() : value { std::make_shared<vector_type_t>() } {
+    }
 
     VectorOperand copy() {
         VectorOperand copy {};
-        std::copy(value->begin(), value->end(), std::back_inserter(*copy.value));
+        std::copy(value->begin(), value->end(),
+                  std::back_inserter(*copy.value));
         return copy;
     }
 
     value_type_t value;
 
-    operator value_type_t() const { return value; }
+    operator value_type_t() const {
+        return value;
+    }
 };
 
 struct StringOperand {
     StringOperand() = default;
-    explicit StringOperand(const StringTable::Key key, StringTable* string_table) : value(key), m_string_table(string_table) {}
+    explicit StringOperand(const StringTable::Key key,
+                           StringTable* string_table)
+        : value(key), m_string_table(string_table) {
+    }
 
     StringOperand(const StringOperand& other) {
         value = other.value;
@@ -61,14 +69,16 @@ struct StringOperand {
         return *this;
     }
 
-    operator StringTable::Key() const { return value; }
+    operator StringTable::Key() const {
+        return value;
+    }
 
     std::string_view resolve() const {
         return m_string_table->get_at(value);
     }
 
-    private:
-        StringTable* m_string_table {nullptr};
+   private:
+    StringTable* m_string_table { nullptr };
 };
 
 using value_operand_t =
@@ -78,8 +88,8 @@ struct ValueOperand {
     value_operand_t value {};
 
     VectorOperand as_vector() const;
-    IntOperand    as_int() const;
-    RealOperand   as_real() const;
+    IntOperand as_int() const;
+    RealOperand as_real() const;
     StringOperand as_string() const;
 
     bool is_vector() const;
@@ -97,7 +107,7 @@ struct ValueOperand {
     T get_as() const {
         return std::get<T>(value);
     }
-    
+
     std::string to_debug_string() const;
     std::string to_value_string() const;
 };
@@ -107,18 +117,20 @@ ADD_OPERAND_TYPE(LabelOperand, unsigned)
 ADD_OPERAND_TYPE(VariableOperand, std::string_view)
 ADD_OPERAND_TYPE(FunctionOperand, unsigned)
 
-using operand_type_t =
-    std::variant<ValueOperand, LabelOperand, VariableOperand, FunctionOperand, Register>;
+using operand_type_t = std::variant<ValueOperand, LabelOperand, VariableOperand,
+                                    FunctionOperand, Register>;
 
 class IrFunction;
 
 class Operand {
    public:
-    Operand() : m_used { false }, m_data {} {}
-    explicit Operand(operand_type_t data) : m_used { true }, m_data { data } {}
+    Operand() : m_used { false }, m_data {} {
+    }
+    explicit Operand(operand_type_t data) : m_used { true }, m_data { data } {
+    }
 
     static Operand create_empty() {
-      return Operand();
+        return Operand();
     }
 
     bool is_value() const;
@@ -127,10 +139,16 @@ class Operand {
     bool is_function() const;
     bool is_register() const;
 
-    bool is_used() const { return m_used; }
+    bool is_used() const {
+        return m_used;
+    }
 
-    auto env() const { return m_env; }
-    void set_env(const IrFunction* env) { m_env = env; }
+    auto env() const {
+        return m_env;
+    }
+    void set_env(const IrFunction* env) {
+        m_env = env;
+    }
 
     std::string to_debug_string() const;
     std::string to_value_string() const;
@@ -152,4 +170,3 @@ class Operand {
 
     const IrFunction* m_env { nullptr };
 };
-
