@@ -43,12 +43,19 @@ StringOperand ValueOperand::as_string() const {
 bool Operand::is_function() const {
     return holds<FunctionOperand>();
 }
+
+bool Operand::is_register() const {
+    return holds<Register>();
+}
+
 bool Operand::is_label() const {
     return holds<LabelOperand>();
 }
+
 bool Operand::is_value() const {
     return holds<ValueOperand>();
 }
+
 bool Operand::is_variable() const {
     return holds<VariableOperand>();
 }
@@ -66,6 +73,11 @@ VariableOperand Operand::as_variable() const {
 FunctionOperand Operand::as_function() const {
     ASSERT(is_function());
     return std::get<FunctionOperand>(m_data);
+}
+
+Register Operand::as_register() const {
+    ASSERT(is_register());
+    return std::get<Register>(m_data);
 }
 
 LabelOperand Operand::as_label() const {
