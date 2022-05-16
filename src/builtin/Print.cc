@@ -6,22 +6,22 @@
 
 namespace BuiltIn {
 
-ValueOperand print(const std::vector<ValueOperand> &args) {
+Value print(const std::vector<Value> &args, const Context &context) {
     std::vector<std::string> stringified_args {};
 
     for (auto &arg : args) {
-        stringified_args.push_back(arg.to_value_string());
+        stringified_args.push_back(arg.to_string());
     }
 
     std::string s = fmt::format("{}", fmt::join(stringified_args, ""));
     fmt::print("{}", s);
 
-    return create_value_operand<IntOperand>(s.size());
+    return context.create_value_from(Integer(s.size()));
 }
 
-ValueOperand println(const std::vector<ValueOperand> &args) {
-    unsigned long chars_printed = print(args).as_int();
+Value println(const std::vector<Value> &args, const Context &context) {
+    unsigned long chars_printed = print(args, context).as_integer().value();
     fmt::print("\n");
-    return create_value_operand<IntOperand>(chars_printed + 1);
+    return context.create_value_from(Integer(chars_printed + 1));
 }
 }  // namespace BuiltIn

@@ -4,10 +4,12 @@
 
 #include "BuiltIn.hh"
 
+#include "interpreter/Context.hh"
+
 namespace BuiltIn {
 
 using builtin_func_t =
-    std::function<Value(const std::vector<Value>&)>;
+    std::function<Value(const std::vector<Value>&, const Context& context)>;
 
 class FuncInfo {
    public:
@@ -16,15 +18,20 @@ class FuncInfo {
         : m_identifier { std::move(identifier) },
           m_func { func },
           m_is_typechecked { is_typechecked },
-          m_id { id } {}
-
-    bool typechecked() const { return m_is_typechecked; }
-
-    Value call(const std::vector<Value>& args) const {
-        return m_func(args);
+          m_id { id } {
     }
 
-    unsigned id() const { return m_id; }
+    bool typechecked() const {
+        return m_is_typechecked;
+    }
+
+    Value call(const std::vector<Value>& args, const Context& context) const {
+        return m_func(args, context);
+    }
+
+    unsigned id() const {
+        return m_id;
+    }
 
    private:
     const std::string m_identifier;
@@ -50,25 +57,22 @@ unsigned get_and_increment_func_id() {
 // See following link for 3rd template argument
 // https://stackoverflow.com/questions/35525777/use-of-string-view-for-map-lookup
 static const std::map<std::string, FuncInfo, std::less<>> builtin_functions {
-    BUILTIN_ENTRY(print, false),
-    BUILTIN_ENTRY(println, false),
-    BUILTIN_ENTRY(create_array, false),
-    BUILTIN_ENTRY(add_element, false),
-    BUILTIN_ENTRY(get_length, false),
-    BUILTIN_ENTRY(halt, false),
+    BUILTIN_ENTRY(print, false),        BUILTIN_ENTRY(println, false),
+    BUILTIN_ENTRY(create_array, false), BUILTIN_ENTRY(add_element, false),
+    BUILTIN_ENTRY(get_length, false),   BUILTIN_ENTRY(halt, false),
     // BUILTIN_ENTRY(input, false)
 };
 
 std::vector<const FuncInfo*> map_id_to_func() {
     std::vector<const FuncInfo*> ret {};
 
-    for (auto it = builtin_functions.begin(); it != builtin_functions.end(); ++it) {
+    for (auto it = builtin_functions.begin(); it != builtin_functions.end();
+         ++it) {
         ret.push_back(&(it->second));
     }
 
-    std::sort(ret.begin(), ret.end(), [] (auto a, auto b) {
-        return a->id() < b->id();
-    });
+    std::sort(ret.begin(), ret.end(),
+              [](auto a, auto b) { return a->id() < b->id(); });
 
     return ret;
 }
@@ -89,7 +93,9 @@ bool is_typechecked(const std::string_view identifier) {
         ->second.typechecked();
 }
 
-size_t number_of_builtins() { return builtin_functions.size(); }
+size_t number_of_builtins() {
+    return builtin_functions.size();
+}
 
 unsigned function_id_from_identifier(std::string_view identifier) {
     ASSERT(is_builtin(identifier));
@@ -97,8 +103,9 @@ unsigned function_id_from_identifier(std::string_view identifier) {
 }
 
 Value call_builtin_function(unsigned function_id,
-                                   const std::vector<Value>& args) {
-    return id_to_builtin.at(function_id)->call(args);
+                            const std::vector<Value>& args,
+                            const Context& context) {
+    return id_to_builtin.at(function_id)->call(args, context);
 }
 
 }  // namespace BuiltIn

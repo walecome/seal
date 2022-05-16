@@ -59,6 +59,7 @@ class Value;
 
 class Vector {
    public:
+    Vector();
     explicit Vector(std::vector<Value> values);
 
     bool operator==(const Vector& other) const;
@@ -95,14 +96,18 @@ class Value {
     bool is_real() const;
     bool is_boolean() const;
 
-    Vector as_vector() const;
-    String as_string() const;
-    Integer as_integer() const;
-    Real as_real() const;
-    Boolean as_boolean() const;
+    Vector& as_vector() const;
+    String& as_string() const;
+    Integer& as_integer() const;
+    Real& as_real() const;
+    Boolean& as_boolean() const;
 
     const value_type_t& data() const;
 
+    std::string to_string() const;
+
    private:
+    value_type_t& mutable_data() const;
+
     std::unique_ptr<value_type_t> m_data;
 };
