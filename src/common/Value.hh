@@ -1,28 +1,46 @@
 #pragma once
 
 #include <memory>
-#include <string_view>
+#include <string>
 #include <variant>
+#include <vector>
 
-#include "utility/StringTable.hh"
+#include "common/PoolEntry.hh"
 
-class Context;
+enum class ValueType { Boolean, Integer, Real, String, Vector };
 
-class Boolean {
+class Value {
+   public:
+    Value() = delete;
+    virtual ~Value() = default;
+
+    virtual std::string to_string() = 0;
+
+   protected:
+    Value(ValueType type);
+
+   private:
+    ValueType m_type;
+};
+
+class Boolean : public Value {
    public:
     explicit Boolean(bool value);
 
-    bool value() const;
+    ~Boolean() override;
 
+    bool value() const;
     bool operator==(const Boolean& other) const;
 
    private:
     const bool m_value;
 };
 
-class Integer {
+class Integer : public Value {
    public:
     explicit Integer(int value);
+
+    ~Integer() override;
 
     bool operator==(const Integer& other) const;
 
@@ -32,9 +50,11 @@ class Integer {
     const int m_value;
 };
 
-class Real {
+class Real : public Value {
    public:
     explicit Real(double value);
+
+    ~Real() override;
 
     bool operator==(const Real& other) const;
 
@@ -44,73 +64,23 @@ class Real {
     const double m_value;
 };
 
-class String {
+class String : public Value {
    public:
     explicit String(std::string runtime_string);
-    explicit String(StringTable::Key compiletime_string);
+
+    ~String() override;
 
     bool operator==(const String& other) const;
 
-    std::string_view resolve(const StringTable& string_table) const;
-    std::string_view resolve(const Context& context) const;
-
    private:
-    std::variant<std::string, StringTable::Key> m_data;
+    const std::string m_value;
 };
 
-class Value;
-
-class Vector {
+class Vector : public Value {
    public:
-    Vector();
-    explicit Vector(std::vector<Value> values);
+    explicit Vector(std::vector<PoolEntry> values);
 
     bool operator==(const Vector& other) const;
 
-    const std::vector<Value>& values() const;
-    std::vector<Value>& mutable_values();
-
    private:
-    // std::vector<Value> m_values;
-};
-
-class Value {
-  private:
-    using value_type_t = std::variant<Integer, Real, String, Vector, Boolean>;
-
-   public:
-    Value();
-
-    Value(const Value& other) = delete;
-    Value& operator=(const Value& other) = delete;
-
-    Value(Value&& other);
-    Value& operator=(Value&& other);
-
-    bool operator==(const Value& other) const;
-
-    Value copy() const;
-
-    bool is_same_type(const Value& other) const;
-
-    bool is_vector() const;
-    bool is_string() const;
-    bool is_integer() const;
-    bool is_real() const;
-    bool is_boolean() const;
-
-    Vector& as_vector() const;
-    String& as_string() const;
-    Integer& as_integer() const;
-    Real& as_real() const;
-    Boolean& as_boolean() const;
-
-    const value_type_t& data() const;
-
-    std::string to_string() const;
-
-   private:
-    value_type_t& mutable_data() const;
-
-    std::unique_ptr<value_type_t> m_data;
 };
