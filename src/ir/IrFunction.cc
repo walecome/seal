@@ -1,7 +1,7 @@
 #include <fmt/format.h>
 #include <memory>
-#include <vector>
 #include <utility>
+#include <vector>
 
 #include "IrFunction.hh"
 #include "Operand.hh"
@@ -16,7 +16,8 @@ ValueOperand IrFunction::create_immediate_int(unsigned long value) {
     return create_value_operand<IntOperand>(value);
 }
 
-ValueOperand IrFunction::create_immediate_string(StringTable* string_table, std::string_view value) {
+ValueOperand IrFunction::create_immediate_string(StringTable* string_table,
+                                                 std::string_view value) {
     StringTable::Entry inserted = string_table->add(std::string(value));
     return ValueOperand { StringOperand { inserted.key, string_table } };
 }
@@ -26,15 +27,16 @@ ValueOperand IrFunction::create_immediate_real(double value) {
 }
 
 ValueOperand IrFunction::create_vector_operand() {
-    return ValueOperand{ VectorOperand{} };
+    return ValueOperand { VectorOperand {} };
 }
 
 LabelOperand IrFunction::create_label() const {
     return LabelOperand { new_label_id() };
 }
 
-FunctionOperand IrFunction::create_function_from_id(unsigned function_id) const {
-    return FunctionOperand{ function_id };
+FunctionOperand IrFunction::create_function_from_id(
+    unsigned function_id) const {
+    return FunctionOperand { function_id };
 }
 
 LabelOperand IrFunction::create_and_queue_label() {
@@ -45,7 +47,8 @@ LabelOperand IrFunction::create_and_queue_label() {
 
 void IrFunction::replace_prologue(Operand start, Operand end) {
     ASSERT(m_quads.at(0)->opcode() == OPCode::SAVE);
-    ptr_t<Quad> quad = std::make_unique<Quad>(OPCode::SAVE, Operand::create_empty(), start, end);
+    ptr_t<Quad> quad = std::make_unique<Quad>(
+        OPCode::SAVE, Operand::create_empty(), start, end);
     m_quads.at(0) = std::move(quad);
 }
 
@@ -55,7 +58,7 @@ void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
     bind_queued_labels(m_quads.size() - 1);
 }
 
-void IrFunction::queue_label(const LabelOperand &label) {
+void IrFunction::queue_label(const LabelOperand& label) {
     m_waiting_labels.push_back(label);
 }
 
@@ -71,19 +74,21 @@ void IrFunction::bind_queued_labels(size_t quad_idx) {
 
 void IrFunction::bind_label(LabelOperand label, size_t quad_idx) {
     ASSERT(m_labels.find(label) == std::end(m_labels));
-    
+
     m_quads.at(quad_idx)->add_label(label);
 
     m_labels.insert({ label, quad_idx });
 }
 
 void IrFunction::dump_quads() const {
-    for (auto &quad : m_quads) {
+    for (auto& quad : m_quads) {
         std::cout << quad->to_string() << std::endl;
     }
 }
 
-unsigned IrFunction::id() const { return declaration()->function_id(); }
+unsigned IrFunction::id() const {
+    return declaration()->function_id();
+}
 
 size_t IrFunction::quad_idx(const LabelOperand label) const {
     return m_labels.at(label);
@@ -97,16 +102,19 @@ void IrFunction::exit_block() {
     m_variables.pop_back();
 }
 
-std::optional<Register> IrFunction::find_variable(const std::map<std::string_view, Register>& vars, const std::string_view name) {
-        auto it = vars.find(name);
-        if (it == vars.end()) {
-            return {};
-        } else {
-            return it->second;
-        }
+std::optional<Register> IrFunction::find_variable(
+    const std::map<std::string_view, Register>& vars,
+    const std::string_view name) {
+    auto it = vars.find(name);
+    if (it == vars.end()) {
+        return {};
+    } else {
+        return it->second;
+    }
 }
 
-std::optional<Register> IrFunction::find_variable(std::string_view name, bool recursive) const {
+std::optional<Register> IrFunction::find_variable(std::string_view name,
+                                                  bool recursive) const {
     ASSERT(!m_variables.empty());
 
     if (!recursive) {
