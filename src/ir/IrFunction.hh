@@ -1,11 +1,11 @@
 #pragma once
 
 #include <map>
+#include <optional>
 #include <set>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <optional>
 
 #include "Constants.hh"
 #include "Operand.hh"
@@ -25,7 +25,8 @@ class IrFunction {
     MAKE_NONMOVABLE(IrFunction)
 
    public:
-    IrFunction(const FunctionDecl *decl) : m_decl { decl } { }
+    IrFunction(const FunctionDecl *decl) : m_decl { decl } {
+    }
 
     void replace_prologue(Operand start, Operand end);
 
@@ -36,7 +37,8 @@ class IrFunction {
     void add_quad(OPCode, Operand, Operand, Operand);
 
     static ValueOperand create_immediate_int(unsigned long value);
-    static ValueOperand create_immediate_string(StringTable* string_table, std::string_view value);
+    static ValueOperand create_immediate_string(StringTable *string_table,
+                                                std::string_view value);
     static ValueOperand create_immediate_real(double value);
     static ValueOperand create_vector_operand();
 
@@ -46,7 +48,8 @@ class IrFunction {
     inline Register create_variable(const std::string_view name,
                                     F create_register,
                                     bool traverse_parent = true) {
-        std::optional<Register> existing_reg = find_variable(name, traverse_parent);
+        std::optional<Register> existing_reg =
+            find_variable(name, traverse_parent);
         if (existing_reg) {
             return existing_reg.value();
         }
@@ -55,8 +58,11 @@ class IrFunction {
         return reg;
     }
 
-    std::optional<Register> find_variable(std::string_view name, bool recursive) const;
-    static std::optional<Register> find_variable(const std::map<std::string_view, Register>& vars, const std::string_view name);
+    std::optional<Register> find_variable(std::string_view name,
+                                          bool recursive) const;
+    static std::optional<Register> find_variable(
+        const std::map<std::string_view, Register> &vars,
+        const std::string_view name);
 
     FunctionOperand create_function_from_id(unsigned) const;
 
@@ -75,7 +81,9 @@ class IrFunction {
     // tmp#<variable_id>.
     std::string resolve_variable_name(unsigned) const;
 
-    auto declaration() const { return m_decl; }
+    auto declaration() const {
+        return m_decl;
+    }
 
     template <class F>
     void for_each_quad(F callback) {
@@ -88,7 +96,7 @@ class IrFunction {
 
     // Return the index of the quad bound to label
     size_t quad_idx(const LabelOperand) const;
-    
+
     LabelOperand get_epilogue_label() const {
         return m_epilogue_label;
     }
