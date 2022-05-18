@@ -1,6 +1,5 @@
 #include "Generate.hh"
 #include "IrFunction.hh"
-#include "OperandType.hh"
 #include "Register.hh"
 #include "ast/ArrayLiteral.hh"
 #include "ast/AssignExpression.hh"
