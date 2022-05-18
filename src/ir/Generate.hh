@@ -45,7 +45,9 @@ class Generate {
 
    public:
     Generate(StringTable* string_table, const CompilationUnit* compilation_unit)
-        : m_string_table(string_table), m_compilation_unit { compilation_unit } {}
+        : m_string_table(string_table),
+          m_compilation_unit { compilation_unit } {
+    }
 
     QuadCollection generate();
 
@@ -73,24 +75,29 @@ class Generate {
     Operand gen_index_expression(const IndexExpression*);
     Operand gen_unary_expression(const UnaryExpression*);
 
-    auto env() const { return m_current_ir_function.get(); }
+    auto env() const {
+        return m_current_ir_function.get();
+    }
 
     // Literals
-    ValueOperand create_literal(const Literal*);
-    ValueOperand create_array_literal(const ArrayLiteral*);
-    ValueOperand create_boolean_literal(const BooleanLiteral*);
-    ValueOperand create_float_literal(const RealLiteral*);
-    ValueOperand create_integer_literal(const IntegerLiteral*);
-    ValueOperand create_string_literal(const StringLiteral*);
-    
+    Operand create_literal(const Literal*);
+    Operand create_array_literal(const ArrayLiteral*);
+    Operand create_boolean_literal(const BooleanLiteral*);
+    Operand create_float_literal(const RealLiteral*);
+    Operand create_integer_literal(const IntegerLiteral*);
+    Operand create_string_literal(const StringLiteral*);
+
     Register create_register();
     Register get_return_register() const;
     Register previous_register() const;
     Register current_register() const;
 
+    ValuePool& get_constant_pool();
+
     StringTable* m_string_table;
     const CompilationUnit* m_compilation_unit;
     ptr_t<IrFunction> m_current_ir_function;
     // Register 0 is reserved for function returns.
-    unsigned m_register_count{1};
+    unsigned m_register_count { 1 };
+    QuadCollection m_quad_collection {};
 };

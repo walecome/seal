@@ -36,35 +36,33 @@
 QuadCollection Generate::generate() {
     auto ir_program = std::make_unique<IrProgram>();
 
-    QuadCollection ret {};
-
     m_compilation_unit->for_each_function([&](auto function_decl) {
         m_current_ir_function = std::make_unique<IrFunction>(function_decl);
         Register first_register = current_register();
         gen_function_decl(function_decl);
 
-        ret.function_to_quad.insert(
+        m_quad_collection.function_to_quad.insert(
             { m_current_ir_function->declaration()->function_id(),
-              ret.quads.size() });
+              m_quad_collection.quads.size() });
 
         m_current_ir_function->replace_prologue(
             Operand { first_register }, Operand { previous_register() });
 
         m_current_ir_function->for_each_quad([&](Quad *quad) {
             for (unsigned label_id : quad->label_ids()) {
-                ret.label_to_quad.insert({ label_id, ret.quads.size() });
+                m_quad_collection.label_to_quad.insert({ label_id, m_quad_collection.quads.size() });
             }
-            ret.quads.push_back(*quad);
+            m_quad_collection.quads.push_back(*quad);
         });
 
         ir_program->add_function(m_current_ir_function);
     });
 
-    ret.main_function_id = ir_program->main_function_id();
+    m_quad_collection.main_function_id = ir_program->main_function_id();
 
-    ret.register_count = m_register_count;
+    m_quad_collection.register_count = m_register_count;
 
-    return ret;
+    return m_quad_collection;
 }
 
 void Generate::gen_block(const Block *block) {
@@ -433,7 +431,7 @@ Operand Generate::gen_index_expression(const IndexExpression *expr) {
     return Operand { result };
 }
 
-ValueOperand Generate::create_literal(const Literal *literal) {
+Operand Generate::create_literal(const Literal *literal) {
     if (auto ptr = dynamic_cast<const ArrayLiteral *>(literal)) {
         return create_array_literal(ptr);
     } else if (auto ptr = dynamic_cast<const BooleanLiteral *>(literal)) {
@@ -484,12 +482,13 @@ Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {
         var_expr->identifier(), [this] { return this->create_register(); }) };
 }
 
-ValueOperand Generate::create_integer_literal(
+Operand Generate::create_integer_literal(
     const IntegerLiteral *integer_literal) {
-    return env()->create_immediate_int(integer_literal->value());
+    PoolEntry entry = get_constant_pool().create_integer(integer_literal->value());
+    return Operand(entry);
 }
 
-ValueOperand Generate::create_array_literal(const ArrayLiteral *array) {
+Operand Generate::create_array_literal(const ArrayLiteral *array) {
     ValueOperand vector_operand = env()->create_vector_operand();
 
     array->for_each_element([&](Expression *element) {
@@ -532,4 +531,8 @@ Register Generate::current_register() const {
 Register Generate::previous_register() const {
     ASSERT(m_register_count > 0);
     return Register(m_register_count - 1);
+}
+
+ValuePool& Generate::get_constant_pool() {
+  return m_quad_collection.constant_pool;
 }
