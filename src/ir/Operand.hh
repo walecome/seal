@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "Constants.hh"
-#include "OperandType.hh"
 #include "ir/Register.hh"
 #include "utility/StringTable.hh"
 
