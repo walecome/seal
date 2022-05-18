@@ -15,11 +15,6 @@
 
 class FunctionDecl;
 
-template <class ValueType, class T = decltype(ValueType().value)>
-ValueOperand create_value_operand(T value) {
-    return ValueOperand { ValueType { value } };
-}
-
 class IrFunction {
     MAKE_NONCOPYABLE(IrFunction)
     MAKE_NONMOVABLE(IrFunction)
@@ -33,14 +28,7 @@ class IrFunction {
     // Construct a quad with the given opcode and operands, placing it in
     // the m_quads vector. Also binds any queued lables to the quad and
     // clears the label queue.
-    // @FIXME: Should not take by value
     void add_quad(OPCode, Operand, Operand, Operand);
-
-    static ValueOperand create_immediate_int(unsigned long value);
-    static ValueOperand create_immediate_string(StringTable *string_table,
-                                                std::string_view value);
-    static ValueOperand create_immediate_real(double value);
-    static ValueOperand create_vector_operand();
 
     LabelOperand create_label() const;
 

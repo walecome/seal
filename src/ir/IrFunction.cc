@@ -12,24 +12,6 @@ unsigned new_label_id() {
     return label_id++;
 }
 
-ValueOperand IrFunction::create_immediate_int(unsigned long value) {
-    return create_value_operand<IntOperand>(value);
-}
-
-ValueOperand IrFunction::create_immediate_string(StringTable* string_table,
-                                                 std::string_view value) {
-    StringTable::Entry inserted = string_table->add(std::string(value));
-    return ValueOperand { StringOperand { inserted.key, string_table } };
-}
-
-ValueOperand IrFunction::create_immediate_real(double value) {
-    return create_value_operand<RealOperand>(value);
-}
-
-ValueOperand IrFunction::create_vector_operand() {
-    return ValueOperand { VectorOperand {} };
-}
-
 LabelOperand IrFunction::create_label() const {
     return LabelOperand { new_label_id() };
 }
