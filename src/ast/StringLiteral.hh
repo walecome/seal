@@ -12,11 +12,11 @@ class StringLiteral final : public Literal {
     AST_DUMPABLE()
 
    public:
-    StringLiteral(StringTable::Key value)
+    StringLiteral(std::string_view value)
         : Literal(Primitive::STRING), m_value { value } {}
 
     auto value() const { return m_value; }
 
    private:
-    StringTable::Key m_value;
+    std::string_view m_value;
 };

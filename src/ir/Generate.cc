@@ -50,7 +50,8 @@ QuadCollection Generate::generate() {
 
         m_current_ir_function->for_each_quad([&](Quad *quad) {
             for (unsigned label_id : quad->label_ids()) {
-                m_quad_collection.label_to_quad.insert({ label_id, m_quad_collection.quads.size() });
+                m_quad_collection.label_to_quad.insert(
+                    { label_id, m_quad_collection.quads.size() });
             }
             m_quad_collection.quads.push_back(*quad);
         });
@@ -248,14 +249,12 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
     };
 
     if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
-        ValueOperand lib =
-            env()->create_immediate_string(m_string_table, x->lib_name());
-        ValueOperand func =
-            env()->create_immediate_string(m_string_table, x->identifier());
+        Operand lib = Operand(get_constant_pool().create_string(x->lib_name()));
+        Operand func = Operand(get_constant_pool().create_string(x->identifier()));
 
         unsigned type_id = ctype::from_seal_type(x->type()).type_id;
         env()->add_quad(OPCode::SET_RET_TYPE, {},
-                        Operand { env()->create_immediate_int(type_id) }, {});
+                        Operand(get_constant_pool().create_integer(type_id)), {});
         env()->add_quad(OPCode::CALL_C, get_function_dest(), Operand { lib },
                         Operand { func });
     } else {
@@ -317,8 +316,7 @@ Operand Generate::gen_equality_expression(
             break;
 
         case OperatorSym::NOT_EQ:
-            env()->add_quad(OPCode::CMP_NOTEQ, Operand { result }, left,
-                            right);
+            env()->add_quad(OPCode::CMP_NOTEQ, Operand { result }, left, right);
             break;
 
         default:
@@ -453,8 +451,8 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
 
     if (sym == OperatorSym::MINUS) {
         auto result = create_register();
-        auto zero = Operand { env()->create_immediate_int(0) };
-        env()->add_quad(OPCode::SUB, Operand { result }, zero, target_operand);
+        auto zero = Operand(get_constant_pool().create_integer(0));
+        env()->add_quad(OPCode::SUB, Operand(result), zero, target_operand);
         return Operand { result };
     }
 
@@ -464,7 +462,7 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     Register result = var_expr ? gen_variable_expression(var_expr).as_register()
                                : create_register();
 
-    auto one = Operand { env()->create_immediate_int(1) };
+    auto one = Operand(get_constant_pool().create_integer(1));
 
     if (sym == OperatorSym::INC) {
         env()->add_quad(OPCode::ADD, Operand { result }, target_operand, one);
@@ -484,45 +482,43 @@ Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {
 
 Operand Generate::create_integer_literal(
     const IntegerLiteral *integer_literal) {
-    PoolEntry entry = get_constant_pool().create_integer(integer_literal->value());
+    PoolEntry entry =
+        get_constant_pool().create_integer(integer_literal->value());
     return Operand(entry);
 }
 
 Operand Generate::create_array_literal(const ArrayLiteral *array) {
-    ValueOperand vector_operand = env()->create_vector_operand();
+    std::vector<PoolEntry> values;
 
-    array->for_each_element([&](Expression *element) {
-        ValueOperand element_operand = gen_expression(element).as_value();
-        vector_operand.as_vector().value->push_back(element_operand);
+    array->for_each_element([&](auto *element) {
+        PoolEntry element_entry = gen_expression(element).as_value_entry();
+        values.push_back(element_entry);
     });
-
-    return vector_operand;
+    return Operand(get_constant_pool().create_vector(values));
 }
 
-ValueOperand Generate::create_boolean_literal(
+Operand Generate::create_boolean_literal(
     const BooleanLiteral *boolean_literal) {
-    // @TODO: Check if this is correct
-
-    if (boolean_literal->value()) {
-        return env()->create_immediate_int(1);
-    } else {
-        return env()->create_immediate_int(0);
-    }
+    PoolEntry entry =
+        get_constant_pool().create_boolean(boolean_literal->value());
+    return Operand(entry);
 }
 
-ValueOperand Generate::create_float_literal(const RealLiteral *real_literal) {
-    return env()->create_immediate_real(real_literal->value());
+Operand Generate::create_float_literal(const RealLiteral *real_literal) {
+    return Operand(get_constant_pool().create_real(real_literal->value()));
 }
 
-ValueOperand Generate::create_string_literal(
-    const StringLiteral *string_literal) {
-    return ValueOperand { StringOperand { string_literal->value(),
-                                          m_string_table } };
+Operand Generate::create_string_literal(const StringLiteral *string_literal) {
+    return Operand(get_constant_pool().create_string(string_literal->value()));
 }
 
-Register Generate::create_register() { return Register(m_register_count++); }
+Register Generate::create_register() {
+    return Register(m_register_count++);
+}
 
-Register Generate::get_return_register() const { return Register(0); }
+Register Generate::get_return_register() const {
+    return Register(0);
+}
 
 Register Generate::current_register() const {
     return Register(m_register_count);
@@ -533,6 +529,6 @@ Register Generate::previous_register() const {
     return Register(m_register_count - 1);
 }
 
-ValuePool& Generate::get_constant_pool() {
-  return m_quad_collection.constant_pool;
+ValuePool &Generate::get_constant_pool() {
+    return m_quad_collection.constant_pool;
 }
