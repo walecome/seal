@@ -18,6 +18,7 @@ class ValuePool {
     PoolEntry create_integer(int value);
     PoolEntry create_real(double value);
     PoolEntry create_string(std::string value);
+    PoolEntry create_string(std::string_view value);
     PoolEntry create_vector(std::vector<PoolEntry> value);
 
     PoolEntry copy(PoolEntry entry);
