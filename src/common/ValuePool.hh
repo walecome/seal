@@ -5,12 +5,17 @@
 #include "common/PoolEntry.hh"
 #include "common/Value.hh"
 
+#include "Constants.hh"
+
 class ValuePool {
    public:
     enum class Type {
         Constant,
         Dynamic,
     };
+
+    ValuePool(const ValuePool& other);
+    ValuePool& operator=(const ValuePool& other);
 
     explicit ValuePool(Type type);
 
@@ -25,5 +30,5 @@ class ValuePool {
 
    private:
     Type m_type;
-    std::vector<std::unique_ptr<Value>> m_values;
+    std::vector<std::unique_ptr<int>> m_values;
 };

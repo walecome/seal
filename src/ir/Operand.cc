@@ -45,7 +45,7 @@ struct OperandDebugPrinter {
     std::ostringstream oss {};
 
     std::string operator()(PoolEntry entry) {
-        return fmt::format("C#{}", entry.key);
+        return fmt::format("C#{}", entry.key());
     }
 
     std::string operator()(FunctionOperand function_id) {

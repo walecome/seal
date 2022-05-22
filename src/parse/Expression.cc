@@ -132,7 +132,9 @@ ptr_t<Expression> Parser::parse_mult_div(TokenBuffer& tokens) {
     return first;
 }
 
-bool is_index(Token token) { return token.value == "["; }
+bool is_index(Token token) {
+    return token.value == "[";
+}
 
 ptr_t<IndexExpression> Parser::parse_index_expression(
     TokenBuffer& tokens, ptr_t<Expression>& indexed) {
@@ -214,9 +216,7 @@ ptr_t<Expression> Parser::parse_primary(TokenBuffer& tokens) {
         std::string_view quotes_removed = current.value;
         quotes_removed.remove_prefix(1);
         quotes_removed.remove_suffix(1);
-        StringTable::Entry created_string =
-            m_string_table->add(std::string(quotes_removed));
-        primary = std::make_unique<StringLiteral>(created_string.key);
+        primary = std::make_unique<StringLiteral>(quotes_removed);
     } else if (current.type == LPARENS) {
         primary = parse_expression(tokens);
         tokens.expect(RPARENS);

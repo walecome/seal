@@ -6,7 +6,7 @@
 
 namespace BuiltIn {
 
-Value halt(const std::vector<Value>&, const Context& context) {
+PoolEntry halt(const std::vector<PoolEntry>&, const Context&) {
     fmt::print("Builtin halt() called!\n");
     exit(0);
 }

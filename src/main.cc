@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         quads.dump();
     }
 
-    Interpreter interpreter { quads, &string_table, verbose };
+    Interpreter interpreter { quads, verbose };
     interpreter.interpret();
 
     return 0;

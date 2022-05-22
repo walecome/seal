@@ -2,28 +2,29 @@
 #include "BuiltIn.hh"
 #include "ir/IrFunction.hh"
 #include "ast/ArgumentList.hh"
+#include "interpreter/Context.hh"
 
 namespace BuiltIn {
 
+PoolEntry create_array(const std::vector<PoolEntry>& args, Context& context) {
+    ASSERT(args.size() == 1);
+    Value& size = context.get_value(args[0]);
+    ASSERT(size.is_integer());
 
-Value create_array(const std::vector<Value>& args, const Context& context) {
-    ASSERT(args.size() == 1 && args[0].is_integer());
+    std::vector<PoolEntry> vec;
 
-    Vector vec = Vector();
-
-    vec.mutable_values().resize(args[0].as_integer().value());
-    return context.create_value_from(vec);
+    vec.resize(size.as_integer().value());
+    return context.dynamic_pool().create_vector(vec);
 }
 
-Value add_element(const std::vector<Value>& args, const Context& context) {
+PoolEntry add_element(const std::vector<PoolEntry>& args, Context& context) {
     ASSERT(args.size() == 2);
-    ASSERT(args[0].is_vector());
+    Value& vec = context.get_value(args[0]);
+    ASSERT(vec.is_vector());
 
-    Vector vec = args[0].as_vector();
-    // FIXME: This is not going to work, since the Vector we is a copy of the original vector.
-    vec.mutable_values().push_back(args.at(1).copy());
+    vec.as_vector().add(args[1]);
 
-    return context.create_value_from(Integer(vec.values().size()));
+    return context.dynamic_pool().create_integer(vec.as_vector().length());
 }
 
 }
