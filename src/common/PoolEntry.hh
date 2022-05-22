@@ -12,6 +12,8 @@ class PoolEntry {
     PoolEntry& operator=(PoolEntry& other);
     PoolEntry& operator=(const PoolEntry& other);
 
+    bool operator==(const PoolEntry& other) const;
+
     static PoolEntry create_constant(size_t key);
     static PoolEntry create_dynamic(size_t key);
 

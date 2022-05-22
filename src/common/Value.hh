@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <variant>
 #include <vector>
 
@@ -17,31 +18,30 @@ class Real;
 
 class Value {
    public:
-    Value() = default;
+    Value() = delete;
     virtual ~Value() = default;
 
     virtual std::string to_string() = 0;
 
+    bool is_boolean() const;
+    bool is_integer() const;
+    bool is_real() const;
     bool is_string() const;
     bool is_vector() const;
-    bool is_integer() const;
-    bool is_boolean() const;
-    bool is_real() const;
 
-    String& as_string();
     Boolean& as_boolean();
+    Integer& as_integer();
+    Real& as_real();
+    String& as_string();
     Vector& as_vector();
-    Integer as_integer();
-    Real as_real();
 
-    const String& as_string() const;
     const Boolean& as_boolean() const;
+    const Integer& as_integer() const;
+    const Real& as_real() const;
+    const String& as_string() const;
     const Vector& as_vector() const;
-    const Integer as_integer() const;
-    const Real as_real() const;
 
     ValueType type() const;
-    ValueType type();
 
     bool operator==(const Value& other) const;
     bool operator!=(const Value& other) const;
@@ -49,8 +49,8 @@ class Value {
     bool operator>(const Value& other) const;
     bool operator<=(const Value& other) const;
     bool operator>=(const Value& other) const;
-    bool operator&&(const Value& other) const;
-    bool operator||(const Value& other) const;
+
+    explicit operator bool() const;
 
    protected:
     Value(ValueType type);
@@ -63,10 +63,7 @@ class Boolean : Value {
    public:
     explicit Boolean(bool value);
 
-    ~Boolean() override;
-
     bool value() const;
-    bool operator==(const Boolean& other) const;
 
    private:
     const bool m_value;
@@ -75,10 +72,6 @@ class Boolean : Value {
 class Integer : Value {
    public:
     explicit Integer(int value);
-
-    ~Integer() override;
-
-    bool operator==(const Integer& other) const;
 
     int value() const;
 
@@ -92,8 +85,6 @@ class Real : Value {
 
     ~Real() override;
 
-    bool operator==(const Real& other) const;
-
     double value() const;
 
    private:
@@ -103,10 +94,6 @@ class Real : Value {
 class String : Value {
    public:
     explicit String(std::string runtime_string);
-
-    ~String() override;
-
-    bool operator==(const String& other) const;
 
     size_t length() const;
 
@@ -120,7 +107,7 @@ class Vector : Value {
    public:
     explicit Vector(std::vector<PoolEntry> values);
 
-    bool operator==(const Vector& other) const;
+    const std::vector<PoolEntry>& value() const;
 
     size_t length() const;
     PoolEntry at(size_t index) const;
@@ -128,4 +115,5 @@ class Vector : Value {
     void add(PoolEntry entry);
 
    private:
+      std::vector<PoolEntry> m_value;
 };

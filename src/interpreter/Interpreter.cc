@@ -540,11 +540,11 @@ void Interpreter::index_assign(const Quad& quad) {
 }
 
 void Interpreter::interpret_and(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return lhs && rhs; });
+    compare(quad, [](Value& lhs, Value& rhs) { return bool(lhs) && bool(rhs); });
 }
 
 void Interpreter::interpret_or(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return lhs || rhs; });
+    compare(quad, [](Value& lhs, Value& rhs) { return bool(lhs) || bool(rhs); });
 }
 
 StackFrame* Interpreter::current_frame() {
