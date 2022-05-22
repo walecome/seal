@@ -90,8 +90,12 @@ def main_in_project_dir():
         run("build/sealc", args.file_to_run)
 
 def main():
-    with pushd(SCRIPT_DIR):
-        main_in_project_dir()
+    try:
+        with pushd(SCRIPT_DIR):
+            main_in_project_dir()
+    except KeyboardInterrupt:
+        print_colored("Interupted!", Color.YELLOW)
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
