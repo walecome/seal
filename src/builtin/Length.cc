@@ -1,24 +1,24 @@
 #include "BuiltIn.hh"
 #include "ast/ArgumentList.hh"
+#include "interpreter/Context.hh"
 #include "ir/IrFunction.hh"
 
 namespace BuiltIn {
 
 // fn get_length(iterable: string | []) -> int
-Value get_length(const std::vector<Value>& args, const Context& context) {
+PoolEntry get_length(const std::vector<PoolEntry>& args, Context& context) {
     ASSERT(args.size() == 1);
-    ASSERT(args[0].is_vector() || args[0].is_string());
 
-    const Value& value = args[0];
+    const Value& target = context.get_value(args[0]);
 
-    if (value.is_string()) {
-      std::string_view underlaying_string = context.resolve(value.as_string());
-      return context.create_value_from(Integer(underlaying_string.size()));
+    if (target.is_string()) {
+        return context.dynamic_pool().create_integer(
+            target.as_string().length());
     }
 
-    if (value.is_vector()) {
-        size_t size = value.as_vector().values().size();
-        return context.create_value_from(Integer(static_cast<int>(size)));
+    if (target.is_vector()) {
+        return context.dynamic_pool().create_integer(
+            target.as_vector().length());
     }
 
     ASSERT_NOT_REACHED();

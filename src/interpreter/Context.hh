@@ -1,14 +1,19 @@
 #pragma once
 
-#include "interpreter/Value.hh"
+#include <memory>
+
+#include "common/ValuePool.hh"
+
+class Value;
 
 class Context {
   public:
-    Value create_value_from(String value) const;
-    Value create_value_from(Boolean value) const;
-    Value create_value_from(Integer value) const;
-    Value create_value_from(Real value) const;
-    Value create_value_from(Vector value) const;
+    Value& get_value(PoolEntry entry);
+    Value& get_value(PoolEntry entry) const;
+    ValuePool& dynamic_pool();
+    const ValuePool& constant_pool();
 
-    std::string_view resolve(const String& string) const;
+  private:
+    const std::unique_ptr<const ValuePool> m_constant_pool;
+    const std::unique_ptr<ValuePool> m_dynamic_pool;
 };

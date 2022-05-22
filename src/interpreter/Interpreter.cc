@@ -20,22 +20,15 @@ void runtime_error(const std::string& message) {
     exit(EXIT_FAILURE);
 }
 
-Value create_from_value_operand(const ValueOperand& value_operand,
-                                const Context& context) {
-  ASSERT_NOT_REACHED_MSG("create_from_value_operand() not implemented");
-}
-
 Register return_register() {
     return Register(0);
 }
 
 }  // namespace
 
-Interpreter::Interpreter(const QuadCollection& quads, StringTable* string_table,
-                         bool verbose)
+Interpreter::Interpreter(const QuadCollection& quads, bool verbose)
     : m_quads { quads },
-      m_string_table { string_table },
-      m_registers(std::vector<Value>(quads.register_count)),
+      m_registers(std::vector<PoolEntry>(quads.register_count)),
       m_verbose { verbose } {
 }
 
@@ -163,24 +156,23 @@ void Interpreter::interpret_function(unsigned function_id) {
     }
 }
 
-Value Interpreter::resolve_register(Register reg) const {
-    // FIXME: Figure out of we always need to copy here.
-    return m_registers[reg.index()].copy();
+Value& Interpreter::resolve_register(Register reg) const {
+    return context().get_value(m_registers[reg.index()]);
 }
 
-void Interpreter::set_register(Register reg, Value value) {
-    m_registers[reg.index()] = std::move(value);
+void Interpreter::set_register(Register reg, PoolEntry entry) {
+    m_registers[reg.index()] = entry;
 }
 
 unsigned Interpreter::resolve_label(const Operand& dest) const {
     return dest.as_label().value;
 }
 
-Value Interpreter::resolve_to_value(const Operand& source) const {
+Value& Interpreter::resolve_to_value(const Operand& source) const {
     // TODO: Support functions
     ASSERT(!source.is_function());
-    if (source.is_value()) {
-        return create_from_value_operand(source.as_value(), context());
+    if (source.is_value_entry()) {
+        return context().get_value(source.as_value_entry());
     }
 
     if (source.is_register()) {
@@ -192,175 +184,165 @@ Value Interpreter::resolve_to_value(const Operand& source) const {
             .c_str());
 }
 
+PoolEntry Interpreter::resolve_to_entry(const Operand& source) const {
+    if (source.is_value_entry()) {
+        return source.as_value_entry();
+    }
+
+    if (source.is_register()) {
+        return m_registers.at(source.as_register().index());
+    }
+
+    ASSERT_NOT_REACHED_MSG(
+        fmt::format("Invalid QuadSource type: {}", source.to_debug_string())
+            .c_str());
+}
+
+namespace {
 template <class BinaryOperator>
-struct BinOpVisitor {
-    BinOpVisitor(const Context& context) : context(context) {
+PoolEntry compute_binary_expression(Context& context, PoolEntry lhs,
+                                    PoolEntry rhs) {
+    Value& first = context.get_value(lhs);
+    Value& second = context.get_value(rhs);
+
+    ASSERT(first.type() == second.type());
+
+    auto apply_binary_operator = [&](const auto& a, const auto& b) {
+        return BinaryOperator {}(a, b);
+    };
+
+    switch (first.type()) {
+        case ValueType::Boolean:
+            return context.dynamic_pool().create_boolean(apply_binary_operator(
+                first.as_boolean().value(), second.as_boolean().value()));
+        case ValueType::Integer:
+            return context.dynamic_pool().create_integer(apply_binary_operator(
+                first.as_integer().value(), second.as_integer().value()));
+        case ValueType::Real:
+            return context.dynamic_pool().create_real(apply_binary_operator(
+                first.as_real().value(), second.as_real().value()));
+        case ValueType::String:
+            ASSERT_NOT_REACHED();
+        case ValueType::Vector:
+            ASSERT_NOT_REACHED();
     }
-    const Context& context;
-
-    template <typename T, typename U>
-    Value operator()(T, U) {
-        ASSERT_NOT_REACHED();
-    }
-
-    Value operator()(String, String) {
-        ASSERT_NOT_REACHED();
-    }
-
-    Value operator()(Vector, Vector) {
-        ASSERT_NOT_REACHED();
-    }
-
-    template <typename T>
-    Value operator()(T a, T b) {
-        auto result = BinaryOperator {}(a.value(), b.value());
-        return context.create_value_from(T(result));
-    }
-};
-
-struct BinOpPlusVisitor {
-    BinOpPlusVisitor(StringTable* string_table, const Context& context)
-        : string_table(string_table), context(context) {
-    }
-
-    StringTable* string_table;
-    const Context& context;
-
-    template <typename T, typename U>
-    Value operator()(T, U) {
-        ASSERT_NOT_REACHED();
-    }
-
-    Value operator()(String a, String b) {
-        std::string_view resolved_a = a.resolve(*string_table);
-        std::string_view resolved_b = b.resolve(*string_table);
-        std::string result = std::string(resolved_a) + std::string(resolved_b);
-        // TODO: Resulting String should not be inserted in string table.
-        StringTable::Entry entry = string_table->add(std::move(result));
-        return context.create_value_from(String { entry.key });
-    }
-
-    Value operator()(Vector, Vector) {
-        ASSERT_NOT_REACHED();
-    }
-
-    template <typename T>
-    Value operator()(T a, T b) {
-        auto result = a.value() + b.value();
-        return context.create_value_from(T(result));
-    }
-};
-
-template <class Operator>
-void binop_helper(Interpreter* interpreter, const Quad& quad,
-                  const Context& context) {
-    Value lhs = interpreter->resolve_to_value(quad.src_a());
-    Value rhs = interpreter->resolve_to_value(quad.src_b());
-
-    Value result =
-        std::visit(BinOpVisitor<Operator> { context }, lhs.data(), rhs.data());
-
-    interpreter->set_register(quad.dest().as_register(), std::move(result));
 }
 
-void plus_helper(Interpreter* interpreter, const Quad& quad,
-                 StringTable* string_table, const Context& context) {
-    Value lhs = interpreter->resolve_to_value(quad.src_a());
-    Value rhs = interpreter->resolve_to_value(quad.src_b());
-
-    Value result = std::visit(BinOpPlusVisitor { string_table, context },
-                              lhs.data(), rhs.data());
-
-    interpreter->set_register(quad.dest().as_register(), std::move(result));
+PoolEntry concatenate_strings(Context& context, String& lhs, String& rhs) {
+    std::string result = std::string(lhs.value()) + std::string(rhs.value());
+    return context.dynamic_pool().create_string(result);
 }
+
+template <>
+PoolEntry compute_binary_expression<std::plus<>>(Context& context,
+                                                 PoolEntry lhs, PoolEntry rhs) {
+    Value& first = context.get_value(lhs);
+    Value& second = context.get_value(rhs);
+
+    ASSERT(first.type() == second.type());
+
+    auto apply_binary_operator = [&](const auto& a, const auto& b) {
+        return std::plus<> {}(a, b);
+    };
+
+    switch (first.type()) {
+        case ValueType::Boolean:
+            return context.dynamic_pool().create_boolean(apply_binary_operator(
+                first.as_boolean().value(), second.as_boolean().value()));
+        case ValueType::Integer:
+            return context.dynamic_pool().create_integer(apply_binary_operator(
+                first.as_integer().value(), second.as_integer().value()));
+        case ValueType::Real:
+            return context.dynamic_pool().create_real(apply_binary_operator(
+                first.as_real().value(), second.as_real().value()));
+        case ValueType::String:
+            return concatenate_strings(context, first.as_string(),
+                                       second.as_string());
+        case ValueType::Vector:
+            ASSERT_NOT_REACHED();
+    }
+}
+
+}  // namespace
 
 void Interpreter::add(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::ADD);
-    plus_helper(this, quad, m_string_table, context());
+
+    PoolEntry lhs = resolve_to_entry(quad.src_a());
+    PoolEntry rhs = resolve_to_entry(quad.src_b());
+    PoolEntry result =
+        compute_binary_expression<std::plus<>>(context(), lhs, rhs);
+
+    set_register(quad.dest().as_register(), result);
 }
 
 void Interpreter::sub(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::SUB);
-    binop_helper<std::minus<>>(this, quad, context());
+
+    PoolEntry lhs = resolve_to_entry(quad.src_a());
+    PoolEntry rhs = resolve_to_entry(quad.src_b());
+    PoolEntry result =
+        compute_binary_expression<std::minus<>>(context(), lhs, rhs);
+
+    set_register(quad.dest().as_register(), result);
 }
 void Interpreter::mult(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MULT);
-    binop_helper<std::multiplies<>>(this, quad, context());
+
+    PoolEntry lhs = resolve_to_entry(quad.src_a());
+    PoolEntry rhs = resolve_to_entry(quad.src_b());
+    PoolEntry result =
+        compute_binary_expression<std::multiplies<>>(context(), lhs, rhs);
+
+    set_register(quad.dest().as_register(), result);
 }
 
 void Interpreter::div(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::DIV);
-    binop_helper<std::divides<>>(this, quad, context());
+
+    PoolEntry lhs = resolve_to_entry(quad.src_a());
+    PoolEntry rhs = resolve_to_entry(quad.src_b());
+    PoolEntry result =
+        compute_binary_expression<std::divides<>>(context(), lhs, rhs);
+
+    set_register(quad.dest().as_register(), result);
 }
 
-template <class Operator>
-struct CmpVisitor {
-    CmpVisitor(StringTable* string_table, const Context& context)
-        : string_table(string_table), context(context) {
-    }
+void Interpreter::compare(
+    const Quad& quad,
+    std::function<bool(Value&, Value&)> comparison_predicate) {
+    Value& lhs = resolve_to_value(quad.src_a());
+    Value& rhs = resolve_to_value(quad.src_b());
 
-    StringTable* string_table;
-    const Context& context;
-
-    template <typename T, typename U>
-    Value operator()(T, U) {
-        ASSERT_NOT_REACHED();
-    }
-
-    template <typename T>
-    Value operator()(T a, T b) {
-        bool result = Operator {}(a.value(), b.value());
-        return context.create_value_from(Boolean(result));
-    }
-
-    template <>
-    Value operator()(String a, String b) {
-        bool result =
-            Operator {}(a.resolve(*string_table), b.resolve(*string_table));
-        return context.create_value_from(Boolean(result));
-    }
-
-    template <>
-    Value operator()(Vector a, Vector b) {
-        bool result = a.values() == b.values();
-        return context.create_value_from(Boolean(result));
-    }
-};
-
-template <class Operator>
-void cmp_helper(Interpreter* interpreter, StringTable* string_table,
-                const Quad& quad, const Context& context) {
-    Value lhs = interpreter->resolve_to_value(quad.src_a());
-    Value rhs = interpreter->resolve_to_value(quad.src_b());
-
-    Value result = std::visit(CmpVisitor<Operator> { string_table, context },
-                              lhs.data(), rhs.data());
-    interpreter->set_register(quad.dest().as_register(), std::move(result));
+    bool result = comparison_predicate(lhs, rhs);
+    PoolEntry result_entry = context().dynamic_pool().create_boolean(result);
+    set_register(quad.dest().as_register(), result_entry);
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
-    cmp_helper<std::equal_to<>>(this, m_string_table, quad, context());
+    compare(quad, [](Value& lhs, Value& rhs) { return lhs == rhs; });
 }
 
 void Interpreter::cmp_gt(const Quad& quad) {
-    cmp_helper<std::greater<>>(this, m_string_table, quad, context());
+    compare(quad, [](Value& lhs, Value& rhs) { return lhs > rhs; });
 }
 
 void Interpreter::cmp_lt(const Quad& quad) {
-    cmp_helper<std::less<>>(this, m_string_table, quad, context());
+    compare(quad, [](Value& lhs, Value& rhs) { return lhs < rhs; });
 }
 
 void Interpreter::cmp_gteq(const Quad& quad) {
-    cmp_helper<std::greater_equal<>>(this, m_string_table, quad, context());
+    compare(quad, [](Value& lhs, Value& rhs) { return lhs >= rhs; });
 }
 
 void Interpreter::cmp_lteq(const Quad& quad) {
-    cmp_helper<std::less_equal<>>(this, m_string_table, quad, context());
+    compare(quad, [](Value& lhs, Value& rhs) { return lhs <= rhs; });
 }
 
 void Interpreter::cmp_noteq(const Quad& quad) {
-    cmp_helper<std::not_equal_to<>>(this, m_string_table, quad, context());
+    compare(quad, [](Value& lhs, Value& rhs) { return lhs != rhs; });
 }
+
 void Interpreter::jmp(const Quad& quad) {
     unsigned label_id = resolve_label(quad.dest());
 
@@ -371,27 +353,27 @@ void Interpreter::jmp(const Quad& quad) {
 }
 
 void Interpreter::jmp_z(const Quad& quad) {
-    Value condition = resolve_to_value(quad.src_a());
+    Value& condition = resolve_to_value(quad.src_a());
     if (condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
 void Interpreter::jmp_nz(const Quad& quad) {
-    Value condition = resolve_to_value(quad.src_a());
+    Value& condition = resolve_to_value(quad.src_a());
     if (!condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
 void Interpreter::push_arg(const Quad& quad) {
-    m_arguments.push(resolve_to_value(quad.src_a()));
+    m_arguments.push(resolve_to_entry(quad.src_a()));
 }
 
 void Interpreter::pop_arg(const Quad& quad) {
     ASSERT(!m_arguments.empty());
 
-    Value argument = std::move(m_arguments.front());
+    PoolEntry argument = m_arguments.front();
     m_arguments.pop();
 
     set_register(quad.dest().as_register(), std::move(argument));
@@ -402,7 +384,8 @@ void Interpreter::save(const Quad& quad) {
     int end_index = quad.src_b().as_register().index();
 
     for (int i = start_idx; i <= end_index; ++i) {
-        m_stack.push(m_registers.at(i).copy());
+        // TODO: Should we copy here?
+        m_stack.push(m_registers.at(i));
     }
 }
 
@@ -421,13 +404,13 @@ void Interpreter::call(const Quad& quad) {
     FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
-        std::vector<Value> args {};
+        std::vector<PoolEntry> args {};
         while (!m_arguments.empty()) {
-            args.push_back(std::move(m_arguments.front()));
+            args.push_back(m_arguments.front());
             m_arguments.pop();
         }
-        Value ret = BuiltIn::call_builtin_function(func, args, context());
-        set_register(quad.dest().as_register(), std::move(ret));
+        PoolEntry ret = BuiltIn::call_builtin_function(func, args, context());
+        set_register(quad.dest().as_register(), ret);
         return;
     }
 
@@ -440,16 +423,15 @@ void Interpreter::call(const Quad& quad) {
 void Interpreter::call_c(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL_C);
 
-    std::vector<Value> args {};
+    std::vector<PoolEntry> args {};
     while (!m_arguments.empty()) {
         args.push_back(std::move(m_arguments.front()));
         m_arguments.pop();
     }
 
-    StringTable::Key lib = quad.src_a().as_value().as_string();
-    StringTable::Key func = quad.src_b().as_value().as_string();
-    std::optional<Value> return_value =
-        call_c_func(lib, func, args, take_pending_type_id());
+    std::optional<PoolEntry> return_value = call_c_func(
+        resolve_to_entry(quad.src_a()), resolve_to_entry(quad.src_b()), args,
+        take_pending_type_id());
 
     if (return_value.has_value()) {
         set_register(quad.dest().as_register(), std::move(*return_value));
@@ -458,14 +440,12 @@ void Interpreter::call_c(const Quad& quad) {
 
 void Interpreter::set_ret_type(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::SET_RET_TYPE);
-    set_pending_type_id(quad.src_a().as_value().as_int());
+    set_pending_type_id(resolve_to_value(quad.src_a()).as_integer().value());
 }
 
-void Interpreter::ret(const Quad& quad) {
-    auto source = quad.src_a();
-
+void Interpreter::ret(const Quad&) {
     if (current_frame()->is_main_frame()) {
-        Value value = resolve_register(return_register());
+        const Value& value = resolve_register(return_register());
         exit(value.as_integer().value());
     }
 
@@ -474,8 +454,8 @@ void Interpreter::ret(const Quad& quad) {
 
 void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
-    Value source = resolve_to_value(quad.src_a());
-    if (source.is_vector()) {
+    PoolEntry source = resolve_to_entry(quad.src_a());
+    if (resolve_to_value(quad.src_a()).as_boolean().value()) {
         // TODO: Need to figure out if we want to copy here or not. It bascially
         // comes down to
         //       which type of value semantics we for objects like array
@@ -485,7 +465,8 @@ void Interpreter::move(const Quad& quad) {
         ASSERT_NOT_REACHED_MSG("TODO: Interpreter::move array");
         // source = source.as_vector();
     }
-    set_register(quad.dest().as_register(), std::move(source));
+    set_register(quad.dest().as_register(),
+                 context().dynamic_pool().copy(source));
 }
 
 void bounds_check(std::string_view s, int index) {
@@ -503,15 +484,13 @@ void bounds_check(std::string_view s, int index) {
     }
 }
 
-void bounds_check(Vector vec, int index) {
+void bounds_check(Vector& vec, int index) {
     if (index < 0) {
         runtime_error(
             fmt::format("Cannot index vector with negative index [{}]", index));
     }
 
-    auto& values = vec.values();
-
-    int size = static_cast<int>(values.size());
+    int size = static_cast<int>(vec.length());
     if (index >= size) {
         runtime_error(
             fmt::format("Index out-of-bounds error. Error indexing vector of "
@@ -520,69 +499,52 @@ void bounds_check(Vector vec, int index) {
     }
 }
 
-String bounds_checked_index(String target, int index,
-                            StringTable* string_table) {
-    std::string_view resolved = target.resolve(*string_table);
-    bounds_check(resolved, index);
-
-    char value_at_index = resolved[index];
-    // FIXME: We really shouldn't add runtime strings to the string table.
-    StringTable::Entry entry = string_table->add(value_at_index);
-    return String(entry.key);
+PoolEntry bounds_checked_index(Context& context, const String& target,
+                               int index) {
+    bounds_check(target.value(), index);
+    char value_at_index = target.value()[index];
+    return context.dynamic_pool().create_string(std::string(1, value_at_index));
 }
 
-Value bounds_checked_index(Vector target, int index) {
+PoolEntry bounds_checked_index(Vector& target, int index) {
     bounds_check(target, index);
-    return target.values().at(index).copy();
+    return target.at(index);
 }
 
 void Interpreter::index_move(const Quad& quad) {
     int index = resolve_to_value(quad.src_b()).as_integer().value();
 
-    Value target = resolve_to_value(quad.src_a());
+    Value& target = resolve_to_value(quad.src_a());
 
-    Value value;
+    PoolEntry result;
 
     if (target.is_string()) {
-        value = context().create_value_from(
-            bounds_checked_index(target.as_string(), index, m_string_table));
+        result = bounds_checked_index(context(), target.as_string(), index);
     } else if (target.is_vector()) {
-        value = bounds_checked_index(target.as_vector(), index);
+        result = bounds_checked_index(target.as_vector(), index);
     } else {
         ASSERT_NOT_REACHED();
     }
 
-    set_register(quad.dest().as_register(), std::move(value));
+    set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::index_assign(const Quad& quad) {
     int index = resolve_to_value(quad.src_a()).as_integer().value();
-    Vector indexed = resolve_to_value(quad.dest()).as_vector();
+    Vector& indexed = resolve_to_value(quad.dest()).as_vector();
 
-    Value value = resolve_to_value(quad.src_b());
+    PoolEntry entry = resolve_to_entry(quad.src_b());
 
     bounds_check(indexed, index);
-    indexed.mutable_values().at(index) = std::move(value);
+    indexed.set(index, entry);
 }
 
 void Interpreter::interpret_and(const Quad& quad) {
-    Value lhs = resolve_to_value(quad.src_a());
-    Value rhs = resolve_to_value(quad.src_b());
-
-    Boolean result =
-        Boolean(lhs.as_boolean().value() && rhs.as_boolean().value());
-    set_register(quad.dest().as_register(),
-                 context().create_value_from(result));
+    compare(quad, [](Value& lhs, Value& rhs) { return lhs && rhs; });
 }
 
 void Interpreter::interpret_or(const Quad& quad) {
-    Value lhs = resolve_to_value(quad.src_a());
-    Value rhs = resolve_to_value(quad.src_b());
-
-    Boolean result =
-        Boolean(lhs.as_boolean().value() || rhs.as_boolean().value());
-    set_register(quad.dest().as_register(),
-                 context().create_value_from(result));
+    compare(quad, [](Value& lhs, Value& rhs) { return lhs || rhs; });
 }
 
 StackFrame* Interpreter::current_frame() {
@@ -614,25 +576,29 @@ const Context& Interpreter::context() const {
     return m_context;
 }
 
-std::optional<Value> Interpreter::call_c_func(StringTable::Key lib,
-                                              StringTable::Key func,
-                                              const std::vector<Value>& args,
-                                              unsigned return_type_id) {
+std::optional<PoolEntry> Interpreter::call_c_func(
+    PoolEntry lib, PoolEntry func, const std::vector<PoolEntry>& args,
+    unsigned return_type_id) {
+    Value& lib_name = context().get_value(lib);
+    ASSERT(lib_name.is_string());
+    Value& func_name = context().get_value(func);
+    ASSERT(func_name.is_string());
+
     Result<dynlib::DynamicLibrary*> loaded_lib_or_error =
-        dynlib::load_lib(m_string_table->get_at(lib));
+        dynlib::load_lib(lib_name.as_string().value());
     if (loaded_lib_or_error.is_error()) {
         ASSERT_NOT_REACHED_MSG("Could not load expected library");
     }
 
     dynlib::DynamicLibrary* loaded_lib = loaded_lib_or_error.get();
-    ASSERT(loaded_lib->has_symbol(m_string_table->get_at(func)));
+    ASSERT(loaded_lib->has_symbol(func_name.as_string().value()));
     dynlib::DynamicLibrary::Callable callable =
-        loaded_lib->get_callable(m_string_table->get_at(func));
+        loaded_lib->get_callable(func_name.as_string().value());
 
     std::vector<ptr_t<vm::CTypeWrapper>> wrapped_args;
 
-    for (const Value& op : args) {
-        wrapped_args.push_back(vm::CTypeWrapper::from(m_string_table, op));
+    for (const PoolEntry& op : args) {
+        wrapped_args.push_back(vm::CTypeWrapper::from(context().get_value(op)));
     }
 
     ctype::TypeInfo type_info = ctype::from_type_id(return_type_id);
@@ -662,18 +628,16 @@ std::optional<Value> Interpreter::call_c_func(StringTable::Key lib,
         case Primitive::INT: {
             unsigned long val =
                 *(static_cast<unsigned long*>(result_wrapper.buffer()));
-            return context().create_value_from(Integer(val));
+            return context().dynamic_pool().create_integer(val);
         }
         case Primitive::FLOAT: {
             double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
-            return context().create_value_from(Real(val));
+            return context().dynamic_pool().create_real(val);
         }
         case Primitive::STRING: {
             std::string val =
                 *(reinterpret_cast<char**>(result_wrapper.buffer()));
-            // FIXME: Should avoid adding runtime strings to the string table.
-            StringTable::Entry entry = m_string_table->add(std::move(val));
-            return context().create_value_from(String(entry.key));
+            return context().dynamic_pool().create_string(val);
         }
         default:
             ASSERT_NOT_REACHED();

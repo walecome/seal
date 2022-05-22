@@ -4,12 +4,13 @@
 
 #include "BuiltIn.hh"
 
+#include "common/PoolEntry.hh"
 #include "interpreter/Context.hh"
 
 namespace BuiltIn {
 
 using builtin_func_t =
-    std::function<Value(const std::vector<Value>&, const Context& context)>;
+    std::function<PoolEntry(const std::vector<PoolEntry>&, Context& context)>;
 
 class FuncInfo {
    public:
@@ -25,7 +26,7 @@ class FuncInfo {
         return m_is_typechecked;
     }
 
-    Value call(const std::vector<Value>& args, const Context& context) const {
+    PoolEntry call(const std::vector<PoolEntry>& args, Context& context) const {
         return m_func(args, context);
     }
 
@@ -102,9 +103,9 @@ unsigned function_id_from_identifier(std::string_view identifier) {
     return builtin_functions.find(identifier)->second.id();
 }
 
-Value call_builtin_function(unsigned function_id,
-                            const std::vector<Value>& args,
-                            const Context& context) {
+PoolEntry call_builtin_function(unsigned function_id,
+                                const std::vector<PoolEntry>& args,
+                                Context& context) {
     return id_to_builtin.at(function_id)->call(args, context);
 }
 

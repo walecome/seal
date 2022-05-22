@@ -6,8 +6,6 @@
 
 #include "Constants.hh"
 
-#include "interpreter/Value.hh"
-
 class StackFrame {
    public:
     StackFrame() = delete;

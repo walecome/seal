@@ -1,14 +1,14 @@
 #pragma once
 
+#include <functional>
 #include <map>
 #include <optional>
+#include <queue>
 #include <stack>
 #include <vector>
-#include <queue>
 
 #include "interpreter/Context.hh"
 #include "interpreter/StackFrame.hh"
-#include "interpreter/Value.hh"
 #include "ir/Operand.hh"
 
 class Quad;
@@ -17,13 +17,14 @@ struct QuadCollection;
 
 class Interpreter {
    public:
-    Interpreter(const QuadCollection&, StringTable* string_table, bool verbose);
+    Interpreter(const QuadCollection&, bool verbose);
 
     void interpret();
 
-    Value resolve_register(Register reg) const;
-    Value resolve_to_value(const Operand& source) const;
-    void set_register(Register reg, Value value);
+    Value& resolve_register(Register reg) const;
+    Value& resolve_to_value(const Operand& source) const;
+    PoolEntry resolve_to_entry(const Operand& source) const;
+    void set_register(Register reg, PoolEntry value);
 
    private:
     void interpret_function(unsigned function_id);
@@ -56,14 +57,15 @@ class Interpreter {
 
     void interpret_and(const Quad&);
     void interpret_or(const Quad&);
-    
+
+    void compare(
+        const Quad&,
+        std::function<bool(Value&, Value&)> comparison_predicate);
+
     unsigned resolve_label(const Operand& dest) const;
-    std::optional<Value> call_c_func(
-        StringTable::Key lib,
-        StringTable::Key func,
-        const std::vector<Value>& args,
-        unsigned return_type_id
-    );
+    std::optional<PoolEntry> call_c_func(PoolEntry lib, PoolEntry func,
+                                         const std::vector<PoolEntry>& args,
+                                         unsigned return_type_id);
 
     StackFrame* current_frame();
     void enter_new_frame();
@@ -72,15 +74,15 @@ class Interpreter {
     unsigned take_pending_type_id();
     void set_pending_type_id(unsigned value);
 
+    Context& context();
     const Context& context() const;
 
     const QuadCollection& m_quads;
-    StringTable* m_string_table;
-    std::vector<Value> m_registers;
+    std::vector<PoolEntry> m_registers;
     bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
-    std::queue<Value> m_arguments { };
-    std::stack<Value> m_stack {};
+    std::queue<PoolEntry> m_arguments {};
+    std::stack<PoolEntry> m_stack {};
     std::optional<unsigned> m_pending_return_type {};
     const Context m_context {};
 };
