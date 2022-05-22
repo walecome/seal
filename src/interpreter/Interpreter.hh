@@ -60,7 +60,7 @@ class Interpreter {
 
     void compare(
         const Quad&,
-        std::function<bool(Value&, Value&)> comparison_predicate);
+        std::function<bool(const Value&, const Value&)> comparison_predicate);
 
     unsigned resolve_label(const Operand& dest) const;
     std::optional<PoolEntry> call_c_func(PoolEntry lib, PoolEntry func,
@@ -84,5 +84,5 @@ class Interpreter {
     std::queue<PoolEntry> m_arguments {};
     std::stack<PoolEntry> m_stack {};
     std::optional<unsigned> m_pending_return_type {};
-    const Context m_context {};
+    Context m_context {};
 };
