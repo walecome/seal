@@ -14,7 +14,7 @@ struct QuadCollection {
 
     unsigned register_count;
 
-    ValuePool constant_pool { ValuePool::Type::Constant };
+    ValuePool constant_pool { PoolEntry::Type::Constant };
 
     void dump() const;
 };

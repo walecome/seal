@@ -3,13 +3,15 @@
 #include <cstddef>
 
 class PoolEntry {
-  public:
+   public:
+    enum class Type {
+        Constant,
+        Dynamic,
+    };
+
     PoolEntry();
 
-    PoolEntry(PoolEntry& other);
     PoolEntry(const PoolEntry& other);
-
-    PoolEntry& operator=(PoolEntry& other);
     PoolEntry& operator=(const PoolEntry& other);
 
     bool operator==(const PoolEntry& other) const;
@@ -18,12 +20,11 @@ class PoolEntry {
     static PoolEntry create_dynamic(size_t key);
 
     size_t key() const;
+    Type type() const;
 
    private:
     PoolEntry(size_t key, bool constant);
 
-    // TODO: Maybe move ValuePool::Type here, and switch that that from bool.
-    const size_t m_key;
-    const bool m_constant;
-
+    size_t m_key;
+    Type m_type;
 };

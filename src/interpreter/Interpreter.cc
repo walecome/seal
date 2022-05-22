@@ -202,8 +202,8 @@ namespace {
 template <class BinaryOperator>
 PoolEntry compute_binary_expression(Context& context, PoolEntry lhs,
                                     PoolEntry rhs) {
-    Value& first = context.get_value(lhs);
-    Value& second = context.get_value(rhs);
+    const Value& first = context.get_value(lhs);
+    const Value& second = context.get_value(rhs);
 
     ASSERT(first.type() == second.type());
 
@@ -228,7 +228,8 @@ PoolEntry compute_binary_expression(Context& context, PoolEntry lhs,
     }
 }
 
-PoolEntry concatenate_strings(Context& context, String& lhs, String& rhs) {
+PoolEntry concatenate_strings(Context& context, const String& lhs,
+                              const String& rhs) {
     std::string result = std::string(lhs.value()) + std::string(rhs.value());
     return context.dynamic_pool().create_string(result);
 }
@@ -236,8 +237,8 @@ PoolEntry concatenate_strings(Context& context, String& lhs, String& rhs) {
 template <>
 PoolEntry compute_binary_expression<std::plus<>>(Context& context,
                                                  PoolEntry lhs, PoolEntry rhs) {
-    Value& first = context.get_value(lhs);
-    Value& second = context.get_value(rhs);
+    const Value& first = context.get_value(lhs);
+    const Value& second = context.get_value(rhs);
 
     ASSERT(first.type() == second.type());
 
@@ -310,9 +311,9 @@ void Interpreter::div(const Quad& quad) {
 
 void Interpreter::compare(
     const Quad& quad,
-    std::function<bool(Value&, Value&)> comparison_predicate) {
-    Value& lhs = resolve_to_value(quad.src_a());
-    Value& rhs = resolve_to_value(quad.src_b());
+    std::function<bool(const Value&, const Value&)> comparison_predicate) {
+    const Value& lhs = resolve_to_value(quad.src_a());
+    const Value& rhs = resolve_to_value(quad.src_b());
 
     bool result = comparison_predicate(lhs, rhs);
     PoolEntry result_entry = context().dynamic_pool().create_boolean(result);
@@ -320,27 +321,31 @@ void Interpreter::compare(
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return lhs == rhs; });
+    compare(quad,
+            [](const Value& lhs, const Value& rhs) { return lhs == rhs; });
 }
 
 void Interpreter::cmp_gt(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return lhs > rhs; });
+    compare(quad, [](const Value& lhs, const Value& rhs) { return lhs > rhs; });
 }
 
 void Interpreter::cmp_lt(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return lhs < rhs; });
+    compare(quad, [](const Value& lhs, const Value& rhs) { return lhs < rhs; });
 }
 
 void Interpreter::cmp_gteq(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return lhs >= rhs; });
+    compare(quad,
+            [](const Value& lhs, const Value& rhs) { return lhs >= rhs; });
 }
 
 void Interpreter::cmp_lteq(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return lhs <= rhs; });
+    compare(quad,
+            [](const Value& lhs, const Value& rhs) { return lhs <= rhs; });
 }
 
 void Interpreter::cmp_noteq(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return lhs != rhs; });
+    compare(quad,
+            [](const Value& lhs, const Value& rhs) { return lhs != rhs; });
 }
 
 void Interpreter::jmp(const Quad& quad) {
@@ -353,14 +358,14 @@ void Interpreter::jmp(const Quad& quad) {
 }
 
 void Interpreter::jmp_z(const Quad& quad) {
-    Value& condition = resolve_to_value(quad.src_a());
+    const Value& condition = resolve_to_value(quad.src_a());
     if (condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
 void Interpreter::jmp_nz(const Quad& quad) {
-    Value& condition = resolve_to_value(quad.src_a());
+    const Value& condition = resolve_to_value(quad.src_a());
     if (!condition.as_boolean().value()) {
         jmp(quad);
     }
@@ -484,7 +489,7 @@ void bounds_check(std::string_view s, int index) {
     }
 }
 
-void bounds_check(Vector& vec, int index) {
+void bounds_check(const Vector& vec, int index) {
     if (index < 0) {
         runtime_error(
             fmt::format("Cannot index vector with negative index [{}]", index));
@@ -506,7 +511,7 @@ PoolEntry bounds_checked_index(Context& context, const String& target,
     return context.dynamic_pool().create_string(std::string(1, value_at_index));
 }
 
-PoolEntry bounds_checked_index(Vector& target, int index) {
+PoolEntry bounds_checked_index(const Vector& target, int index) {
     bounds_check(target, index);
     return target.at(index);
 }
@@ -514,7 +519,7 @@ PoolEntry bounds_checked_index(Vector& target, int index) {
 void Interpreter::index_move(const Quad& quad) {
     int index = resolve_to_value(quad.src_b()).as_integer().value();
 
-    Value& target = resolve_to_value(quad.src_a());
+    const Value& target = resolve_to_value(quad.src_a());
 
     PoolEntry result;
 
@@ -540,11 +545,13 @@ void Interpreter::index_assign(const Quad& quad) {
 }
 
 void Interpreter::interpret_and(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return bool(lhs) && bool(rhs); });
+    compare(quad,
+            [](const Value& lhs, const Value& rhs) { return bool(lhs) && bool(rhs); });
 }
 
 void Interpreter::interpret_or(const Quad& quad) {
-    compare(quad, [](Value& lhs, Value& rhs) { return bool(lhs) || bool(rhs); });
+    compare(quad,
+            [](const Value& lhs, const Value& rhs) { return bool(lhs) || bool(rhs); });
 }
 
 StackFrame* Interpreter::current_frame() {
@@ -572,6 +579,10 @@ void Interpreter::set_pending_type_id(unsigned value) {
     m_pending_return_type = value;
 }
 
+Context& Interpreter::context() {
+    return m_context;
+}
+
 const Context& Interpreter::context() const {
     return m_context;
 }
@@ -579,9 +590,9 @@ const Context& Interpreter::context() const {
 std::optional<PoolEntry> Interpreter::call_c_func(
     PoolEntry lib, PoolEntry func, const std::vector<PoolEntry>& args,
     unsigned return_type_id) {
-    Value& lib_name = context().get_value(lib);
+    const Value& lib_name = context().get_value(lib);
     ASSERT(lib_name.is_string());
-    Value& func_name = context().get_value(func);
+    const Value& func_name = context().get_value(func);
     ASSERT(func_name.is_string());
 
     Result<dynlib::DynamicLibrary*> loaded_lib_or_error =

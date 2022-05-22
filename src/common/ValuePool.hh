@@ -9,15 +9,10 @@
 
 class ValuePool {
    public:
-    enum class Type {
-        Constant,
-        Dynamic,
-    };
+    explicit ValuePool(PoolEntry::Type type);
 
     ValuePool(const ValuePool& other);
     ValuePool& operator=(const ValuePool& other);
-
-    explicit ValuePool(Type type);
 
     PoolEntry create_boolean(bool value);
     PoolEntry create_integer(int value);
@@ -27,8 +22,10 @@ class ValuePool {
     PoolEntry create_vector(std::vector<PoolEntry> value);
 
     PoolEntry copy(PoolEntry entry);
+  
+    Value& get_entry(PoolEntry entry) const;
 
    private:
-    Type m_type;
-    std::vector<std::unique_ptr<int>> m_values;
+    PoolEntry::Type m_type;
+    std::vector<std::unique_ptr<Value>> m_values;
 };
