@@ -21,7 +21,7 @@ class Value {
     Value() = delete;
     virtual ~Value() = default;
 
-    virtual std::string to_string() = 0;
+    virtual std::string to_string() const = 0;
 
     bool is_boolean() const;
     bool is_integer() const;
@@ -59,53 +59,65 @@ class Value {
     ValueType m_type;
 };
 
-class Boolean : Value {
+class Boolean : public Value {
    public:
     explicit Boolean(bool value);
+    ~Boolean();
 
     bool value() const;
+
+    std::string to_string() const override;
 
    private:
     const bool m_value;
 };
 
-class Integer : Value {
+class Integer : public Value {
    public:
     explicit Integer(int value);
+    ~Integer();
 
     int value() const;
+
+    std::string to_string() const override;
 
    private:
     const int m_value;
 };
 
-class Real : Value {
+class Real : public Value {
    public:
     explicit Real(double value);
 
-    ~Real() override;
+    ~Real();
 
     double value() const;
+
+    std::string to_string() const override;
 
    private:
     const double m_value;
 };
 
-class String : Value {
+class String : public Value {
    public:
-    explicit String(std::string runtime_string);
+    explicit String(std::string value);
+    ~String();
 
     size_t length() const;
 
     std::string_view value() const;
 
+    std::string to_string() const override;
+
    private:
     const std::string m_value;
 };
 
-class Vector : Value {
+class Vector : public Value {
    public:
     explicit Vector(std::vector<PoolEntry> values);
+    ~Vector();
 
     const std::vector<PoolEntry>& value() const;
 
@@ -113,6 +125,8 @@ class Vector : Value {
     PoolEntry at(size_t index) const;
     void set(size_t index, PoolEntry entry);
     void add(PoolEntry entry);
+
+    std::string to_string() const override;
 
    private:
       std::vector<PoolEntry> m_value;

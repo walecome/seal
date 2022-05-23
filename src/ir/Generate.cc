@@ -33,6 +33,11 @@
 
 #include "fmt/format.h"
 
+Generate::Generate(const CompilationUnit *compilation_unit,
+                   ValuePool *constant_pool)
+    : m_compilation_unit(compilation_unit), m_constant_pool(constant_pool) {
+}
+
 QuadCollection Generate::generate() {
     auto ir_program = std::make_unique<IrProgram>();
 
@@ -250,11 +255,13 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
 
     if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
         Operand lib = Operand(get_constant_pool().create_string(x->lib_name()));
-        Operand func = Operand(get_constant_pool().create_string(x->identifier()));
+        Operand func =
+            Operand(get_constant_pool().create_string(x->identifier()));
 
         unsigned type_id = ctype::from_seal_type(x->type()).type_id;
         env()->add_quad(OPCode::SET_RET_TYPE, {},
-                        Operand(get_constant_pool().create_integer(type_id)), {});
+                        Operand(get_constant_pool().create_integer(type_id)),
+                        {});
         env()->add_quad(OPCode::CALL_C, get_function_dest(), Operand { lib },
                         Operand { func });
     } else {
@@ -530,5 +537,5 @@ Register Generate::previous_register() const {
 }
 
 ValuePool &Generate::get_constant_pool() {
-    return m_quad_collection.constant_pool;
+    return *m_constant_pool;
 }

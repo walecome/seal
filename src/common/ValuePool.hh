@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "common/PoolEntry.hh"
@@ -11,8 +12,8 @@ class ValuePool {
    public:
     explicit ValuePool(PoolEntry::Type type);
 
-    ValuePool(const ValuePool& other);
-    ValuePool& operator=(const ValuePool& other);
+    ValuePool(const ValuePool& other) = delete;
+    ValuePool& operator=(const ValuePool& other) = delete;
 
     PoolEntry create_boolean(bool value);
     PoolEntry create_integer(int value);

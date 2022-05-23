@@ -5,6 +5,17 @@
 PoolEntry::PoolEntry() : m_key(-1), m_type(PoolEntry::Type::Constant) {
 }
 
+PoolEntry::PoolEntry(size_t key, Type type) : m_key(key), m_type(type) {
+}
+
+PoolEntry PoolEntry::create_constant(size_t key) {
+    return PoolEntry(key, Type::Constant);
+}
+
+PoolEntry PoolEntry::create_dynamic(size_t key) {
+    return PoolEntry(key, Type::Dynamic);
+}
+
 PoolEntry::PoolEntry(const PoolEntry& other)
     : m_key(other.key()), m_type(other.type()) {
 }
