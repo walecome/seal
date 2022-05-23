@@ -1,6 +1,11 @@
 #include "common/Value.hh"
 
+#include <fmt/format.h>
+
 #include "Constants.hh"
+
+Value::Value(ValueType type) : m_type(type) {
+}
 
 bool Value::is_boolean() const {
     return m_type == ValueType::Boolean;
@@ -46,7 +51,6 @@ Vector& Value::as_vector() {
     ASSERT(is_vector());
     return *reinterpret_cast<Vector*>(this);
 }
-
 
 const Boolean& Value::as_boolean() const {
     ASSERT(is_boolean());
@@ -145,61 +149,108 @@ bool Value::operator>=(const Value& other) const {
 
 Value::operator bool() const {
     if (is_boolean()) {
-      return as_boolean().value();
+        return as_boolean().value();
     }
     if (is_integer()) {
-      return !!as_integer().value();
+        return !!as_integer().value();
     }
     if (is_real()) {
-      return !!as_real().value();
+        return !!as_real().value();
     }
     if (is_string()) {
-      return !as_string().value().empty();
+        return !as_string().value().empty();
     }
     if (is_vector()) {
-      return !as_vector().value().empty();
+        return !as_vector().value().empty();
     }
     ASSERT_NOT_REACHED();
     return false;
 }
 
-bool Boolean::value() const {
-  return m_value;
+Boolean::Boolean(bool value) : Value(ValueType::Boolean), m_value(value) {
 }
+
+Boolean::~Boolean() = default;
+
+bool Boolean::value() const {
+    return m_value;
+}
+
+std::string Boolean::to_string() const {
+  return fmt::format("{}", value());
+}
+
+Integer::Integer(int value) : Value(ValueType::Integer), m_value(value) {
+}
+
+Integer::~Integer() = default;
 
 int Integer::value() const {
-  return m_value;
+    return m_value;
 }
+
+std::string Integer::to_string() const {
+  return fmt::format("{}", value());
+}
+
+Real::Real(double value) : Value(ValueType::Real), m_value(value) {
+}
+
+Real::~Real() = default;
 
 double Real::value() const {
-  return m_value;
+    return m_value;
 }
 
+std::string Real::to_string() const {
+  return fmt::format("{}", value());
+}
+
+String::String(std::string value)
+    : Value(ValueType::String), m_value(std::move(value)) {
+}
+
+String::~String() = default;
+
 size_t String::length() const {
-  return m_value.length();
+    return m_value.length();
 }
 
 std::string_view String::value() const {
-  return m_value;
+    return m_value;
 }
 
+std::string String::to_string() const {
+  return std::string(value());
+}
+
+Vector::Vector(std::vector<PoolEntry> value)
+    : Value(ValueType::Vector), m_value(std::move(value)) {
+}
+
+Vector::~Vector() = default;
+
 size_t Vector::length() const {
-  return m_value.size();
+    return m_value.size();
 }
 
 PoolEntry Vector::at(size_t index) const {
-  return m_value.at(index);
+    return m_value.at(index);
 }
 
 void Vector::set(size_t index, PoolEntry entry) {
-  m_value.at(index) = entry;
+    m_value.at(index) = entry;
 }
 
 void Vector::add(PoolEntry entry) {
-  m_value.push_back(entry);
+    m_value.push_back(entry);
 }
 
 const std::vector<PoolEntry>& Vector::value() const {
-  return m_value;
+    return m_value;
 }
 
+std::string Vector::to_string() const {
+  // FIXME: Only have access to PoolEntry, need to print value.
+  return "[Vector::to_string() not implemented]";
+}
