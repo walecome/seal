@@ -29,8 +29,8 @@ LabelOperand IrFunction::create_and_queue_label() {
 
 void IrFunction::replace_prologue(Operand start, Operand end) {
     ASSERT(m_quads.at(0)->opcode() == OPCode::SAVE);
-    ptr_t<Quad> quad = std::make_unique<Quad>(
-        OPCode::SAVE, Operand::create_empty(), start, end);
+    ptr_t<Quad> quad =
+        std::make_unique<Quad>(OPCode::SAVE, Operand::empty(), start, end);
     m_quads.at(0) = std::move(quad);
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <optional>
 
 class PoolEntry {
    public:
@@ -11,11 +12,11 @@ class PoolEntry {
 
     PoolEntry();
 
-    static PoolEntry create_constant(size_t key);
-    static PoolEntry create_dynamic(size_t key);
-
     PoolEntry(const PoolEntry& other);
     PoolEntry& operator=(const PoolEntry& other);
+
+    static PoolEntry create_constant(size_t key);
+    static PoolEntry create_dynamic(size_t key);
 
     bool operator==(const PoolEntry& other) const;
 
@@ -25,6 +26,6 @@ class PoolEntry {
    private:
     PoolEntry(size_t key, Type type);
 
-    size_t m_key;
-    Type m_type;
+    std::optional<size_t> m_key;
+    std::optional<Type> m_type;
 };

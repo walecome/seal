@@ -26,9 +26,11 @@ Register return_register() {
 
 }  // namespace
 
-Interpreter::Interpreter(const QuadCollection& quads, bool verbose)
+Interpreter::Interpreter(const QuadCollection& quads,
+                         const ValuePool* constant_pool, bool verbose)
     : m_quads { quads },
       m_registers(std::vector<PoolEntry>(quads.register_count)),
+      m_context(Context(constant_pool)),
       m_verbose { verbose } {
 }
 
@@ -545,13 +547,15 @@ void Interpreter::index_assign(const Quad& quad) {
 }
 
 void Interpreter::interpret_and(const Quad& quad) {
-    compare(quad,
-            [](const Value& lhs, const Value& rhs) { return bool(lhs) && bool(rhs); });
+    compare(quad, [](const Value& lhs, const Value& rhs) {
+        return bool(lhs) && bool(rhs);
+    });
 }
 
 void Interpreter::interpret_or(const Quad& quad) {
-    compare(quad,
-            [](const Value& lhs, const Value& rhs) { return bool(lhs) || bool(rhs); });
+    compare(quad, [](const Value& lhs, const Value& rhs) {
+        return bool(lhs) || bool(rhs);
+    });
 }
 
 StackFrame* Interpreter::current_frame() {

@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "Constants.hh"
-#include "ir/Register.hh"
 #include "common/PoolEntry.hh"
+#include "ir/Register.hh"
 
 // This defines a struct with the identifier name. In addition it adds a member
 // named value of the given type, as well as an overload for that type.
@@ -30,12 +30,10 @@ class IrFunction;
 
 class Operand {
    public:
-    Operand() : m_used { false }, m_data {} {
-    }
-    explicit Operand(operand_type_t data) : m_used { true }, m_data { data } {
+    explicit Operand(operand_type_t data) : m_data { data } {
     }
 
-    static Operand create_empty() {
+    static Operand empty() {
         return Operand();
     }
 
@@ -45,7 +43,7 @@ class Operand {
     bool is_register() const;
 
     bool is_used() const {
-        return m_used;
+        return m_data.has_value();
     }
 
     auto env() const {
@@ -64,13 +62,18 @@ class Operand {
     Register as_register() const;
 
    private:
-    template <class T>
-    bool holds() const {
-        return std::holds_alternative<T>(m_data);
+    Operand() : m_data(std::nullopt) {
     }
 
-    bool m_used;
-    operand_type_t m_data;
+    template <class T>
+    bool holds() const {
+        if (!m_data.has_value()) {
+            return false;
+        }
+        return std::holds_alternative<T>(m_data.value());
+    }
+
+    std::optional<operand_type_t> m_data;
 
     const IrFunction* m_env { nullptr };
 };
