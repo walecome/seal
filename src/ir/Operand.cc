@@ -63,7 +63,7 @@ struct OperandDebugPrinter {
 
 std::string Operand::to_debug_string() const {
     if (!m_data.has_value()) {
-      return "NO VALUE";
+      return "_";
     }
     return std::visit(OperandDebugPrinter { this }, m_data.value());
 }
