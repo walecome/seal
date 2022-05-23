@@ -22,22 +22,22 @@ bool Operand::is_value_entry() const {
 
 PoolEntry Operand::as_value_entry() const {
     ASSERT(is_value_entry());
-    return std::get<PoolEntry>(m_data);
+    return std::get<PoolEntry>(m_data.value());
 }
 
 FunctionOperand Operand::as_function() const {
     ASSERT(is_function());
-    return std::get<FunctionOperand>(m_data);
+    return std::get<FunctionOperand>(m_data.value());
 }
 
 Register Operand::as_register() const {
     ASSERT(is_register());
-    return std::get<Register>(m_data);
+    return std::get<Register>(m_data.value());
 }
 
 LabelOperand Operand::as_label() const {
     ASSERT(is_label());
-    return std::get<LabelOperand>(m_data);
+    return std::get<LabelOperand>(m_data.value());
 }
 
 struct OperandDebugPrinter {
@@ -62,5 +62,8 @@ struct OperandDebugPrinter {
 };
 
 std::string Operand::to_debug_string() const {
-    return std::visit(OperandDebugPrinter { this }, m_data);
+    if (!m_data.has_value()) {
+      return "NO VALUE";
+    }
+    return std::visit(OperandDebugPrinter { this }, m_data.value());
 }

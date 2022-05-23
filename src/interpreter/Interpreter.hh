@@ -17,7 +17,8 @@ struct QuadCollection;
 
 class Interpreter {
    public:
-    Interpreter(const QuadCollection&, bool verbose);
+    Interpreter(const QuadCollection&, const ValuePool* constant_pool,
+                bool verbose);
 
     void interpret();
 
@@ -79,10 +80,10 @@ class Interpreter {
 
     const QuadCollection& m_quads;
     std::vector<PoolEntry> m_registers;
+    Context m_context;
     bool m_verbose;
     std::stack<StackFrame> m_stack_frames {};
     std::queue<PoolEntry> m_arguments {};
     std::stack<PoolEntry> m_stack {};
     std::optional<unsigned> m_pending_return_type {};
-    Context m_context {};
 };

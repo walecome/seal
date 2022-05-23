@@ -2,10 +2,22 @@
 
 #include <utility>
 
-PoolEntry::PoolEntry() : m_key(-1), m_type(PoolEntry::Type::Constant) {
+#include "Constants.hh"
+
+PoolEntry::PoolEntry() : m_key(std::nullopt), m_type(std::nullopt) {
 }
 
 PoolEntry::PoolEntry(size_t key, Type type) : m_key(key), m_type(type) {
+}
+
+PoolEntry::PoolEntry(const PoolEntry& other)
+    : m_key(other.m_key), m_type(other.m_type) {
+}
+
+PoolEntry& PoolEntry::operator=(const PoolEntry& other) {
+    m_key = other.key();
+    m_type = other.type();
+    return *this;
 }
 
 PoolEntry PoolEntry::create_constant(size_t key) {
@@ -16,20 +28,12 @@ PoolEntry PoolEntry::create_dynamic(size_t key) {
     return PoolEntry(key, Type::Dynamic);
 }
 
-PoolEntry::PoolEntry(const PoolEntry& other)
-    : m_key(other.key()), m_type(other.type()) {
-}
-
-PoolEntry& PoolEntry::operator=(const PoolEntry& other) {
-    m_key = other.key();
-    m_type = other.type();
-    return *this;
-}
-
 size_t PoolEntry::key() const {
-    return m_key;
+    ASSERT(m_key.has_value());
+    return m_key.value();
 }
 
 PoolEntry::Type PoolEntry::type() const {
-    return m_type;
+    ASSERT(m_type.has_value());
+    return m_type.value();
 }

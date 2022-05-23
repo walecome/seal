@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
         quads.dump();
     }
 
-    Interpreter interpreter { quads, verbose };
+    Interpreter interpreter { quads, constant_pool.get(), verbose };
     interpreter.interpret();
 
     return 0;
