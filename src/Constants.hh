@@ -4,13 +4,19 @@
 #include <memory>
 #include <sstream>
 
-bool print_assert_message(const char* message);
+#include "CrashHandler.hh"
 
-bool print_assert_message(const std::string& message);
+[[noreturn]] void verify_not_reached(const char* file, int line);
+[[noreturn]] void verify_not_reached_message(const char* file, int line,
+                                             const char* message);
+[[noreturn]] void verify_not_reached_message(const char* file, int line,
+                                             const std::string& message);
+void verify(bool condition, const char* file, int line, const char* expression);
 
-#define ASSERT_NOT_REACHED() assert(false)
-#define ASSERT_NOT_REACHED_MSG(message) assert(print_assert_message(message) && false)
-#define ASSERT assert
+#define ASSERT_NOT_REACHED() verify_not_reached(__FILE__, __LINE__)
+#define ASSERT_NOT_REACHED_MSG(message) \
+    verify_not_reached_message(__FILE__, __LINE__, message)
+#define ASSERT(condition) verify(condition, __FILE__, __LINE__, #condition)
 
 static std::ostringstream out {};
 
