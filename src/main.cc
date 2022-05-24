@@ -116,6 +116,9 @@ int main(int argc, char **argv) {
         fmt::print("\n");
 
         quads.dump();
+        fmt::print("Constant pool:\n");
+        constant_pool->dump();
+        fmt::print("\n");
     }
 
     Interpreter interpreter { quads, constant_pool.get(), verbose };
