@@ -466,7 +466,7 @@ void Interpreter::ret(const Quad&) {
 void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
     PoolEntry source = resolve_to_entry(quad.src_a());
-    if (resolve_to_value(quad.src_a()).as_boolean().value()) {
+    if (resolve_to_value(quad.src_a()).is_vector()) {
         // TODO: Need to figure out if we want to copy here or not. It bascially
         // comes down to
         //       which type of value semantics we for objects like array
