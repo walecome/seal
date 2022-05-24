@@ -5,10 +5,17 @@
 #include "Constants.hh"
 #include "CrashHelper.hh"
 
+namespace {
+static const char* program_name = "sealc";
+
+[[noreturn]] void print_and_terminate(const char* file, int line, std::string_view message) {
+    fmt::print("{} {}:{}: {}\n", program_name, file, line, message);
+    CrashHelper::the()->check_crash_handler_and_terminate();
+}
+}  // namespace
+
 void verify_not_reached(const char* file, int line) {
-    std::string message = fmt::format(
-        "At location {}:{}: Should not have been reached!", file, line);
-    CrashHelper::the()->verify_not_reached(message);
+    print_and_terminate(file, line, "SHOULD NOT BE REACHED!");
 }
 
 void verify_not_reached_message(const char* file, int line,
@@ -18,15 +25,13 @@ void verify_not_reached_message(const char* file, int line,
 
 void verify_not_reached_message(const char* file, int line,
                                 const char* message) {
-    std::string full_message =
-        fmt::format("At location {}:{}: Should not have been reached: {}", file,
-                    line, message);
-    CrashHelper::the()->verify_not_reached(full_message);
+    print_and_terminate(file, line, fmt::format("SHOULD NOT BE REACHED: {}", message));
 }
 
 void verify(bool condition, const char* file, int line,
             const char* expression) {
-    std::string message = fmt::format(
-        "At location {}:{}: Assertion '{}' failed", file, line, expression);
-    CrashHelper::the()->verify(condition, message);
+    if (condition) {
+        return;
+    }
+    print_and_terminate(file, line, fmt::format("Assertion '{}' failed", expression));
 }
