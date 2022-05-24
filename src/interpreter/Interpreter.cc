@@ -476,12 +476,7 @@ void Interpreter::move(const Quad& quad) {
         ASSERT_NOT_REACHED_MSG("TODO: Interpreter::move array");
         // source = source.as_vector();
     }
-    // FIXME: Fix copy logic
-    ASSERT_NOT_REACHED_MSG(
-        "FIXME: source can be an entry in the constant pool, but need to copy "
-        "to dynamic pool");
-    set_register(quad.dest().as_register(),
-                 context().dynamic_pool().copy(source));
+    set_register(quad.dest().as_register(), source);
 }
 
 void bounds_check(std::string_view s, int index) {
