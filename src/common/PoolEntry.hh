@@ -23,6 +23,8 @@ class PoolEntry {
     size_t key() const;
     Type type() const;
 
+    bool has_value() const;
+
    private:
     PoolEntry(size_t key, Type type);
 

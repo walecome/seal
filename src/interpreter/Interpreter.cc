@@ -666,5 +666,21 @@ std::optional<PoolEntry> Interpreter::call_c_func(
 }
 
 void Interpreter::handle_crash() {
-    fmt::print("HELLO WORLD!\n");
+    fmt::print("The interpreter crashed unexpectedly. Dumping state:\n");
+    fmt::print("Program counter: {}\n", current_frame()->program_counter());
+    const Quad& quad = m_quads.quads[current_frame()->program_counter()];
+    fmt::print("Quad: {}\n", quad.to_string());
+    fmt::print("Dumping dynamic pool:\n");
+    context().dynamic_pool().dump();
+    fmt::print("Dumping registers:\n");
+    for (size_t i = 0; i < m_registers.size(); ++i) {
+        PoolEntry entry = m_registers.at(i);
+        if (entry.has_value()) {
+            fmt::print("r{}: {} ({})\n", i, entry.key(),
+                       entry.type() == PoolEntry::Type::Constant ? "Constant"
+                                                                 : "Dynamic");
+        } else {
+            fmt::print("r{}: empty\n", i);
+        }
+    }
 }

@@ -180,6 +180,10 @@ std::string Boolean::to_string() const {
   return fmt::format("{}", value());
 }
 
+std::string Boolean::to_debug_string() const {
+  return fmt::format("{} (Boolean)", value());
+}
+
 Integer::Integer(int value) : Value(ValueType::Integer), m_value(value) {
 }
 
@@ -193,6 +197,10 @@ std::string Integer::to_string() const {
   return fmt::format("{}", value());
 }
 
+std::string Integer::to_debug_string() const {
+  return fmt::format("{} (Integer)", value());
+}
+
 Real::Real(double value) : Value(ValueType::Real), m_value(value) {
 }
 
@@ -204,6 +212,10 @@ double Real::value() const {
 
 std::string Real::to_string() const {
   return fmt::format("{}", value());
+}
+
+std::string Real::to_debug_string() const {
+  return fmt::format("{} (Real)", value());
 }
 
 String::String(std::string value)
@@ -222,6 +234,10 @@ std::string_view String::value() const {
 
 std::string String::to_string() const {
   return std::string(value());
+}
+
+std::string String::to_debug_string() const {
+  return fmt::format("\"{}\" (String)", value());
 }
 
 Vector::Vector(std::vector<PoolEntry> value)
@@ -253,4 +269,9 @@ const std::vector<PoolEntry>& Vector::value() const {
 std::string Vector::to_string() const {
   // FIXME: Only have access to PoolEntry, need to print value.
   return "[Vector::to_string() not implemented]";
+}
+
+std::string Vector::to_debug_string() const {
+  // FIXME: Only have access to PoolEntry, need to print value.
+  return "[Vector::to_debug_string() not implemented]";
 }

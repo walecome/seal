@@ -26,6 +26,8 @@ class ValuePool {
   
     Value& get_entry(PoolEntry entry) const;
 
+    void dump() const;
+
    private:
     PoolEntry::Type m_type;
     std::vector<std::unique_ptr<Value>> m_values;

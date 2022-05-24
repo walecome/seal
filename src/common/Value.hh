@@ -22,6 +22,7 @@ class Value {
     virtual ~Value() = default;
 
     virtual std::string to_string() const = 0;
+    virtual std::string to_debug_string() const = 0;
 
     bool is_boolean() const;
     bool is_integer() const;
@@ -67,6 +68,7 @@ class Boolean : public Value {
     bool value() const;
 
     std::string to_string() const override;
+    std::string to_debug_string() const override;
 
    private:
     const bool m_value;
@@ -80,6 +82,7 @@ class Integer : public Value {
     int value() const;
 
     std::string to_string() const override;
+    std::string to_debug_string() const override;
 
    private:
     const int m_value;
@@ -94,6 +97,7 @@ class Real : public Value {
     double value() const;
 
     std::string to_string() const override;
+    std::string to_debug_string() const override;
 
    private:
     const double m_value;
@@ -109,6 +113,7 @@ class String : public Value {
     std::string_view value() const;
 
     std::string to_string() const override;
+    std::string to_debug_string() const override;
 
    private:
     const std::string m_value;
@@ -127,6 +132,7 @@ class Vector : public Value {
     void add(PoolEntry entry);
 
     std::string to_string() const override;
+    std::string to_debug_string() const override;
 
    private:
       std::vector<PoolEntry> m_value;
