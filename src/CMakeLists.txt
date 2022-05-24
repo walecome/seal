@@ -21,7 +21,7 @@ add_subdirectory(utility)
 
 add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
     Constants.cc
-    CrashHandler.cc
+    CrashHelper.cc
     Error.cc
     Lexer.cc
     main.cc

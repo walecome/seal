@@ -4,8 +4,6 @@
 #include <memory>
 #include <sstream>
 
-#include "CrashHandler.hh"
-
 [[noreturn]] void verify_not_reached(const char* file, int line);
 [[noreturn]] void verify_not_reached_message(const char* file, int line,
                                              const char* message);
