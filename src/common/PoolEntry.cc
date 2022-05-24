@@ -37,3 +37,7 @@ PoolEntry::Type PoolEntry::type() const {
     ASSERT(m_type.has_value());
     return m_type.value();
 }
+
+bool PoolEntry::has_value() const {
+  return m_type.has_value() && m_key.has_value();
+}

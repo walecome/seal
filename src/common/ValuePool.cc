@@ -1,5 +1,7 @@
 #include "common/ValuePool.hh"
 
+#include <fmt/format.h>
+
 namespace {
 template <class SealValueType, class CppValueType>
 PoolEntry add_new_entry(std::vector<std::unique_ptr<Value>>& values,
@@ -67,4 +69,10 @@ Value& ValuePool::get_entry(PoolEntry entry) const {
         ASSERT_NOT_REACHED_MSG("Out of bounds ValuePool entry");
     }
     return *m_values.at(entry.key());
+}
+
+void ValuePool::dump() const {
+  for (size_t i = 0; i < m_values.size(); ++i) {
+    fmt::print("{}: {}\n", i, m_values.at(i)->to_debug_string());
+  }
 }
