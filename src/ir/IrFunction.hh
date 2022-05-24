@@ -11,7 +11,6 @@
 #include "Operand.hh"
 #include "Quad.hh"
 #include "Register.hh"
-#include "utility/StringTable.hh"
 
 class FunctionDecl;
 

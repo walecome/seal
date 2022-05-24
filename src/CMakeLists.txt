@@ -6,7 +6,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE interpreter)
 target_include_directories(${PROJECT_NAME} PRIVATE ir)
 target_include_directories(${PROJECT_NAME} PRIVATE parse)
 target_include_directories(${PROJECT_NAME} PRIVATE semantic)
-target_include_directories(${PROJECT_NAME} PRIVATE utility)
 
 add_subdirectory(ast)
 add_subdirectory(builtin)
@@ -16,8 +15,6 @@ add_subdirectory(interpreter)
 add_subdirectory(ir)
 add_subdirectory(parse)
 add_subdirectory(semantic)
-add_subdirectory(utility)
-
 
 add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
     Constants.cc
