@@ -78,6 +78,8 @@ class Interpreter {
     Context& context();
     const Context& context() const;
 
+    void handle_crash();
+
     const QuadCollection& m_quads;
     std::vector<PoolEntry> m_registers;
     Context m_context;
