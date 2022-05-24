@@ -11,7 +11,6 @@
 #include "Error.hh"
 #include "TokenBuffer.hh"
 #include "ast/CompilationUnit.hh"
-#include "utility/StringTable.hh"
 
 class ArgumentList;
 class ArrayLiteral;
@@ -39,7 +38,7 @@ class For;
 
 class Parser {
    public:
-    Parser(StringTable* string_table) : m_string_table(string_table) {}
+    Parser() {}
 
     void parse(TokenBuffer &tokens);
 
@@ -79,6 +78,4 @@ class Parser {
     ptr_t<FunctionCall> parse_function_call(TokenBuffer &tokens);
 
     ptr_t<CompilationUnit> compilation_unit { nullptr };
-
-    StringTable* m_string_table;
 };
