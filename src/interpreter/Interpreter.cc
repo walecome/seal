@@ -5,6 +5,7 @@
 
 #include "CTypeWrapper.hh"
 #include "Constants.hh"
+#include "CrashHelper.hh"
 #include "Interpreter.hh"
 #include "OPCode.hh"
 #include "builtin/BuiltIn.hh"
@@ -13,6 +14,7 @@
 #include "fmt/core.h"
 #include "ir/QuadCollection.hh"
 #include "types/CType.hh"
+
 namespace {
 
 void runtime_error(const std::string& message) {
@@ -35,6 +37,8 @@ Interpreter::Interpreter(const QuadCollection& quads,
 }
 
 void Interpreter::interpret() {
+    CrashHelper::ScopedHandler handler([this] { handle_crash(); });
+
     m_stack_frames.push(StackFrame { 0, nullptr });
     interpret_function(m_quads.main_function_id);
 }
@@ -659,4 +663,8 @@ std::optional<PoolEntry> Interpreter::call_c_func(
     }
 
     return {};
+}
+
+void Interpreter::handle_crash() {
+    fmt::print("HELLO WORLD!\n");
 }
