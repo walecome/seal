@@ -81,6 +81,10 @@ ValueType Value::type() const {
     return m_type;
 }
 
+bool Value::is_mutable() const {
+  return false;
+}
+
 namespace {
 
 template <class Pred>
@@ -264,6 +268,10 @@ void Vector::add(PoolEntry entry) {
 
 const std::vector<PoolEntry>& Vector::value() const {
     return m_value;
+}
+
+bool Vector::is_mutable() const {
+  return true;
 }
 
 std::string Vector::to_string() const {

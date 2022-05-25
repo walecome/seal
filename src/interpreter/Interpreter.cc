@@ -466,15 +466,12 @@ void Interpreter::ret(const Quad&) {
 void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
     PoolEntry source = resolve_to_entry(quad.src_a());
-    if (resolve_to_value(quad.src_a()).is_vector()) {
-        // TODO: Need to figure out if we want to copy here or not. It bascially
-        // comes down to
-        //       which type of value semantics we for objects like array
-        //       (possible string). Currently leaning towards a Python style,
-        //       which would mean we need to add copy functionality to the
-        //       language.
-        ASSERT_NOT_REACHED_MSG("TODO: Interpreter::move array");
-        // source = source.as_vector();
+    const Value& value = resolve_to_value(quad.src_a());
+    // We need to make a copy of mutable values, as we could have a previous
+    // reference to that value that then modifies the value. The register that
+    // we move to should not observe that modfication.
+    if (value.is_mutable()) {
+        source = context().dynamic_pool().copy_value(value);
     }
     set_register(quad.dest().as_register(), source);
 }

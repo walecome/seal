@@ -42,6 +42,26 @@ PoolEntry ValuePool::create_vector(std::vector<PoolEntry> value) {
     return add_new_entry<Vector>(m_values, m_type, std::move(value));
 }
 
+PoolEntry ValuePool::copy_value(const Value& value) {
+    ASSERT(value.is_mutable());
+    if (value.is_boolean()) {
+        return create_boolean(value.as_boolean().value());
+    }
+    if (value.is_integer()) {
+        return create_integer(value.as_integer().value());
+    }
+    if (value.is_real()) {
+        return create_real(value.as_real().value());
+    }
+    if (value.is_string()) {
+        return create_string(value.as_string().value());
+    }
+    if (value.is_vector()) {
+        return create_vector(value.as_vector().value());
+    }
+    ASSERT_NOT_REACHED();
+}
+
 Value& ValuePool::get_entry(PoolEntry entry) const {
     if (entry.key() >= m_values.size()) {
         ASSERT_NOT_REACHED_MSG("Out of bounds ValuePool entry");
@@ -50,7 +70,7 @@ Value& ValuePool::get_entry(PoolEntry entry) const {
 }
 
 void ValuePool::dump() const {
-  for (size_t i = 0; i < m_values.size(); ++i) {
-    fmt::print("{}: {}\n", i, m_values.at(i)->to_debug_string());
-  }
+    for (size_t i = 0; i < m_values.size(); ++i) {
+        fmt::print("{}: {}\n", i, m_values.at(i)->to_debug_string());
+    }
 }

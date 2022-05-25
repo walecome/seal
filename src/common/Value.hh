@@ -44,6 +44,8 @@ class Value {
 
     ValueType type() const;
 
+    virtual bool is_mutable() const;
+
     bool operator==(const Value& other) const;
     bool operator!=(const Value& other) const;
     bool operator<(const Value& other) const;
@@ -130,6 +132,8 @@ class Vector : public Value {
     PoolEntry at(size_t index) const;
     void set(size_t index, PoolEntry entry);
     void add(PoolEntry entry);
+
+    bool is_mutable() const override;
 
     std::string to_string() const override;
     std::string to_debug_string() const override;
