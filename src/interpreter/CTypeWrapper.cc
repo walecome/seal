@@ -28,15 +28,18 @@ class CIntWrapper : public CTypeWrapper {
 class CStringWrapper : public CTypeWrapper {
    public:
     explicit CStringWrapper(std::string value)
-        : CTypeWrapper(ffi_type_pointer), m_value(std::move(value)) {
+        : CTypeWrapper(ffi_type_pointer),
+          m_value(std::move(value)),
+          m_string_data(m_value.c_str()) {
     }
 
     void* get_value() {
-        return m_value.data();
+        return &m_string_data;
     }
 
    private:
     std::string m_value;
+    const char* m_string_data;
 };
 
 class CRealWrapper : public CTypeWrapper {
@@ -63,7 +66,8 @@ ptr_t<CTypeWrapper> CTypeWrapper::from(const Value& value) {
         return std::make_unique<CRealWrapper>(value.as_real().value());
     }
     if (value.is_string()) {
-        return std::make_unique<CStringWrapper>(std::string(value.as_string().value()));
+        return std::make_unique<CStringWrapper>(
+            std::string(value.as_string().value()));
     }
     ASSERT_NOT_REACHED_MSG("Unsupported value type");
 }
