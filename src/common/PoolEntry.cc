@@ -15,8 +15,8 @@ PoolEntry::PoolEntry(const PoolEntry& other)
 }
 
 PoolEntry& PoolEntry::operator=(const PoolEntry& other) {
-    m_key = other.key();
-    m_type = other.type();
+    m_key = other.m_key;
+    m_type = other.m_type;
     return *this;
 }
 
