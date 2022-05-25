@@ -11,4 +11,4 @@
 - [ ] Run tests with ASAN
 - [ ] Add commit hook for formatting
   - Would be nice to run lint checks
-- Upgrade to C++20
+- [ ] Upgrade to C++20
