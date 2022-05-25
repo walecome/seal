@@ -22,8 +22,6 @@ class ValuePool {
     PoolEntry create_string(std::string_view value);
     PoolEntry create_vector(std::vector<PoolEntry> value);
 
-    PoolEntry copy(PoolEntry entry);
-  
     Value& get_entry(PoolEntry entry) const;
 
     void dump() const;

@@ -42,28 +42,6 @@ PoolEntry ValuePool::create_vector(std::vector<PoolEntry> value) {
     return add_new_entry<Vector>(m_values, m_type, std::move(value));
 }
 
-PoolEntry ValuePool::copy(PoolEntry entry) {
-    const Value& current = *m_values[entry.key()];
-
-    if (current.is_boolean()) {
-        return create_boolean(current.as_boolean().value());
-    }
-    if (current.is_integer()) {
-        return create_integer(current.as_integer().value());
-    }
-    if (current.is_real()) {
-        return create_real(current.as_real().value());
-    }
-    if (current.is_string()) {
-        return create_string(current.as_string().value());
-    }
-    if (current.is_vector()) {
-        return create_vector(current.as_vector().value());
-    }
-
-    ASSERT_NOT_REACHED();
-}
-
 Value& ValuePool::get_entry(PoolEntry entry) const {
     if (entry.key() >= m_values.size()) {
         ASSERT_NOT_REACHED_MSG("Out of bounds ValuePool entry");
