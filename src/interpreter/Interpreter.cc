@@ -365,7 +365,7 @@ void Interpreter::jmp(const Quad& quad) {
 
 void Interpreter::jmp_z(const Quad& quad) {
     const Value& condition = resolve_to_value(quad.src_a());
-    if (condition.as_boolean().value()) {
+    if (!condition.as_boolean().value()) {
         jmp(quad);
     }
 }
