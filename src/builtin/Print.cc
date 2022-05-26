@@ -11,7 +11,7 @@ PoolEntry print(const std::vector<PoolEntry> &args, Context &context) {
     std::vector<std::string> stringified_args {};
 
     for (auto &arg : args) {
-        stringified_args.push_back(context.get_value(arg).to_string());
+        stringified_args.push_back(context.get_value(arg).to_string(context));
     }
 
     std::string s = fmt::format("{}", fmt::join(stringified_args, ""));
