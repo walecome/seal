@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from subprocess import check_call, CalledProcessError
 from pathlib import Path
 import sys
+from multiprocessing import cpu_count
 
 SCRIPT_DIR = Path(os.path.dirname(os.path.realpath(__file__)))
 
@@ -60,7 +61,7 @@ def configure_if_needed():
 def assemble():
     print_colored("Building project...", Color.YELLOW)
     try:
-        run_in_dir("cmake --build ./build")
+        run_in_dir(f"cmake --build ./build -- -j {cpu_count()}")
         print_colored("Build succeeded", Color.GREEN)
     except CalledProcessError:
         print_colored("Build failed", Color.RED)
