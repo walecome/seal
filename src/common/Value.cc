@@ -181,7 +181,7 @@ bool Boolean::value() const {
     return m_value;
 }
 
-std::string Boolean::to_string(const ValueResolver& resolver) const {
+std::string Boolean::to_string(const ValueResolver&) const {
   return fmt::format("{}", value());
 }
 
