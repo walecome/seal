@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 
 #include "Constants.hh"
+#include "common/ValueResolver.hh"
 
 Value::Value(ValueType type) : m_type(type) {
 }
@@ -180,11 +181,11 @@ bool Boolean::value() const {
     return m_value;
 }
 
-std::string Boolean::to_string() const {
+std::string Boolean::to_string(const ValueResolver& resolver) const {
   return fmt::format("{}", value());
 }
 
-std::string Boolean::to_debug_string() const {
+std::string Boolean::to_debug_string(const ValueResolver&) const {
   return fmt::format("{} (Boolean)", value());
 }
 
@@ -197,11 +198,11 @@ int Integer::value() const {
     return m_value;
 }
 
-std::string Integer::to_string() const {
+std::string Integer::to_string(const ValueResolver&) const {
   return fmt::format("{}", value());
 }
 
-std::string Integer::to_debug_string() const {
+std::string Integer::to_debug_string(const ValueResolver&) const {
   return fmt::format("{} (Integer)", value());
 }
 
@@ -214,11 +215,11 @@ double Real::value() const {
     return m_value;
 }
 
-std::string Real::to_string() const {
+std::string Real::to_string(const ValueResolver&) const {
   return fmt::format("{}", value());
 }
 
-std::string Real::to_debug_string() const {
+std::string Real::to_debug_string(const ValueResolver&) const {
   return fmt::format("{} (Real)", value());
 }
 
@@ -236,11 +237,11 @@ std::string_view String::value() const {
     return m_value;
 }
 
-std::string String::to_string() const {
+std::string String::to_string(const ValueResolver&) const {
   return std::string(value());
 }
 
-std::string String::to_debug_string() const {
+std::string String::to_debug_string(const ValueResolver&) const {
   return fmt::format("\"{}\" (String)", value());
 }
 
@@ -274,12 +275,18 @@ bool Vector::is_mutable() const {
   return true;
 }
 
-std::string Vector::to_string() const {
-  // FIXME: Only have access to PoolEntry, need to print value.
-  return "[Vector::to_string() not implemented]";
+std::string Vector::to_string(const ValueResolver& resolver) const {
+  std::vector<std::string> stringified_values;
+  for (PoolEntry entry : value()) {
+    stringified_values.push_back(resolver.get_value(entry).to_string(resolver));
+  }
+  return fmt::format("[{}]", fmt::join(stringified_values, ", "));
 }
 
-std::string Vector::to_debug_string() const {
-  // FIXME: Only have access to PoolEntry, need to print value.
-  return "[Vector::to_debug_string() not implemented]";
+std::string Vector::to_debug_string(const ValueResolver& resolver) const {
+  std::vector<std::string> stringified_values;
+  for (PoolEntry entry : value()) {
+    stringified_values.push_back(resolver.get_value(entry).to_debug_string(resolver));
+  }
+  return fmt::format("[{}]", fmt::join(stringified_values, ", "));
 }

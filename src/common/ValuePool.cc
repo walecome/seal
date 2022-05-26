@@ -2,6 +2,8 @@
 
 #include <fmt/format.h>
 
+#include "common/ValueResolver.hh"
+
 namespace {
 template <class SealValueType, class CppValueType>
 PoolEntry add_new_entry(std::vector<std::unique_ptr<Value>>& values,
@@ -13,6 +15,18 @@ PoolEntry add_new_entry(std::vector<std::unique_ptr<Value>>& values,
     values.push_back(std::make_unique<SealValueType>(data));
     return entry;
 }
+
+class SinglePoolResolver : public ValueResolver {
+   public:
+    explicit SinglePoolResolver(const ValuePool* pool) : m_pool(pool) {
+    }
+    Value& get_value(PoolEntry entry) const override {
+        return m_pool->get_entry(entry);
+    }
+
+   private:
+    const ValuePool* m_pool;
+};
 }  // namespace
 
 ValuePool::ValuePool(PoolEntry::Type type) : m_type(type) {
@@ -70,7 +84,8 @@ Value& ValuePool::get_entry(PoolEntry entry) const {
 }
 
 void ValuePool::dump() const {
+    SinglePoolResolver resolver(this);
     for (size_t i = 0; i < m_values.size(); ++i) {
-        fmt::print("{}: {}\n", i, m_values.at(i)->to_debug_string());
+        fmt::print("{}: {}\n", i, m_values.at(i)->to_debug_string(resolver));
     }
 }
