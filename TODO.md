@@ -12,3 +12,5 @@
 - [ ] Add commit hook for formatting
   - Would be nice to run lint checks
 - [ ] Upgrade to C++20
+- [ ] Add string formatting
+  - To print/println at least
