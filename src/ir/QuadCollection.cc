@@ -28,13 +28,15 @@ void QuadCollection::dump() const {
     };
 
     auto print_function_header = [print_column_header, print_separator](
-                                     auto function_id, bool first) {
+                                     auto function_id, auto function_name,
+                                     bool first) {
         if (!first) {
             print_separator();
             fmt::print("\n");
         }
         print_separator();
-        std::string content = fmt::format("Function #{}", function_id);
+        std::string content =
+            fmt::format("\"{}\" (Function #{})", function_name, function_id);
         fmt::print("|{:^{}}|\n", content, width - 1);
         print_column_header();
     };
@@ -52,7 +54,10 @@ void QuadCollection::dump() const {
 
         bool new_function = quad_to_function.find(i) != quad_to_function.end();
         if (new_function) {
-            print_function_header(quad_to_function[i], !first_function_printed);
+            auto function_id = quad_to_function[i];
+            print_function_header(function_id,
+                                  function_to_string.at(function_id),
+                                  !first_function_printed);
             first_function_printed = true;
         }
 

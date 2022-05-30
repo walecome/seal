@@ -46,9 +46,11 @@ QuadCollection Generate::generate() {
         Register first_register = current_register();
         gen_function_decl(function_decl);
 
+        const FunctionDecl *decl = m_current_ir_function->declaration();
         m_quad_collection.function_to_quad.insert(
-            { m_current_ir_function->declaration()->function_id(),
-              m_quad_collection.quads.size() });
+            { decl->function_id(), m_quad_collection.quads.size() });
+        m_quad_collection.function_to_string.insert(
+            { decl->function_id(), std::string(decl->identifier()) });
 
         m_current_ir_function->replace_prologue(
             Operand { first_register }, Operand { previous_register() });

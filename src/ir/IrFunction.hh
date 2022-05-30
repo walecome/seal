@@ -68,7 +68,7 @@ class IrFunction {
     // tmp#<variable_id>.
     std::string resolve_variable_name(unsigned) const;
 
-    auto declaration() const {
+    const FunctionDecl* declaration() const {
         return m_decl;
     }
 
