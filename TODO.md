@@ -14,3 +14,5 @@
 - [ ] Upgrade to C++20
 - [ ] Add string formatting
   - To print/println at least
+- [ ] Add signal handler to CrashHelper
+  - Is currently only helpful on asserts failing
