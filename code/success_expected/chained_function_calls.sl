@@ -1,7 +1,7 @@
 fn main() -> int {
   a := 1;
   b := 2;
-  return a + b + func_a();
+  return a + b + func_a() - 36;
 }
 
 fn func_a() -> int {
