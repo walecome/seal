@@ -97,8 +97,8 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
     env().enter_block();
 
     function_decl->parameter_list()->for_each_parameter([this](auto param) {
-        Register reg = env().create_variable(
-            param->identifier(), [this]() { return this->create_register(); });
+        Register reg =
+            env().create_register_for_identifier(param->identifier());
         env().add_quad(OPCode::POP_ARG, Operand { reg }, Operand::empty(),
                        Operand::empty());
     });
@@ -122,9 +122,8 @@ void Generate::gen_user_function_decl(const FunctionDeclUser *decl) {
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
     if (variable_decl->value()) {
         auto value = gen_expression(variable_decl->value());
-        auto dest = Operand { env().create_variable(
-            variable_decl->identifier(), [this] { return create_register(); },
-            false) };
+        auto dest = Operand { env().create_register_for_identifier(
+            variable_decl->identifier()) };
         env().add_quad(OPCode::MOVE, dest, value, Operand::empty());
     }
 }
@@ -240,7 +239,7 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
                            Operand::empty());
         });
 
-    Register result_reg = create_register();
+    Register result_reg = env().create_register();
 
     bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
 
@@ -320,7 +319,7 @@ Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
 
 Operand Generate::gen_equality_expression(
     const EqualityExpression *equality_expr) {
-    auto result = create_register();
+    auto result = env().create_register();
 
     auto left = gen_expression(equality_expr->left());
     auto right = gen_expression(equality_expr->right());
@@ -343,7 +342,7 @@ Operand Generate::gen_equality_expression(
 
 Operand Generate::gen_compare_expression(
     const CompareExpression *compare_expr) {
-    auto result = create_register();
+    auto result = env().create_register();
 
     auto result_dest = Operand { result };
 
@@ -386,7 +385,7 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
     auto right = gen_expression(bin_expr->right());
     auto left = gen_expression(bin_expr->left());
 
-    auto result = create_register();
+    auto result = env().create_register();
 
     auto result_dest = Operand { result };
 
@@ -437,7 +436,7 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
 Operand Generate::gen_index_expression(const IndexExpression *expr) {
     Operand indexed = gen_expression(expr->indexed_expression());
     Operand index = gen_expression(expr->index());
-    Register result = create_register();
+    Register result = env().create_register();
 
     env().add_quad(OPCode::INDEX_MOVE, Operand { result }, indexed, index);
 
@@ -465,7 +464,7 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     auto sym = unary_expr->op()->symbol();
 
     if (sym == OperatorSym::MINUS) {
-        auto result = create_register();
+        auto result = env().create_register();
         auto zero = Operand(get_constant_pool().create_integer(0));
         env().add_quad(OPCode::SUB, Operand(result), zero, target_operand);
         return Operand { result };
@@ -475,7 +474,7 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
         dynamic_cast<VariableExpression *>(unary_expr->expression());
 
     Register result = var_expr ? gen_variable_expression(var_expr).as_register()
-                               : create_register();
+                               : env().create_register();
 
     auto one = Operand(get_constant_pool().create_integer(1));
 
@@ -491,8 +490,10 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
 }
 
 Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {
-    return Operand { env().create_variable(
-        var_expr->identifier(), [this] { return this->create_register(); }) };
+    std::optional<Register> maybe_reg =
+        env().find_register_for_identifier(var_expr->identifier());
+    ASSERT(maybe_reg.has_value());
+    return Operand { maybe_reg.value() };
 }
 
 Operand Generate::create_integer_literal(
@@ -525,10 +526,6 @@ Operand Generate::create_float_literal(const RealLiteral *real_literal) {
 
 Operand Generate::create_string_literal(const StringLiteral *string_literal) {
     return Operand(get_constant_pool().create_string(string_literal->value()));
-}
-
-Register Generate::create_register() {
-    return Register(m_register_count++);
 }
 
 Register Generate::get_return_register() const {

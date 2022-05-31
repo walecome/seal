@@ -84,7 +84,6 @@ class Generate {
     Operand create_integer_literal(const IntegerLiteral*);
     Operand create_string_literal(const StringLiteral*);
 
-    Register create_register();
     Register get_return_register() const;
     Register previous_register() const;
     Register current_register() const;

@@ -84,32 +84,34 @@ void IrFunction::exit_block() {
     m_variables.pop_back();
 }
 
-std::optional<Register> IrFunction::find_variable(
-    const std::map<std::string_view, Register>& vars,
-    const std::string_view name) {
-    auto it = vars.find(name);
-    if (it == vars.end()) {
-        return {};
-    } else {
-        return it->second;
-    }
+Register IrFunction::create_register() {
+  return allocate_register();
 }
 
-std::optional<Register> IrFunction::find_variable(std::string_view name,
-                                                  bool recursive) const {
-    ASSERT(!m_variables.empty());
+Register IrFunction::create_register_for_identifier(std::string_view identifier) {
+    auto& current_variables = current_block_variables();
+    ASSERT(current_variables.find(identifier) == current_variables.end());
 
-    if (!recursive) {
-        return find_variable(m_variables.back(), name);
-    }
+    Register allocated_register = allocate_register();
+    current_variables.insert({ identifier, allocated_register });
+    return allocated_register;
+}
 
-    for (int i = m_variables.size() - 1; i >= 0; --i) {
-        const auto& vars = m_variables.at(i);
-        auto reg = find_variable(vars, name);
-        if (reg) {
-            return reg;
+std::optional<Register> IrFunction::find_register_for_identifier(
+    std::string_view identifier) {
+    for (auto it = m_variables.rbegin(); it != m_variables.rend(); ++it) {
+        auto allocated_entry = it->find(identifier);
+        if (allocated_entry != it->end()) {
+            return allocated_entry->second;
         }
     }
+    return std::nullopt;
+}
 
-    return {};
+Register IrFunction::allocate_register() {
+    return Register(m_register_count++);
+}
+
+std::map<std::string_view, Register>& IrFunction::current_block_variables() {
+  return m_variables.back();
 }

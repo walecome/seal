@@ -31,25 +31,9 @@ class IrFunction {
 
     LabelOperand create_label() const;
 
-    template <class F>
-    inline Register create_variable(const std::string_view name,
-                                    F create_register,
-                                    bool traverse_parent = true) {
-        std::optional<Register> existing_reg =
-            find_variable(name, traverse_parent);
-        if (existing_reg) {
-            return existing_reg.value();
-        }
-        auto reg = create_register();
-        m_variables.back().insert({ name, reg });
-        return reg;
-    }
-
-    std::optional<Register> find_variable(std::string_view name,
-                                          bool recursive) const;
-    static std::optional<Register> find_variable(
-        const std::map<std::string_view, Register> &vars,
-        const std::string_view name);
+    Register create_register();
+    Register create_register_for_identifier(std::string_view identifier);
+    std::optional<Register> find_register_for_identifier(std::string_view identifier);
 
     FunctionOperand create_function_from_id(unsigned) const;
 
@@ -68,7 +52,7 @@ class IrFunction {
     // tmp#<variable_id>.
     std::string resolve_variable_name(unsigned) const;
 
-    const FunctionDecl* declaration() const {
+    const FunctionDecl *declaration() const {
         return m_decl;
     }
 
@@ -94,6 +78,9 @@ class IrFunction {
    private:
     // Bind the given label id to the given quad
     void bind_label(LabelOperand, size_t);
+    Register allocate_register();
+
+    std::map<std::string_view, Register>& current_block_variables();
 
     const FunctionDecl *m_decl;
     const LabelOperand m_epilogue_label { create_label() };
@@ -102,4 +89,6 @@ class IrFunction {
     std::vector<std::map<std::string_view, Register>> m_variables {};
     std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
+    // TODO: Change this to 0 when we have special register window for return register.
+    size_t m_register_count { 1 };
 };
