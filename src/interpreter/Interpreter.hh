@@ -46,8 +46,6 @@ class Interpreter {
     void jmp_nz(const Quad&);
     void push_arg(const Quad&);
     void pop_arg(const Quad&);
-    void save(const Quad&);
-    void restore(const Quad&);
     void call(const Quad&);
     void call_c(const Quad&);
     void set_ret_type(const Quad&);

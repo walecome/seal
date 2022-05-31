@@ -84,16 +84,12 @@ class Generate {
     Operand create_integer_literal(const IntegerLiteral*);
     Operand create_string_literal(const StringLiteral*);
 
-    Register get_return_register() const;
-    Register previous_register() const;
-    Register current_register() const;
-
     ValuePool& get_constant_pool();
 
     const CompilationUnit* m_compilation_unit;
     ValuePool* m_constant_pool;
     ptr_t<IrFunction> m_current_ir_function;
     // Register 0 is reserved for function returns.
-    unsigned m_register_count { 1 };
+    unsigned m_register_count { 0 };
     QuadCollection m_quad_collection {};
 };

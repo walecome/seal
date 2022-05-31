@@ -22,8 +22,6 @@ class IrFunction {
     IrFunction(const FunctionDecl *decl) : m_decl { decl } {
     }
 
-    void replace_prologue(Operand start, Operand end);
-
     // Construct a quad with the given opcode and operands, placing it in
     // the m_quads vector. Also binds any queued lables to the quad and
     // clears the label queue.
@@ -62,6 +60,8 @@ class IrFunction {
             callback(quad_ptr.get());
         }
     }
+
+    const Quad& get_last_quad() const;
 
     unsigned id() const;
 

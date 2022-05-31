@@ -110,12 +110,6 @@ void Interpreter::interpret_function(unsigned function_id) {
             case OPCode::POP_ARG:
                 pop_arg(quad);
                 break;
-            case OPCode::SAVE:
-                save(quad);
-                break;
-            case OPCode::RESTORE:
-                restore(quad);
-                break;
             case OPCode::CALL:
                 call(quad);
                 break;
@@ -388,25 +382,6 @@ void Interpreter::pop_arg(const Quad& quad) {
     m_arguments.pop();
 
     set_register(quad.dest().as_register(), std::move(argument));
-}
-
-void Interpreter::save(const Quad& quad) {
-    int start_idx = quad.src_a().as_register().index();
-    int end_index = quad.src_b().as_register().index();
-
-    for (int i = start_idx; i <= end_index; ++i) {
-        // TODO: Should we copy here?
-        m_stack.push(m_registers.at(i));
-    }
-}
-
-void Interpreter::restore(const Quad& quad) {
-    int start_idx = quad.src_a().as_register().index();
-    int end_index = quad.src_b().as_register().index();
-    for (int i = end_index; i >= start_idx; --i) {
-        set_register(Register(i), std::move(m_stack.top()));
-        m_stack.pop();
-    }
 }
 
 void Interpreter::call(const Quad& quad) {

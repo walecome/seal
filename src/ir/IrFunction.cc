@@ -27,13 +27,6 @@ LabelOperand IrFunction::create_and_queue_label() {
     return label;
 }
 
-void IrFunction::replace_prologue(Operand start, Operand end) {
-    ASSERT(m_quads.at(0)->opcode() == OPCode::SAVE);
-    ptr_t<Quad> quad =
-        std::make_unique<Quad>(OPCode::SAVE, Operand::empty(), start, end);
-    m_quads.at(0) = std::move(quad);
-}
-
 void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
                           Operand src_b) {
     m_quads.push_back(std::make_unique<Quad>(op_code, dest, src_a, src_b));
@@ -70,6 +63,11 @@ void IrFunction::dump_quads() const {
 
 unsigned IrFunction::id() const {
     return declaration()->function_id();
+}
+
+const Quad& IrFunction::get_last_quad() const {
+  ASSERT(!m_quads.empty());
+  return *m_quads.back();
 }
 
 size_t IrFunction::quad_idx(const LabelOperand label) const {

@@ -43,7 +43,6 @@ QuadCollection Generate::generate() {
 
     m_compilation_unit->for_each_function([&](auto function_decl) {
         m_current_ir_function = std::make_unique<IrFunction>(function_decl);
-        Register first_register = current_register();
         gen_function_decl(function_decl);
 
         const FunctionDecl *decl = m_current_ir_function->declaration();
@@ -51,9 +50,6 @@ QuadCollection Generate::generate() {
             { decl->function_id(), m_quad_collection.quads.size() });
         m_quad_collection.function_to_string.insert(
             { decl->function_id(), std::string(decl->identifier()) });
-
-        m_current_ir_function->replace_prologue(
-            Operand { first_register }, Operand { previous_register() });
 
         m_current_ir_function->for_each_quad([&](Quad *quad) {
             for (unsigned label_id : quad->label_ids()) {
@@ -90,10 +86,6 @@ void Generate::gen_block(const Block *block) {
 }
 
 void Generate::gen_function_decl(const FunctionDecl *function_decl) {
-    env().add_quad(OPCode::SAVE, Operand::empty(), Operand::empty(),
-                   Operand::empty());
-    Register first_register = current_register();
-
     env().enter_block();
 
     function_decl->parameter_list()->for_each_parameter([this](auto param) {
@@ -107,11 +99,11 @@ void Generate::gen_function_decl(const FunctionDecl *function_decl) {
         gen_user_function_decl(x);
     }
 
-    env().queue_label(env().get_epilogue_label());
-    env().add_quad(OPCode::RESTORE, Operand::empty(),
-                   Operand { first_register }, Operand { previous_register() });
-    env().add_quad(OPCode::RET, Operand::empty(), Operand::empty(),
-                   Operand::empty());
+    // Need to insert a RET if there wasn't an explicit one.
+    if (env().get_last_quad().opcode() != OPCode::RET) {
+        env().add_quad(OPCode::RET, Operand::empty(), Operand::empty(),
+                       Operand::empty());
+    }
     env().exit_block();
 }
 
@@ -203,12 +195,8 @@ void Generate::gen_for(const For *for_statement) {
 }
 
 void Generate::gen_return(const ReturnStatement *return_statement) {
-    // TODO: Figure out where to place return values
     Operand source = gen_expression(return_statement->return_value());
-    env().add_quad(OPCode::MOVE, Operand { get_return_register() }, source,
-                   Operand::empty());
-    env().add_quad(OPCode::JMP, Operand { env().get_epilogue_label() },
-                   Operand::empty(), Operand::empty());
+    env().add_quad(OPCode::RET, Operand::empty(), source, Operand::empty());
 }
 
 Operand Generate::gen_expression(const Expression *expression) {
@@ -239,27 +227,23 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
                            Operand::empty());
         });
 
-    Register result_reg = env().create_register();
-
     bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
 
     if (is_builtin) {
         unsigned function_id =
             BuiltIn::function_id_from_identifier(func_call->identifier());
         FunctionOperand func = env().create_function_from_id(function_id);
-        env().add_quad(OPCode::CALL, Operand { get_return_register() },
-                       Operand { func }, Operand::empty());
-        env().add_quad(OPCode::MOVE, Operand { result_reg },
-                       Operand { get_return_register() }, Operand::empty());
-        return Operand { result_reg };
+        Operand destination = Operand { env().create_register() };
+        env().add_quad(OPCode::CALL, destination, Operand { func },
+                       Operand::empty());
+        return destination;
     }
 
     FunctionDecl *decl = func_call->declaration();
 
-    auto get_function_dest = [&]() -> Operand {
-        return decl->type().is_void() ? Operand::empty()
-                                      : Operand { get_return_register() };
-    };
+    Operand destination = decl->type().is_void()
+                              ? Operand::empty()
+                              : Operand { env().create_register() };
 
     if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
         Operand lib = Operand(get_constant_pool().create_string(x->lib_name()));
@@ -270,20 +254,16 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
         env().add_quad(OPCode::SET_RET_TYPE, Operand::empty(),
                        Operand(get_constant_pool().create_integer(type_id)),
                        Operand::empty());
-        env().add_quad(OPCode::CALL_C, get_function_dest(), Operand { lib },
+        env().add_quad(OPCode::CALL_C, destination, Operand { lib },
                        Operand { func });
     } else {
         auto function_id = func_call->declaration()->function_id();
         FunctionOperand func = env().create_function_from_id(function_id);
-        env().add_quad(OPCode::CALL, get_function_dest(), Operand { func },
+        env().add_quad(OPCode::CALL, destination, Operand { func },
                        Operand::empty());
     }
-    if (!decl->type().is_void()) {
-        env().add_quad(OPCode::MOVE, Operand { result_reg },
-                       Operand { get_return_register() }, Operand::empty());
-    }
 
-    return Operand { result_reg };
+    return destination;
 }
 
 Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
@@ -526,19 +506,6 @@ Operand Generate::create_float_literal(const RealLiteral *real_literal) {
 
 Operand Generate::create_string_literal(const StringLiteral *string_literal) {
     return Operand(get_constant_pool().create_string(string_literal->value()));
-}
-
-Register Generate::get_return_register() const {
-    return Register(0);
-}
-
-Register Generate::current_register() const {
-    return Register(m_register_count);
-}
-
-Register Generate::previous_register() const {
-    ASSERT(m_register_count > 0);
-    return Register(m_register_count - 1);
 }
 
 ValuePool &Generate::get_constant_pool() {
