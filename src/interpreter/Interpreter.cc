@@ -387,6 +387,8 @@ void Interpreter::pop_arg(const Quad& quad) {
 void Interpreter::call(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
 
+    ASSERT_NOT_REACHED_MSG("Implement pushing return address to stack. Could let src_b indicate how many register we need");
+
     FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
@@ -434,6 +436,7 @@ void Interpreter::ret(const Quad&) {
         const Value& value = resolve_register(return_register());
         exit(value.as_integer().value());
     }
+    ASSERT_NOT_REACHED_MSG("Implement RET for non-main frames");
 
     exit_frame();
 }

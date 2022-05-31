@@ -22,3 +22,5 @@ struct CallFrame {
   RegisterWindow register_window;
 }
 - [ ] Remove the SAVE/RESTORE opcodes, this logic can be implemented by CALL/RET.
+- [ ] SRC_B for CALL could be the number of register we need to allocate.
+  - Might be better to have this as part of the function prologue.
