@@ -74,7 +74,7 @@ QuadCollection Generate::generate() {
 }
 
 void Generate::gen_block(const Block *block) {
-    env()->enter_block();
+    env().enter_block();
     block->for_each_node([this](Node *node) {
         if (auto x = dynamic_cast<Statement *>(node))
             gen_statement(x);
@@ -86,34 +86,33 @@ void Generate::gen_block(const Block *block) {
         else
             ASSERT_NOT_REACHED();
     });
-    env()->exit_block();
+    env().exit_block();
 }
 
 void Generate::gen_function_decl(const FunctionDecl *function_decl) {
-    env()->add_quad(OPCode::SAVE, Operand::empty(), Operand::empty(),
-                    Operand::empty());
+    env().add_quad(OPCode::SAVE, Operand::empty(), Operand::empty(),
+                   Operand::empty());
     Register first_register = current_register();
 
-    env()->enter_block();
+    env().enter_block();
 
     function_decl->parameter_list()->for_each_parameter([this](auto param) {
-        Register reg = env()->create_variable(
+        Register reg = env().create_variable(
             param->identifier(), [this]() { return this->create_register(); });
-        env()->add_quad(OPCode::POP_ARG, Operand { reg }, Operand::empty(),
-                        Operand::empty());
+        env().add_quad(OPCode::POP_ARG, Operand { reg }, Operand::empty(),
+                       Operand::empty());
     });
 
     if (auto x = dynamic_cast<const FunctionDeclUser *>(function_decl)) {
         gen_user_function_decl(x);
     }
 
-    env()->queue_label(env()->get_epilogue_label());
-    env()->add_quad(OPCode::RESTORE, Operand::empty(),
-                    Operand { first_register },
-                    Operand { previous_register() });
-    env()->add_quad(OPCode::RET, Operand::empty(), Operand::empty(),
-                    Operand::empty());
-    env()->exit_block();
+    env().queue_label(env().get_epilogue_label());
+    env().add_quad(OPCode::RESTORE, Operand::empty(),
+                   Operand { first_register }, Operand { previous_register() });
+    env().add_quad(OPCode::RET, Operand::empty(), Operand::empty(),
+                   Operand::empty());
+    env().exit_block();
 }
 
 void Generate::gen_user_function_decl(const FunctionDeclUser *decl) {
@@ -123,10 +122,10 @@ void Generate::gen_user_function_decl(const FunctionDeclUser *decl) {
 void Generate::gen_variable_decl(const VariableDecl *variable_decl) {
     if (variable_decl->value()) {
         auto value = gen_expression(variable_decl->value());
-        auto dest = Operand { env()->create_variable(
+        auto dest = Operand { env().create_variable(
             variable_decl->identifier(), [this] { return create_register(); },
             false) };
-        env()->add_quad(OPCode::MOVE, dest, value, Operand::empty());
+        env().add_quad(OPCode::MOVE, dest, value, Operand::empty());
     }
 }
 
@@ -153,35 +152,35 @@ void Generate::gen_statement(const Statement *statement) {
 void Generate::gen_if_statement(const IfStatement *if_statement) {
     auto condition = gen_expression(if_statement->condition());
 
-    auto else_label = Operand { env()->create_label() };
-    env()->add_quad(OPCode::JMP_Z, else_label, condition, Operand::empty());
+    auto else_label = Operand { env().create_label() };
+    env().add_quad(OPCode::JMP_Z, else_label, condition, Operand::empty());
 
     gen_block(if_statement->if_body());
 
     if (if_statement->else_body()) {
-        auto end_label = Operand { env()->create_label() };
-        env()->add_quad(OPCode::JMP, end_label, Operand::empty(),
-                        Operand::empty());
-        env()->queue_label(else_label.as_label());
+        auto end_label = Operand { env().create_label() };
+        env().add_quad(OPCode::JMP, end_label, Operand::empty(),
+                       Operand::empty());
+        env().queue_label(else_label.as_label());
         gen_block(if_statement->else_body());
-        env()->queue_label(end_label.as_label());
+        env().queue_label(end_label.as_label());
     } else {
-        env()->queue_label(else_label.as_label());
+        env().queue_label(else_label.as_label());
     }
 }
 
 void Generate::gen_while(const While *while_statement) {
-    auto condition_label = Operand { env()->create_and_queue_label() };
+    auto condition_label = Operand { env().create_and_queue_label() };
     auto condition = gen_expression(while_statement->condition());
 
-    auto end_label = Operand { env()->create_label() };
-    env()->add_quad(OPCode::JMP_Z, end_label, condition, Operand::empty());
+    auto end_label = Operand { env().create_label() };
+    env().add_quad(OPCode::JMP_Z, end_label, condition, Operand::empty());
 
     gen_block(while_statement->body());
 
-    env()->add_quad(OPCode::JMP, condition_label, Operand::empty(),
-                    Operand::empty());
-    env()->queue_label(end_label.as_label());
+    env().add_quad(OPCode::JMP, condition_label, Operand::empty(),
+                   Operand::empty());
+    env().queue_label(end_label.as_label());
 
     while_statement->body();
 }
@@ -189,28 +188,28 @@ void Generate::gen_while(const While *while_statement) {
 void Generate::gen_for(const For *for_statement) {
     gen_variable_decl(for_statement->initial_expression());
 
-    auto condition_label = Operand { env()->create_and_queue_label() };
+    auto condition_label = Operand { env().create_and_queue_label() };
 
     auto stop_condition = gen_expression(for_statement->stop_condition());
 
-    auto end_label = Operand { env()->create_label() };
-    env()->add_quad(OPCode::JMP_Z, end_label, stop_condition, Operand::empty());
+    auto end_label = Operand { env().create_label() };
+    env().add_quad(OPCode::JMP_Z, end_label, stop_condition, Operand::empty());
 
     gen_block(for_statement->body());
     gen_expression(for_statement->per_iteration_expression());
-    env()->add_quad(OPCode::JMP, condition_label, Operand::empty(),
-                    Operand::empty());
+    env().add_quad(OPCode::JMP, condition_label, Operand::empty(),
+                   Operand::empty());
 
-    env()->queue_label(end_label.as_label());
+    env().queue_label(end_label.as_label());
 }
 
 void Generate::gen_return(const ReturnStatement *return_statement) {
     // TODO: Figure out where to place return values
     Operand source = gen_expression(return_statement->return_value());
-    env()->add_quad(OPCode::MOVE, Operand { get_return_register() }, source,
-                    Operand::empty());
-    env()->add_quad(OPCode::JMP, Operand { env()->get_epilogue_label() },
-                    Operand::empty(), Operand::empty());
+    env().add_quad(OPCode::MOVE, Operand { get_return_register() }, source,
+                   Operand::empty());
+    env().add_quad(OPCode::JMP, Operand { env().get_epilogue_label() },
+                   Operand::empty(), Operand::empty());
 }
 
 Operand Generate::gen_expression(const Expression *expression) {
@@ -237,8 +236,8 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
     func_call->argument_list()->for_each_enumerated_argument(
         [&](auto arg, unsigned) {
             auto arg_operand = gen_expression(arg);
-            env()->add_quad(OPCode::PUSH_ARG, Operand::empty(), arg_operand,
-                            Operand::empty());
+            env().add_quad(OPCode::PUSH_ARG, Operand::empty(), arg_operand,
+                           Operand::empty());
         });
 
     Register result_reg = create_register();
@@ -248,11 +247,11 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
     if (is_builtin) {
         unsigned function_id =
             BuiltIn::function_id_from_identifier(func_call->identifier());
-        FunctionOperand func = env()->create_function_from_id(function_id);
-        env()->add_quad(OPCode::CALL, Operand { get_return_register() },
-                        Operand { func }, Operand::empty());
-        env()->add_quad(OPCode::MOVE, Operand { result_reg },
-                        Operand { get_return_register() }, Operand::empty());
+        FunctionOperand func = env().create_function_from_id(function_id);
+        env().add_quad(OPCode::CALL, Operand { get_return_register() },
+                       Operand { func }, Operand::empty());
+        env().add_quad(OPCode::MOVE, Operand { result_reg },
+                       Operand { get_return_register() }, Operand::empty());
         return Operand { result_reg };
     }
 
@@ -269,20 +268,20 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
             Operand(get_constant_pool().create_string(x->identifier()));
 
         unsigned type_id = ctype::from_seal_type(x->type()).type_id;
-        env()->add_quad(OPCode::SET_RET_TYPE, Operand::empty(),
-                        Operand(get_constant_pool().create_integer(type_id)),
-                        Operand::empty());
-        env()->add_quad(OPCode::CALL_C, get_function_dest(), Operand { lib },
-                        Operand { func });
+        env().add_quad(OPCode::SET_RET_TYPE, Operand::empty(),
+                       Operand(get_constant_pool().create_integer(type_id)),
+                       Operand::empty());
+        env().add_quad(OPCode::CALL_C, get_function_dest(), Operand { lib },
+                       Operand { func });
     } else {
         auto function_id = func_call->declaration()->function_id();
-        FunctionOperand func = env()->create_function_from_id(function_id);
-        env()->add_quad(OPCode::CALL, get_function_dest(), Operand { func },
-                        Operand::empty());
+        FunctionOperand func = env().create_function_from_id(function_id);
+        env().add_quad(OPCode::CALL, get_function_dest(), Operand { func },
+                       Operand::empty());
     }
     if (!decl->type().is_void()) {
-        env()->add_quad(OPCode::MOVE, Operand { result_reg },
-                        Operand { get_return_register() }, Operand::empty());
+        env().add_quad(OPCode::MOVE, Operand { result_reg },
+                       Operand { get_return_register() }, Operand::empty());
     }
 
     return Operand { result_reg };
@@ -297,8 +296,8 @@ Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
         dynamic_cast<VariableExpression *>(assign_expr->left());
     if (var) {
         Operand left = gen_variable_expression(var);
-        env()->add_quad(OPCode::MOVE, Operand { left.as_register() }, right,
-                        Operand::empty());
+        env().add_quad(OPCode::MOVE, Operand { left.as_register() }, right,
+                       Operand::empty());
         return left;
     }
 
@@ -312,8 +311,7 @@ Operand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
         Register indexed =
             gen_expression(index_expr->indexed_expression()).as_register();
         Operand index = gen_expression(index_expr->index());
-        env()->add_quad(OPCode::INDEX_ASSIGN, Operand { indexed }, index,
-                        right);
+        env().add_quad(OPCode::INDEX_ASSIGN, Operand { indexed }, index, right);
         return right;
     }
 
@@ -329,11 +327,11 @@ Operand Generate::gen_equality_expression(
 
     switch (equality_expr->op()->symbol()) {
         case OperatorSym::EQ:
-            env()->add_quad(OPCode::CMP_EQ, Operand { result }, left, right);
+            env().add_quad(OPCode::CMP_EQ, Operand { result }, left, right);
             break;
 
         case OperatorSym::NOT_EQ:
-            env()->add_quad(OPCode::CMP_NOTEQ, Operand { result }, left, right);
+            env().add_quad(OPCode::CMP_NOTEQ, Operand { result }, left, right);
             break;
 
         default:
@@ -354,19 +352,19 @@ Operand Generate::gen_compare_expression(
 
     switch (compare_expr->op()->symbol()) {
         case OperatorSym::LT:
-            env()->add_quad(OPCode::CMP_LT, result_dest, left, right);
+            env().add_quad(OPCode::CMP_LT, result_dest, left, right);
             break;
 
         case OperatorSym::LTEQ:
-            env()->add_quad(OPCode::CMP_LTEQ, result_dest, left, right);
+            env().add_quad(OPCode::CMP_LTEQ, result_dest, left, right);
             break;
 
         case OperatorSym::GT:
-            env()->add_quad(OPCode::CMP_GT, result_dest, left, right);
+            env().add_quad(OPCode::CMP_GT, result_dest, left, right);
             break;
 
         case OperatorSym::GTEQ:
-            env()->add_quad(OPCode::CMP_GTEQ, result_dest, left, right);
+            env().add_quad(OPCode::CMP_GTEQ, result_dest, left, right);
             break;
 
         default:
@@ -394,27 +392,27 @@ Operand Generate::gen_binary_expression(const BinaryExpression *bin_expr) {
 
     switch (bin_expr->op()->symbol()) {
         case OperatorSym::PLUS:
-            env()->add_quad(OPCode::ADD, result_dest, left, right);
+            env().add_quad(OPCode::ADD, result_dest, left, right);
             break;
 
         case OperatorSym::MINUS:
-            env()->add_quad(OPCode::SUB, result_dest, left, right);
+            env().add_quad(OPCode::SUB, result_dest, left, right);
             break;
 
         case OperatorSym::MULT:
-            env()->add_quad(OPCode::MULT, result_dest, left, right);
+            env().add_quad(OPCode::MULT, result_dest, left, right);
             break;
 
         case OperatorSym::DIV:
-            env()->add_quad(OPCode::DIV, result_dest, left, right);
+            env().add_quad(OPCode::DIV, result_dest, left, right);
             break;
 
         case OperatorSym::AND:
-            env()->add_quad(OPCode::AND, result_dest, left, right);
+            env().add_quad(OPCode::AND, result_dest, left, right);
             break;
 
         case OperatorSym::OR:
-            env()->add_quad(OPCode::OR, result_dest, left, right);
+            env().add_quad(OPCode::OR, result_dest, left, right);
             break;
 
         // @TODO: Handle
@@ -441,7 +439,7 @@ Operand Generate::gen_index_expression(const IndexExpression *expr) {
     Operand index = gen_expression(expr->index());
     Register result = create_register();
 
-    env()->add_quad(OPCode::INDEX_MOVE, Operand { result }, indexed, index);
+    env().add_quad(OPCode::INDEX_MOVE, Operand { result }, indexed, index);
 
     return Operand { result };
 }
@@ -469,7 +467,7 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     if (sym == OperatorSym::MINUS) {
         auto result = create_register();
         auto zero = Operand(get_constant_pool().create_integer(0));
-        env()->add_quad(OPCode::SUB, Operand(result), zero, target_operand);
+        env().add_quad(OPCode::SUB, Operand(result), zero, target_operand);
         return Operand { result };
     }
 
@@ -482,9 +480,9 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     auto one = Operand(get_constant_pool().create_integer(1));
 
     if (sym == OperatorSym::INC) {
-        env()->add_quad(OPCode::ADD, Operand { result }, target_operand, one);
+        env().add_quad(OPCode::ADD, Operand { result }, target_operand, one);
     } else if (sym == OperatorSym::DEC) {
-        env()->add_quad(OPCode::SUB, Operand { result }, target_operand, one);
+        env().add_quad(OPCode::SUB, Operand { result }, target_operand, one);
     } else {
         ASSERT_NOT_REACHED();
     }
@@ -493,7 +491,7 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
 }
 
 Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {
-    return Operand { env()->create_variable(
+    return Operand { env().create_variable(
         var_expr->identifier(), [this] { return this->create_register(); }) };
 }
 

@@ -72,8 +72,8 @@ class Generate {
     Operand gen_index_expression(const IndexExpression*);
     Operand gen_unary_expression(const UnaryExpression*);
 
-    auto env() const {
-        return m_current_ir_function.get();
+    IrFunction& env() const {
+        return *m_current_ir_function;
     }
 
     // Literals
