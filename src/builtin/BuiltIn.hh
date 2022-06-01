@@ -9,30 +9,29 @@
 #include "ast/ArgumentList.hh"
 #include "ast/Type.hh"
 
-#include "common/PoolEntry.hh"
-
 class ArgumentList;
 class Context;
+class ValueFactory;
 
 namespace BuiltIn {
 
-using expr_value_t = std::variant<int, float, bool, std::string>;
-using param_type_t = const std::vector<expr_value_t>&;
+using builtin_arg_t = ptr_t<ValueFactory>;
+using builtin_return_type_t = ptr_t<ValueFactory>;
+using builtin_args_t = std::vector<builtin_arg_t>;
 
 bool is_builtin(const std::string_view);
 bool is_builtin(unsigned);
 bool is_typechecked(const std::string_view);
-PoolEntry call_builtin_function(unsigned, const std::vector<PoolEntry>&,
-                                Context& context);
+builtin_return_type_t call_builtin_function(unsigned, const builtin_args_t&);
 size_t number_of_builtins();
 unsigned function_id_from_identifier(std::string_view);
 
 // Built-in functions
-PoolEntry print(const std::vector<PoolEntry>&, Context& context);
-PoolEntry println(const std::vector<PoolEntry>&, Context& context);
-PoolEntry create_array(const std::vector<PoolEntry>&, Context& context);
-PoolEntry add_element(const std::vector<PoolEntry>&, Context& context);
-PoolEntry get_length(const std::vector<PoolEntry>&, Context& context);
-PoolEntry halt(const std::vector<PoolEntry>&, Context& context);
+builtin_return_type_t print(const builtin_args_t&);
+builtin_return_type_t println(const builtin_args_t&);
+builtin_return_type_t create_array(const builtin_args_t&);
+builtin_return_type_t add_element(const builtin_args_t&);
+builtin_return_type_t get_length(const builtin_args_t&);
+builtin_return_type_t halt(const builtin_args_t&);
 
 }  // namespace BuiltIn

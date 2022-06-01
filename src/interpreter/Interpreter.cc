@@ -19,6 +19,7 @@
 #include "interpreter/InstructionSequencer.hh"
 #include "interpreter/LabelResolver.hh"
 #include "interpreter/RegisterWindow.hh"
+#include "interpreter/ValueFactory.hh"
 
 namespace {
 
@@ -80,27 +81,30 @@ void Interpreter::set_register(Register reg, Value& value) {
 
 namespace {
 template <class BinaryOperator>
-PoolEntry compute_binary_expression(Context& context, PoolEntry lhs,
-                                    PoolEntry rhs) {
-    const Value& first = context.get_value(lhs);
-    const Value& second = context.get_value(rhs);
-
-    ASSERT(first.type() == second.type());
+ptr_t<ValueFactory> compute_binary_expression(const Value& lhs,
+                                              const Value& rhs) {
+    ASSERT(lhs.type() == rhs.type());
 
     auto apply_binary_operator = [&](const auto& a, const auto& b) {
         return BinaryOperator {}(a, b);
     };
 
-    switch (first.type()) {
-        case ValueType::Boolean:
-            return context.dynamic_pool().create_boolean(apply_binary_operator(
-                first.as_boolean().value(), second.as_boolean().value()));
-        case ValueType::Integer:
-            return context.dynamic_pool().create_integer(apply_binary_operator(
-                first.as_integer().value(), second.as_integer().value()));
-        case ValueType::Real:
-            return context.dynamic_pool().create_real(apply_binary_operator(
-                first.as_real().value(), second.as_real().value()));
+    switch (lhs.type()) {
+        case ValueType::Boolean: {
+            bool result = apply_binary_operator(lhs.as_boolean().value(),
+                                                rhs.as_boolean().value());
+            return ValueFactory::for_boolean(result);
+        }
+        case ValueType::Integer: {
+            int result = apply_binary_operator(lhs.as_integer().value(),
+                                               rhs.as_integer().value());
+            return ValueFactory::for_integer(result);
+        }
+        case ValueType::Real: {
+            int result = apply_binary_operator(lhs.as_real().value(),
+                                               rhs.as_real().value());
+            return ValueFactory::for_real(result);
+        }
         case ValueType::String:
             ASSERT_NOT_REACHED();
         case ValueType::Vector:
@@ -108,37 +112,36 @@ PoolEntry compute_binary_expression(Context& context, PoolEntry lhs,
     }
 }
 
-PoolEntry concatenate_strings(Context& context, const String& lhs,
-                              const String& rhs) {
+ptr_t<ValueFactory> concatenate_strings(const String& lhs, const String& rhs) {
     std::string result = std::string(lhs.value()) + std::string(rhs.value());
-    return context.dynamic_pool().create_string(result);
+    return ValueFactory::for_string(result);
 }
 
 template <>
-PoolEntry compute_binary_expression<std::plus<>>(Context& context,
-                                                 PoolEntry lhs, PoolEntry rhs) {
-    const Value& first = context.get_value(lhs);
-    const Value& second = context.get_value(rhs);
-
-    ASSERT(first.type() == second.type());
+ptr_t<ValueFactory> compute_binary_expression<std::plus<>>(const Value& lhs,
+                                                           const Value& rhs) {
+    ASSERT(lhs.type() == rhs.type());
 
     auto apply_binary_operator = [&](const auto& a, const auto& b) {
         return std::plus<> {}(a, b);
     };
 
-    switch (first.type()) {
-        case ValueType::Boolean:
-            return context.dynamic_pool().create_boolean(apply_binary_operator(
-                first.as_boolean().value(), second.as_boolean().value()));
-        case ValueType::Integer:
-            return context.dynamic_pool().create_integer(apply_binary_operator(
-                first.as_integer().value(), second.as_integer().value()));
-        case ValueType::Real:
-            return context.dynamic_pool().create_real(apply_binary_operator(
-                first.as_real().value(), second.as_real().value()));
+    switch (lhs.type()) {
+        case ValueType::Integer: {
+            int result = apply_binary_operator(lhs.as_integer().value(),
+                                               rhs.as_integer().value());
+            return ValueFactory::for_integer(result);
+        }
+        case ValueType::Real: {
+            double result = apply_binary_operator(lhs.as_real().value(),
+                                                  rhs.as_real().value());
+            return ValueFactory::for_real(result);
+        }
         case ValueType::String:
-            return concatenate_strings(context, first.as_string(),
-                                       second.as_string());
+            return concatenate_strings(lhs.as_string(), rhs.as_string());
+
+        case ValueType::Boolean:
+            ASSERT_NOT_REACHED();
         case ValueType::Vector:
             ASSERT_NOT_REACHED();
     }
@@ -151,10 +154,10 @@ void Interpreter::add(const Quad& quad) {
 
     const Value& lhs = resolve_to_value(quad.src_a());
     const Value& rhs = resolve_to_value(quad.src_b());
-    const Value& result =
-        compute_binary_expression<std::plus<>>(context(), lhs, rhs);
+    ptr_t<ValueFactory> result =
+        compute_binary_expression<std::plus<>>(lhs, rhs);
 
-    set_register(quad.dest().as_register(), result);
+    set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::sub(const Quad& quad) {
@@ -162,20 +165,21 @@ void Interpreter::sub(const Quad& quad) {
 
     const Value& lhs = resolve_to_value(quad.src_a());
     const Value& rhs = resolve_to_value(quad.src_b());
-    const Value& result =
-        compute_binary_expression<std::minus<>>(context(), lhs, rhs);
+    ptr_t<ValueFactory> result =
+        compute_binary_expression<std::minus<>>(lhs, rhs);
 
-    set_register(quad.dest().as_register(), result);
+    set_register(quad.dest().as_register(), std::move(result));
 }
+
 void Interpreter::mult(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MULT);
 
     const Value& lhs = resolve_to_value(quad.src_a());
     const Value& rhs = resolve_to_value(quad.src_b());
-    const Value& result =
-        compute_binary_expression<std::multiplies<>>(context(), lhs, rhs);
+    ptr_t<ValueFactory> result =
+        compute_binary_expression<std::multiplies<>>(lhs, rhs);
 
-    set_register(quad.dest().as_register(), result);
+    set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::div(const Quad& quad) {
@@ -183,10 +187,10 @@ void Interpreter::div(const Quad& quad) {
 
     const Value& lhs = resolve_to_value(quad.src_a());
     const Value& rhs = resolve_to_value(quad.src_b());
-    const Value& result =
-        compute_binary_expression<std::divides<>>(context(), lhs, rhs);
+    ptr_t<ValueFactory> result =
+        compute_binary_expression<std::divides<>>(lhs, rhs);
 
-    set_register(quad.dest().as_register(), result);
+    set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::compare(
@@ -196,8 +200,7 @@ void Interpreter::compare(
     const Value& rhs = resolve_to_value(quad.src_b());
 
     bool result = comparison_predicate(lhs, rhs);
-    PoolEntry result_entry = context().dynamic_pool().create_boolean(result);
-    set_register(quad.dest().as_register(), result_entry);
+    set_register(quad.dest().as_register(), ValueFactory::for_boolean(result));
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
@@ -249,13 +252,13 @@ void Interpreter::jmp_nz(const Quad& quad) {
 }
 
 void Interpreter::push_arg(const Quad& quad) {
-    m_arguments.push(resolve_to_entry(quad.src_a()));
+    m_arguments.push(ValueFactory::for_copy(resolve_to_value(quad.src_a())));
 }
 
 void Interpreter::pop_arg(const Quad& quad) {
     ASSERT(!m_arguments.empty());
 
-    PoolEntry argument = m_arguments.front();
+    ptr_t<ValueFactory> argument = std::move(m_arguments.front());
     m_arguments.pop();
 
     set_register(quad.dest().as_register(), std::move(argument));
@@ -267,13 +270,13 @@ void Interpreter::call(const Quad& quad) {
     FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
-        std::vector<PoolEntry> args {};
+        std::vector<ptr_t<ValueFactory>> args {};
         while (!m_arguments.empty()) {
-            args.push_back(m_arguments.front());
+            args.push_back(std::move(m_arguments.front()));
             m_arguments.pop();
         }
-        PoolEntry ret = BuiltIn::call_builtin_function(func, args, context());
-        set_register(quad.dest().as_register(), ret);
+        ptr_t<ValueFactory> ret = BuiltIn::call_builtin_function(func, args);
+        set_register(quad.dest().as_register(), std::move(ret));
         return;
     }
 
@@ -283,15 +286,16 @@ void Interpreter::call(const Quad& quad) {
 void Interpreter::call_c(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL_C);
 
-    std::vector<PoolEntry> args {};
+    std::vector<ptr_t<ValueFactory>> args {};
     while (!m_arguments.empty()) {
         args.push_back(std::move(m_arguments.front()));
         m_arguments.pop();
     }
 
-    std::optional<PoolEntry> return_value = call_c_func(
-        resolve_to_entry(quad.src_a()), resolve_to_entry(quad.src_b()), args,
-        take_pending_type_id());
+    std::optional<ptr_t<ValueFactory>> return_value =
+        call_c_func(resolve_to_value(quad.src_a()).as_string().value(),
+                    resolve_to_value(quad.src_b()).as_string().value(), args,
+                    take_pending_type_id());
 
     if (return_value.has_value()) {
         set_register(quad.dest().as_register(), std::move(*return_value));
@@ -316,15 +320,8 @@ void Interpreter::ret(const Quad&) {
 
 void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
-    PoolEntry source = resolve_to_entry(quad.src_a());
     const Value& value = resolve_to_value(quad.src_a());
-    // We need to make a copy of mutable values, as we could have a previous
-    // reference to that value that then modifies the value. The register that
-    // we move to should not observe that modfication.
-    if (value.is_mutable()) {
-        source = context().dynamic_pool().copy_value(value);
-    }
-    set_register(quad.dest().as_register(), source);
+    set_register(quad.dest().as_register(), ValueFactory::for_copy(value));
 }
 
 void bounds_check(std::string_view s, int index) {
@@ -357,16 +354,16 @@ void bounds_check(const Vector& vec, int index) {
     }
 }
 
-PoolEntry bounds_checked_index(Context& context, const String& target,
-                               int index) {
+ptr_t<ValueFactory> bounds_checked_index(Context& context, const String& target,
+                                         int index) {
     bounds_check(target.value(), index);
     char value_at_index = target.value()[index];
-    return context.dynamic_pool().create_string(std::string(1, value_at_index));
+    return ValueFactory::for_string(std::string(1, value_at_index));
 }
 
-PoolEntry bounds_checked_index(const Vector& target, int index) {
+ptr_t<ValueFactory> bounds_checked_index(const Vector& target, int index) {
     bounds_check(target, index);
-    return target.at(index);
+    return ValueFactory::for_copy(target.at(index));
 }
 
 void Interpreter::index_move(const Quad& quad) {
@@ -374,7 +371,7 @@ void Interpreter::index_move(const Quad& quad) {
 
     const Value& target = resolve_to_value(quad.src_a());
 
-    PoolEntry result;
+    ptr_t<ValueFactory> result;
 
     if (target.is_string()) {
         result = bounds_checked_index(context(), target.as_string(), index);
@@ -391,10 +388,10 @@ void Interpreter::index_assign(const Quad& quad) {
     int index = resolve_to_value(quad.src_a()).as_integer().value();
     Vector& indexed = resolve_to_value(quad.dest()).as_vector();
 
-    PoolEntry entry = resolve_to_entry(quad.src_b());
+    const Value& value = resolve_to_value(quad.src_b());
 
     bounds_check(indexed, index);
-    indexed.set(index, entry);
+    indexed.set(index, ValueFactory::for_copy(value));
 }
 
 void Interpreter::interpret_and(const Quad& quad) {
@@ -429,29 +426,22 @@ const Context& Interpreter::context() const {
     return m_context;
 }
 
-std::optional<PoolEntry> Interpreter::call_c_func(
-    PoolEntry lib, PoolEntry func, const std::vector<PoolEntry>& args,
-    unsigned return_type_id) {
-    const Value& lib_name = context().get_value(lib);
-    ASSERT(lib_name.is_string());
-    const Value& func_name = context().get_value(func);
-    ASSERT(func_name.is_string());
-
-    Result<dynlib::DynamicLibrary*> loaded_lib_or_error =
-        dynlib::load_lib(lib_name.as_string().value());
+std::optional<ptr_t<ValueFactory>> Interpreter::call_c_func(
+    std::string_view lib, std::string_view func,
+    const std::vector<ptr_t<ValueFactory>>& args, unsigned return_type_id) {
+    Result<dynlib::DynamicLibrary*> loaded_lib_or_error = dynlib::load_lib(lib);
     if (loaded_lib_or_error.is_error()) {
         ASSERT_NOT_REACHED_MSG("Could not load expected library");
     }
 
     dynlib::DynamicLibrary* loaded_lib = loaded_lib_or_error.get();
-    ASSERT(loaded_lib->has_symbol(func_name.as_string().value()));
-    dynlib::DynamicLibrary::Callable callable =
-        loaded_lib->get_callable(func_name.as_string().value());
+    ASSERT(loaded_lib->has_symbol(func));
+    dynlib::DynamicLibrary::Callable callable = loaded_lib->get_callable(func);
 
     std::vector<ptr_t<vm::CTypeWrapper>> wrapped_args;
 
-    for (const PoolEntry& op : args) {
-        wrapped_args.push_back(vm::CTypeWrapper::from(context().get_value(op)));
+    for (const ptr_t<ValueFactory>& op : args) {
+        wrapped_args.push_back(vm::CTypeWrapper::from(op->produce()));
     }
 
     ctype::TypeInfo type_info = ctype::from_type_id(return_type_id);
@@ -476,27 +466,27 @@ std::optional<PoolEntry> Interpreter::call_c_func(
 
     switch (type_info.seal_type.primitive()) {
         case Primitive::VOID: {
-            return {};
+            return std::nullopt;
         }
         case Primitive::INT: {
             unsigned long val =
                 *(static_cast<unsigned long*>(result_wrapper.buffer()));
-            return context().dynamic_pool().create_integer(val);
+            return ValueFactory::for_integer(val);
         }
         case Primitive::FLOAT: {
             double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
-            return context().dynamic_pool().create_real(val);
+            return ValueFactory::for_real(val);
         }
         case Primitive::STRING: {
             std::string val =
                 *(reinterpret_cast<char**>(result_wrapper.buffer()));
-            return context().dynamic_pool().create_string(val);
+            return ValueFactory::for_string(val);
         }
         default:
             ASSERT_NOT_REACHED();
     }
 
-    return {};
+    return std::nullopt;
 }
 
 void Interpreter::handle_crash() {
@@ -585,4 +575,3 @@ void Interpreter::interpret_quad(const Quad& quad) {
                                        .c_str());
     }
 }
-

@@ -4,13 +4,13 @@
 
 #include "BuiltIn.hh"
 
-#include "common/PoolEntry.hh"
 #include "interpreter/Context.hh"
+#include "interpreter/ValueFactory.hh"
 
 namespace BuiltIn {
 
 using builtin_func_t =
-    std::function<PoolEntry(const std::vector<PoolEntry>&, Context& context)>;
+    std::function<builtin_return_type_t(const builtin_args_t&)>;
 
 class FuncInfo {
    public:
@@ -26,8 +26,8 @@ class FuncInfo {
         return m_is_typechecked;
     }
 
-    PoolEntry call(const std::vector<PoolEntry>& args, Context& context) const {
-        return m_func(args, context);
+    builtin_return_type_t call(const builtin_args_t& args) const {
+        return m_func(args);
     }
 
     unsigned id() const {
@@ -55,9 +55,7 @@ unsigned get_and_increment_func_id() {
     }
 
 // @TODO: std::function sucks, replace with something else
-// See following link for 3rd template argument
-// https://stackoverflow.com/questions/35525777/use-of-string-view-for-map-lookup
-static const std::map<std::string, FuncInfo, std::less<>> builtin_functions {
+static const std::map<std::string, FuncInfo> builtin_functions {
     BUILTIN_ENTRY(print, false),        BUILTIN_ENTRY(println, false),
     BUILTIN_ENTRY(create_array, false), BUILTIN_ENTRY(add_element, false),
     BUILTIN_ENTRY(get_length, false),   BUILTIN_ENTRY(halt, false),
@@ -100,13 +98,12 @@ size_t number_of_builtins() {
 
 unsigned function_id_from_identifier(std::string_view identifier) {
     ASSERT(is_builtin(identifier));
-    return builtin_functions.find(identifier)->second.id();
+    return builtin_functions.find(std::string(identifier))->second.id();
 }
 
-PoolEntry call_builtin_function(unsigned function_id,
-                                const std::vector<PoolEntry>& args,
-                                Context& context) {
-    return id_to_builtin.at(function_id)->call(args, context);
+builtin_return_type_t call_builtin_function(unsigned function_id,
+                                            const builtin_args_t& args) {
+    return id_to_builtin.at(function_id)->call(args);
 }
 
 }  // namespace BuiltIn
