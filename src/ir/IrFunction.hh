@@ -31,7 +31,8 @@ class IrFunction {
 
     Register create_register();
     Register create_register_for_identifier(std::string_view identifier);
-    std::optional<Register> find_register_for_identifier(std::string_view identifier);
+    std::optional<Register> find_register_for_identifier(
+        std::string_view identifier);
 
     FunctionOperand create_function_from_id(unsigned) const;
 
@@ -45,6 +46,8 @@ class IrFunction {
     void bind_queued_labels(size_t);
 
     void dump_quads() const;
+
+    void finalize(PoolEntry register_count);
 
     // Returns the name bound to variable_id if present, otherwise
     // tmp#<variable_id>.
@@ -61,7 +64,7 @@ class IrFunction {
         }
     }
 
-    const Quad& get_last_quad() const;
+    const Quad &get_last_quad() const;
 
     unsigned id() const;
 
@@ -72,6 +75,10 @@ class IrFunction {
         return m_epilogue_label;
     }
 
+    size_t register_count() const {
+        return m_register_count;
+    }
+
     void enter_block();
     void exit_block();
 
@@ -80,7 +87,7 @@ class IrFunction {
     void bind_label(LabelOperand, size_t);
     Register allocate_register();
 
-    std::map<std::string_view, Register>& current_block_variables();
+    std::map<std::string_view, Register> &current_block_variables();
 
     const FunctionDecl *m_decl;
     const LabelOperand m_epilogue_label { create_label() };
@@ -89,6 +96,5 @@ class IrFunction {
     std::vector<std::map<std::string_view, Register>> m_variables {};
     std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
-    // TODO: Change this to 0 when we have special register window for return register.
-    size_t m_register_count { 1 };
+    size_t m_register_count { 0 };
 };

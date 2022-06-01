@@ -61,13 +61,20 @@ void IrFunction::dump_quads() const {
     }
 }
 
+void IrFunction::finalize(PoolEntry entry) {
+    ASSERT(m_quads.front()->opcode() == OPCode::ALLOC_REGS);
+    auto quad = std::make_unique<Quad>(OPCode::ALLOC_REGS, Operand::empty(),
+                                       Operand { entry }, Operand::empty());
+    m_quads.front() = std::move(quad);
+}
+
 unsigned IrFunction::id() const {
     return declaration()->function_id();
 }
 
 const Quad& IrFunction::get_last_quad() const {
-  ASSERT(!m_quads.empty());
-  return *m_quads.back();
+    ASSERT(!m_quads.empty());
+    return *m_quads.back();
 }
 
 size_t IrFunction::quad_idx(const LabelOperand label) const {
@@ -83,10 +90,11 @@ void IrFunction::exit_block() {
 }
 
 Register IrFunction::create_register() {
-  return allocate_register();
+    return allocate_register();
 }
 
-Register IrFunction::create_register_for_identifier(std::string_view identifier) {
+Register IrFunction::create_register_for_identifier(
+    std::string_view identifier) {
     auto& current_variables = current_block_variables();
     ASSERT(current_variables.find(identifier) == current_variables.end());
 
@@ -111,5 +119,5 @@ Register IrFunction::allocate_register() {
 }
 
 std::map<std::string_view, Register>& IrFunction::current_block_variables() {
-  return m_variables.back();
+    return m_variables.back();
 }

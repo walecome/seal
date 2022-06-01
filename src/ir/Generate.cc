@@ -45,6 +45,9 @@ QuadCollection Generate::generate() {
         m_current_ir_function = std::make_unique<IrFunction>(function_decl);
         gen_function_decl(function_decl);
 
+        env().finalize(
+            get_constant_pool().create_integer(env().register_count()));
+
         const FunctionDecl *decl = m_current_ir_function->declaration();
         m_quad_collection.function_to_quad.insert(
             { decl->function_id(), m_quad_collection.quads.size() });
@@ -87,6 +90,8 @@ void Generate::gen_block(const Block *block) {
 
 void Generate::gen_function_decl(const FunctionDecl *function_decl) {
     env().enter_block();
+    // Temporary
+    env().add_quad(OPCode::ALLOC_REGS, Operand::empty(), Operand::empty(), Operand::empty());
 
     function_decl->parameter_list()->for_each_parameter([this](auto param) {
         Register reg =
