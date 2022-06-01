@@ -8,27 +8,33 @@
 #include <vector>
 
 #include "interpreter/Context.hh"
-#include "interpreter/StackFrame.hh"
 #include "ir/Operand.hh"
 
+#include "interpreter/InstructionAddress.hh"
+
+class InstructionSequencer;
 class Quad;
 class Register;
-struct QuadCollection;
+class RegisterWindow;
+class LabelResolver;
+class FunctionResolver;
 
 class Interpreter {
    public:
-    Interpreter(const QuadCollection&, const ValuePool* constant_pool,
+    Interpreter(InstructionSequencer* instruction_sequencer,
+                const ValuePool* constant_pool,
+                const LabelResolver* label_resolver,
+                const FunctionResolver* function_resolver,
                 bool verbose);
 
     void interpret();
 
     Value& resolve_register(Register reg) const;
     Value& resolve_to_value(const Operand& source) const;
-    PoolEntry resolve_to_entry(const Operand& source) const;
-    void set_register(Register reg, PoolEntry value);
+    void set_register(Register reg, Value& value);
 
    private:
-    void interpret_function(unsigned function_id);
+    void interpret_quad(const Quad&);
 
     // Interpret function for different opcodes
     void add(const Quad&);
@@ -61,29 +67,31 @@ class Interpreter {
         const Quad&,
         std::function<bool(const Value&, const Value&)> comparison_predicate);
 
-    unsigned resolve_label(const Operand& dest) const;
     std::optional<PoolEntry> call_c_func(PoolEntry lib, PoolEntry func,
                                          const std::vector<PoolEntry>& args,
                                          unsigned return_type_id);
-
-    StackFrame* current_frame();
-    void enter_new_frame();
-    void exit_frame();
 
     unsigned take_pending_type_id();
     void set_pending_type_id(unsigned value);
 
     Context& context();
     const Context& context() const;
+    InstructionSequencer& sequencer();
+    RegisterWindow& current_register_window();
+    RegisterWindow& current_register_window() const;
+    const LabelResolver& label_resolver() const;
+    const FunctionResolver& function_resolver() const;
+
+    bool is_main_function();
 
     void handle_crash();
 
-    const QuadCollection& m_quads;
-    std::vector<PoolEntry> m_registers;
-    Context m_context;
+    InstructionSequencer* m_instruction_sequencer;
+    std::stack<RegisterWindow> m_register_windows;
+    const LabelResolver* m_label_resolver;
+    const FunctionResolver* m_function_resolver;
     bool m_verbose;
-    std::stack<StackFrame> m_stack_frames {};
+    Context m_context;
     std::queue<PoolEntry> m_arguments {};
-    std::stack<PoolEntry> m_stack {};
     std::optional<unsigned> m_pending_return_type {};
 };

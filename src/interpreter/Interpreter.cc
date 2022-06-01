@@ -15,6 +15,11 @@
 #include "ir/QuadCollection.hh"
 #include "types/CType.hh"
 
+#include "interpreter/FunctionResolver.hh"
+#include "interpreter/InstructionSequencer.hh"
+#include "interpreter/LabelResolver.hh"
+#include "interpreter/RegisterWindow.hh"
+
 namespace {
 
 void runtime_error(const std::string& message) {
@@ -28,144 +33,29 @@ Register return_register() {
 
 }  // namespace
 
-Interpreter::Interpreter(const QuadCollection& quads,
-                         const ValuePool* constant_pool, bool verbose)
-    : m_quads { quads },
-      m_registers(std::vector<PoolEntry>(quads.register_count)),
-      m_context(Context(constant_pool)),
-      m_verbose { verbose } {
+Interpreter::Interpreter(InstructionSequencer* instruction_sequencer,
+                         const ValuePool* constant_pool,
+                         const LabelResolver* label_resolver,
+                         const FunctionResolver* function_resolver,
+                         bool verbose)
+    : m_instruction_sequencer(instruction_sequencer),
+      m_register_windows(std::stack<RegisterWindow>()),
+      m_label_resolver(label_resolver),
+      m_function_resolver(function_resolver),
+      m_verbose(verbose),
+      m_context(Context(constant_pool)) {
 }
 
 void Interpreter::interpret() {
     CrashHelper::ScopedHandler handler([this] { handle_crash(); });
 
-    m_stack_frames.push(StackFrame { 0, nullptr });
-    interpret_function(m_quads.main_function_id);
-}
-
-void Interpreter::interpret_function(unsigned function_id) {
-    if (m_verbose) {
-        fmt::print("Interpreting function with id {}\n", function_id);
-    }
-
-    current_frame()->set_program_counter(
-        m_quads.function_to_quad.at(function_id));
-
     while (true) {
-        const Quad& quad = m_quads.quads[current_frame()->program_counter()];
-        // fmt::print("Interpreting quad: {}\n", quad.to_string());
-
-        switch (quad.opcode()) {
-            case OPCode::ADD:
-                add(quad);
-                break;
-
-            case OPCode::SUB:
-                sub(quad);
-                break;
-
-            case OPCode::MULT:
-                mult(quad);
-                break;
-
-            case OPCode::DIV:
-                div(quad);
-                break;
-
-            case OPCode::CMP_EQ:
-                cmp_eq(quad);
-                break;
-
-            case OPCode::CMP_GT:
-                cmp_gt(quad);
-                break;
-
-            case OPCode::CMP_LT:
-                cmp_lt(quad);
-                break;
-
-            case OPCode::CMP_GTEQ:
-                cmp_gteq(quad);
-                break;
-
-            case OPCode::CMP_LTEQ:
-                cmp_lteq(quad);
-                break;
-
-            case OPCode::CMP_NOTEQ:
-                cmp_noteq(quad);
-                break;
-            case OPCode::JMP:
-                jmp(quad);
-                break;
-            case OPCode::JMP_Z:
-                jmp_z(quad);
-                break;
-            case OPCode::JMP_NZ:
-                jmp_nz(quad);
-                break;
-            case OPCode::PUSH_ARG:
-                push_arg(quad);
-                break;
-            case OPCode::POP_ARG:
-                pop_arg(quad);
-                break;
-            case OPCode::CALL:
-                call(quad);
-                break;
-            case OPCode::CALL_C:
-                call_c(quad);
-                break;
-            case OPCode::SET_RET_TYPE:
-                set_ret_type(quad);
-                break;
-            case OPCode::RET:
-                ret(quad);
-                break;
-            case OPCode::MOVE:
-                move(quad);
-                break;
-            case OPCode::INDEX_MOVE:
-                index_move(quad);
-                break;
-
-            case OPCode::INDEX_ASSIGN:
-                index_assign(quad);
-                break;
-
-            case OPCode::AND:
-                interpret_and(quad);
-                break;
-
-            case OPCode::OR:
-                interpret_or(quad);
-                break;
-
-            default:
-                ASSERT_NOT_REACHED_MSG(
-                    fmt::format("Invalid OPCode: {}",
-                                opcode_to_string(quad.opcode()))
-                        .c_str());
-        }
-
-        if (current_frame()->jump_performed()) {
-            current_frame()->set_jump_performed(false);
-        } else {
-            current_frame()->increment_program_counter();
-        }
+        interpret_quad(sequencer().fetch_next_instruction());
     }
 }
 
 Value& Interpreter::resolve_register(Register reg) const {
-    return context().get_value(m_registers[reg.index()]);
-}
-
-void Interpreter::set_register(Register reg, PoolEntry entry) {
-    m_registers[reg.index()] = entry;
-}
-
-unsigned Interpreter::resolve_label(const Operand& dest) const {
-    return dest.as_label().value;
+    return current_register_window().get_from_register(reg);
 }
 
 Value& Interpreter::resolve_to_value(const Operand& source) const {
@@ -184,18 +74,8 @@ Value& Interpreter::resolve_to_value(const Operand& source) const {
             .c_str());
 }
 
-PoolEntry Interpreter::resolve_to_entry(const Operand& source) const {
-    if (source.is_value_entry()) {
-        return source.as_value_entry();
-    }
-
-    if (source.is_register()) {
-        return m_registers.at(source.as_register().index());
-    }
-
-    ASSERT_NOT_REACHED_MSG(
-        fmt::format("Invalid QuadSource type: {}", source.to_debug_string())
-            .c_str());
+void Interpreter::set_register(Register reg, Value& value) {
+    current_register_window().set_register_value(reg, value);
 }
 
 namespace {
@@ -269,9 +149,9 @@ PoolEntry compute_binary_expression<std::plus<>>(Context& context,
 void Interpreter::add(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::ADD);
 
-    PoolEntry lhs = resolve_to_entry(quad.src_a());
-    PoolEntry rhs = resolve_to_entry(quad.src_b());
-    PoolEntry result =
+    const Value& lhs = resolve_to_value(quad.src_a());
+    const Value& rhs = resolve_to_value(quad.src_b());
+    const Value& result =
         compute_binary_expression<std::plus<>>(context(), lhs, rhs);
 
     set_register(quad.dest().as_register(), result);
@@ -280,9 +160,9 @@ void Interpreter::add(const Quad& quad) {
 void Interpreter::sub(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::SUB);
 
-    PoolEntry lhs = resolve_to_entry(quad.src_a());
-    PoolEntry rhs = resolve_to_entry(quad.src_b());
-    PoolEntry result =
+    const Value& lhs = resolve_to_value(quad.src_a());
+    const Value& rhs = resolve_to_value(quad.src_b());
+    const Value& result =
         compute_binary_expression<std::minus<>>(context(), lhs, rhs);
 
     set_register(quad.dest().as_register(), result);
@@ -290,9 +170,9 @@ void Interpreter::sub(const Quad& quad) {
 void Interpreter::mult(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MULT);
 
-    PoolEntry lhs = resolve_to_entry(quad.src_a());
-    PoolEntry rhs = resolve_to_entry(quad.src_b());
-    PoolEntry result =
+    const Value& lhs = resolve_to_value(quad.src_a());
+    const Value& rhs = resolve_to_value(quad.src_b());
+    const Value& result =
         compute_binary_expression<std::multiplies<>>(context(), lhs, rhs);
 
     set_register(quad.dest().as_register(), result);
@@ -301,9 +181,9 @@ void Interpreter::mult(const Quad& quad) {
 void Interpreter::div(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::DIV);
 
-    PoolEntry lhs = resolve_to_entry(quad.src_a());
-    PoolEntry rhs = resolve_to_entry(quad.src_b());
-    PoolEntry result =
+    const Value& lhs = resolve_to_value(quad.src_a());
+    const Value& rhs = resolve_to_value(quad.src_b());
+    const Value& result =
         compute_binary_expression<std::divides<>>(context(), lhs, rhs);
 
     set_register(quad.dest().as_register(), result);
@@ -349,12 +229,9 @@ void Interpreter::cmp_noteq(const Quad& quad) {
 }
 
 void Interpreter::jmp(const Quad& quad) {
-    unsigned label_id = resolve_label(quad.dest());
-
-    auto target_quad = m_quads.label_to_quad.find(label_id);
-    ASSERT(target_quad != m_quads.label_to_quad.end());
-    current_frame()->set_program_counter(target_quad->second);
-    current_frame()->set_jump_performed(true);
+    InstructionAddress jump_address =
+        label_resolver().resolve_label(quad.dest().as_label());
+    sequencer().set_jump_address(jump_address);
 }
 
 void Interpreter::jmp_z(const Quad& quad) {
@@ -387,8 +264,6 @@ void Interpreter::pop_arg(const Quad& quad) {
 void Interpreter::call(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
 
-    ASSERT_NOT_REACHED_MSG("Implement pushing return address to stack. Could let src_b indicate how many register we need");
-
     FunctionOperand func = quad.src_a().as_function();
 
     if (BuiltIn::is_builtin(func)) {
@@ -402,10 +277,7 @@ void Interpreter::call(const Quad& quad) {
         return;
     }
 
-    enter_new_frame();
-
-    // Program counter will be incremented in interpret function
-    current_frame()->set_program_counter(m_quads.function_to_quad.at(func) - 1);
+    sequencer().call(function_resolver().resolve_function(func));
 }
 
 void Interpreter::call_c(const Quad& quad) {
@@ -432,13 +304,14 @@ void Interpreter::set_ret_type(const Quad& quad) {
 }
 
 void Interpreter::ret(const Quad&) {
-    if (current_frame()->is_main_frame()) {
+    if (is_main_function()) {
         const Value& value = resolve_register(return_register());
         exit(value.as_integer().value());
     }
-    ASSERT_NOT_REACHED_MSG("Implement RET for non-main frames");
 
-    exit_frame();
+    ASSERT(!m_register_windows.empty());
+    m_register_windows.pop();
+    sequencer().ret();
 }
 
 void Interpreter::move(const Quad& quad) {
@@ -536,19 +409,6 @@ void Interpreter::interpret_or(const Quad& quad) {
     });
 }
 
-StackFrame* Interpreter::current_frame() {
-    return &m_stack_frames.top();
-}
-
-void Interpreter::enter_new_frame() {
-    m_stack_frames.emplace(current_frame()->program_counter(), current_frame());
-};
-
-void Interpreter::exit_frame() {
-    // fmt::print("exit_frame()\n");
-    m_stack_frames.pop();
-}
-
 unsigned Interpreter::take_pending_type_id() {
     ASSERT(m_pending_return_type.has_value());
     unsigned tmp = m_pending_return_type.value();
@@ -641,20 +501,88 @@ std::optional<PoolEntry> Interpreter::call_c_func(
 
 void Interpreter::handle_crash() {
     fmt::print("The interpreter crashed unexpectedly. Dumping state:\n");
-    fmt::print("Program counter: {}\n", current_frame()->program_counter());
-    const Quad& quad = m_quads.quads[current_frame()->program_counter()];
-    fmt::print("Quad: {}\n", quad.to_string());
-    fmt::print("Dumping dynamic pool:\n");
-    context().dynamic_pool().dump();
-    fmt::print("Dumping registers:\n");
-    for (size_t i = 0; i < m_registers.size(); ++i) {
-        PoolEntry entry = m_registers.at(i);
-        if (entry.has_value()) {
-            fmt::print("r{}: {} ({})\n", i, entry.key(),
-                       entry.type() == PoolEntry::Type::Constant ? "Constant"
-                                                                 : "Dynamic");
-        } else {
-            fmt::print("r{}: empty\n", i);
-        }
+    fmt::print("Sequencer:\n");
+    sequencer().dump();
+}
+
+void Interpreter::interpret_quad(const Quad& quad) {
+    switch (quad.opcode()) {
+        case OPCode::ADD:
+            add(quad);
+            break;
+        case OPCode::SUB:
+            sub(quad);
+            break;
+        case OPCode::MULT:
+            mult(quad);
+            break;
+        case OPCode::DIV:
+            div(quad);
+            break;
+        case OPCode::CMP_EQ:
+            cmp_eq(quad);
+            break;
+        case OPCode::CMP_GT:
+            cmp_gt(quad);
+            break;
+        case OPCode::CMP_LT:
+            cmp_lt(quad);
+            break;
+        case OPCode::CMP_GTEQ:
+            cmp_gteq(quad);
+            break;
+        case OPCode::CMP_LTEQ:
+            cmp_lteq(quad);
+            break;
+        case OPCode::CMP_NOTEQ:
+            cmp_noteq(quad);
+            break;
+        case OPCode::JMP:
+            jmp(quad);
+            break;
+        case OPCode::JMP_Z:
+            jmp_z(quad);
+            break;
+        case OPCode::JMP_NZ:
+            jmp_nz(quad);
+            break;
+        case OPCode::PUSH_ARG:
+            push_arg(quad);
+            break;
+        case OPCode::POP_ARG:
+            pop_arg(quad);
+            break;
+        case OPCode::CALL:
+            call(quad);
+            break;
+        case OPCode::CALL_C:
+            call_c(quad);
+            break;
+        case OPCode::SET_RET_TYPE:
+            set_ret_type(quad);
+            break;
+        case OPCode::RET:
+            ret(quad);
+            break;
+        case OPCode::MOVE:
+            move(quad);
+            break;
+        case OPCode::INDEX_MOVE:
+            index_move(quad);
+            break;
+        case OPCode::INDEX_ASSIGN:
+            index_assign(quad);
+            break;
+        case OPCode::AND:
+            interpret_and(quad);
+            break;
+        case OPCode::OR:
+            interpret_or(quad);
+            break;
+        default:
+            ASSERT_NOT_REACHED_MSG(fmt::format("Invalid OPCode: {}",
+                                               opcode_to_string(quad.opcode()))
+                                       .c_str());
     }
 }
+

@@ -1,6 +1,7 @@
 add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
-    Context.cc
     CTypeWrapper.cc
+    Context.cc
     Interpreter.cc
-    StackFrame.cc
+    RegisterWindow.cc
+    SystemRegisters.cc
 )

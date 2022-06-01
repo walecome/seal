@@ -6,7 +6,7 @@
 
 #include "Constants.hh"
 #include "common/PoolEntry.hh"
-#include "ir/Register.hh"
+#include "common/Register.hh"
 
 // This defines a struct with the identifier name. In addition it adds a member
 // named value of the given type, as well as an overload for that type.
