@@ -63,7 +63,6 @@ class Real {
 
 class String {
    public:
-
     size_t length() const;
 
     std::string_view value() const;
@@ -104,15 +103,15 @@ class Value final {
     std::string to_string() const;
     std::string to_debug_string() const;
 
-    template<class T>
+    template <class T>
     bool is() const {
-      return std::holds_alternative<T>(m_base_value);
+        return std::holds_alternative<T>(m_base_value);
     }
 
-    template<class T>
+    template <class T>
     T as() const {
-      ASSERT(is<T>());
-      return std::get<T>(m_base_value);
+        ASSERT(is<T>());
+        return std::get<T>(m_base_value);
     }
 
     bool is_same_type(Value other) const;
@@ -127,9 +126,6 @@ class Value final {
     bool operator>=(const Value& other) const;
 
    protected:
-
    private:
-    std::variant< Boolean, Integer, Real, String, Vector
-        > m_base_value;
+    std::variant<Boolean, Integer, Real, String, Vector> m_base_value;
 };
-
