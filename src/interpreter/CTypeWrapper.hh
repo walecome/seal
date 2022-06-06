@@ -4,12 +4,12 @@
 
 #include "Constants.hh"
 
-class Value;
+#include "common/Value.hh"
 
 namespace vm {
 class CTypeWrapper {
    public:
-    static ptr_t<CTypeWrapper> from(const Value& value);
+    static ptr_t<CTypeWrapper> from(Value value);
     virtual ~CTypeWrapper() = default;
 
     ffi_type& get_type() {

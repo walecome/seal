@@ -7,23 +7,23 @@
 
 namespace BuiltIn {
 
-PoolEntry print(const std::vector<PoolEntry> &args, Context &context) {
+Value print(const builtin_args_t& args) {
     std::vector<std::string> stringified_args {};
 
-    for (auto &arg : args) {
-        stringified_args.push_back(context.get_value(arg).to_string(context));
+    for (auto arg : args) {
+        stringified_args.push_back(arg.to_string());
     }
 
     std::string s = fmt::format("{}", fmt::join(stringified_args, ""));
     fmt::print("{}", s);
 
-    return context.dynamic_pool().create_integer(s.size());
+    return Value::create_integer(s.size());
 }
 
-PoolEntry println(const std::vector<PoolEntry> &args, Context &context) {
-    unsigned long chars_printed =
-        context.get_value(print(args, context)).as_integer().value();
+Value println(const builtin_args_t& args) {
+    
+    unsigned long chars_printed = print(args).as<Integer>().value();
     fmt::print("\n");
-    return context.dynamic_pool().create_integer(chars_printed + 1);
+    return Value::create_integer(chars_printed + 1);
 }
 }  // namespace BuiltIn

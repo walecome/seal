@@ -12,11 +12,11 @@
 
 #include "interpreter/InstructionAddress.hh"
 #include "interpreter/ValueFactory.hh"
+#include "interpreter/RegisterWindow.hh"
 
 class InstructionSequencer;
 class Quad;
 class Register;
-class RegisterWindow;
 class LabelResolver;
 class FunctionResolver;
 
@@ -29,9 +29,9 @@ class Interpreter {
 
     void interpret();
 
-    Value& resolve_register(Register reg) const;
-    Value& resolve_to_value(const Operand& source) const;
-    void set_register(Register reg, Value& value);
+    Value resolve_register(Register reg) const;
+    Value resolve_to_value(const Operand& source) const;
+    void set_register(Register reg, Value value);
     void set_register(Register reg, ptr_t<ValueFactory>&& value_factory);
 
    private:
@@ -70,7 +70,7 @@ class Interpreter {
 
     std::optional<ptr_t<ValueFactory>> call_c_func(
         std::string_view lib, std::string_view func,
-        const std::vector<ptr_t<ValueFactory>>& args, unsigned return_type_id);
+        const std::vector<Value>& args, unsigned return_type_id);
 
     unsigned take_pending_type_id();
     void set_pending_type_id(unsigned value);
@@ -93,6 +93,6 @@ class Interpreter {
     const FunctionResolver* m_function_resolver;
     bool m_verbose;
     Context m_context;
-    std::queue<ptr_t<ValueFactory>> m_arguments {};
+    std::queue<Value> m_arguments {};
     std::optional<unsigned> m_pending_return_type {};
 };

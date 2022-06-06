@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
                   << lexer_duration << " milliseconds" << std::endl;
     }
 
-    Parser parser { };
+    Parser parser {};
 
     long parser_duration =
         measure_time([&] { parser.parse(lexer.get_tokens()); });
@@ -121,7 +121,8 @@ int main(int argc, char **argv) {
         fmt::print("\n");
     }
 
-    Interpreter interpreter { quads, constant_pool.get(), verbose };
+    ASSERT_NOT_REACHED_MSG("FIXME: Add resolvers");
+    Interpreter interpreter { nullptr, nullptr, nullptr, nullptr, verbose };
     interpreter.interpret();
 
     return 0;

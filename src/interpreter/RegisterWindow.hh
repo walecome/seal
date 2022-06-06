@@ -11,7 +11,7 @@ class RegisterWindow {
     RegisterWindow() = delete;
     explicit RegisterWindow(size_t register_count);
 
-    void set_register_value(Register reg, Value& value);
+    void set_register_value(Register reg, Value value);
     Value& get_from_register(Register reg);
 
   private:

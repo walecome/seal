@@ -5,7 +5,6 @@
 #include <type_traits>
 
 #include "Constants.hh"
-#include "common/Value.hh"
 
 namespace vm {
 
@@ -58,16 +57,16 @@ class CRealWrapper : public CTypeWrapper {
 
 }  // namespace
 
-ptr_t<CTypeWrapper> CTypeWrapper::from(const Value& value) {
-    if (value.is_integer()) {
-        return std::make_unique<CIntWrapper>(value.as_integer().value());
+ptr_t<CTypeWrapper> CTypeWrapper::from(Value value) {
+    if (value.is<Integer>()) {
+        return std::make_unique<CIntWrapper>(value.as<Integer>().value());
     }
-    if (value.is_real()) {
-        return std::make_unique<CRealWrapper>(value.as_real().value());
+    if (value.is<Real>()) {
+        return std::make_unique<CRealWrapper>(value.as<Real>().value());
     }
-    if (value.is_string()) {
+    if (value.is<String>()) {
         return std::make_unique<CStringWrapper>(
-            std::string(value.as_string().value()));
+            std::string(value.as<String>().value()));
     }
     ASSERT_NOT_REACHED_MSG("Unsupported value type");
 }

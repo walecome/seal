@@ -9,15 +9,16 @@
 #include "ast/ArgumentList.hh"
 #include "ast/Type.hh"
 
+#include "common/Value.hh"
+
 class ArgumentList;
 class Context;
-class ValueFactory;
 
 namespace BuiltIn {
 
-using builtin_arg_t = ptr_t<ValueFactory>;
-using builtin_return_type_t = ptr_t<ValueFactory>;
-using builtin_args_t = std::vector<builtin_arg_t>;
+using builtin_arg_t = Value;
+using builtin_return_type_t = Value;
+using builtin_args_t = std::vector<Value>;
 
 bool is_builtin(const std::string_view);
 bool is_builtin(unsigned);

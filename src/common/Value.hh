@@ -8,45 +8,116 @@
 
 #include "common/PoolEntry.hh"
 
-enum class ValueType { Boolean, Integer, Real, String, Vector };
-
-class String;
-class Boolean;
-class Vector;
-class Integer;
-class Real;
-
+class Value;
 class ValueResolver;
 
-class Value {
+class Boolean {
    public:
-    Value() = delete;
-    virtual ~Value() = default;
+    ~Boolean();
 
-    virtual std::string to_string(const ValueResolver& resolver) const = 0;
-    virtual std::string to_debug_string(const ValueResolver& resolver) const = 0;
+    bool value() const;
 
-    bool is_boolean() const;
-    bool is_integer() const;
-    bool is_real() const;
-    bool is_string() const;
-    bool is_vector() const;
+    std::string to_string(const ValueResolver& resolver) const;
+    std::string to_debug_string(const ValueResolver& resolver) const;
 
-    Boolean& as_boolean();
-    Integer& as_integer();
-    Real& as_real();
-    String& as_string();
-    Vector& as_vector();
+   private:
+    explicit Boolean(bool value);
 
-    const Boolean& as_boolean() const;
-    const Integer& as_integer() const;
-    const Real& as_real() const;
-    const String& as_string() const;
-    const Vector& as_vector() const;
+    const bool m_value;
+    friend class Value;
+};
 
-    ValueType type() const;
+class Integer {
+   public:
+    ~Integer();
 
-    virtual bool is_mutable() const;
+    int value() const;
+
+    std::string to_string(const ValueResolver& resolver) const;
+    std::string to_debug_string(const ValueResolver& resolver) const;
+
+   private:
+    explicit Integer(int value);
+
+    const int m_value;
+
+    friend class Value;
+};
+
+class Real {
+   public:
+    ~Real();
+
+    double value() const;
+
+    std::string to_string(const ValueResolver& resolver) const;
+    std::string to_debug_string(const ValueResolver& resolver) const;
+
+   private:
+    explicit Real(double value);
+
+    const double m_value;
+
+    friend class Value;
+};
+
+class String {
+   public:
+
+    size_t length() const;
+
+    std::string_view value() const;
+
+    std::string to_string(const ValueResolver& resolver) const;
+    std::string to_debug_string(const ValueResolver& resolver) const;
+
+   private:
+};
+
+class Vector {
+   public:
+    ~Vector();
+
+    const std::vector<Value>& value() const;
+
+    size_t length() const;
+    Value at(size_t index) const;
+    void set(size_t index, Value entry);
+    void add(Value entry);
+
+    std::string to_string(const ValueResolver& resolver) const;
+    std::string to_debug_string(const ValueResolver& resolver) const;
+
+   private:
+};
+
+class Value final {
+   public:
+    Value();
+    virtual ~Value();
+
+    static Value create_boolean(bool base_value);
+    static Value create_integer(int base_value);
+    static Value create_real(double base_value);
+    static Value copy(Value other);
+
+    std::string to_string() const;
+    std::string to_debug_string() const;
+
+    template<class T>
+    bool is() const {
+      return std::holds_alternative<T>(m_base_value);
+    }
+
+    template<class T>
+    T as() const {
+      ASSERT(is<T>());
+      return std::get<T>(m_base_value);
+    }
+
+    bool is_same_type(Value other) const;
+
+    bool is_truthy() const;
 
     bool operator==(const Value& other) const;
     bool operator!=(const Value& other) const;
@@ -55,91 +126,10 @@ class Value {
     bool operator<=(const Value& other) const;
     bool operator>=(const Value& other) const;
 
-    explicit operator bool() const;
-
    protected:
-    Value(ValueType type);
 
    private:
-    ValueType m_type;
+    std::variant< Boolean, Integer, Real, String, Vector
+        > m_base_value;
 };
 
-class Boolean : public Value {
-   public:
-    explicit Boolean(bool value);
-    ~Boolean();
-
-    bool value() const;
-
-    std::string to_string(const ValueResolver& resolver) const override;
-    std::string to_debug_string(const ValueResolver& resolver) const override;
-
-   private:
-    const bool m_value;
-};
-
-class Integer : public Value {
-   public:
-    explicit Integer(int value);
-    ~Integer();
-
-    int value() const;
-
-    std::string to_string(const ValueResolver& resolver) const override;
-    std::string to_debug_string(const ValueResolver& resolver) const override;
-
-   private:
-    const int m_value;
-};
-
-class Real : public Value {
-   public:
-    explicit Real(double value);
-
-    ~Real();
-
-    double value() const;
-
-    std::string to_string(const ValueResolver& resolver) const override;
-    std::string to_debug_string(const ValueResolver& resolver) const override;
-
-   private:
-    const double m_value;
-};
-
-class String : public Value {
-   public:
-    explicit String(std::string value);
-    ~String();
-
-    size_t length() const;
-
-    std::string_view value() const;
-
-    std::string to_string(const ValueResolver& resolver) const override;
-    std::string to_debug_string(const ValueResolver& resolver) const override;
-
-   private:
-    const std::string m_value;
-};
-
-class Vector : public Value {
-   public:
-    explicit Vector(std::vector<PoolEntry> values);
-    ~Vector();
-
-    const std::vector<PoolEntry>& value() const;
-
-    size_t length() const;
-    PoolEntry at(size_t index) const;
-    void set(size_t index, PoolEntry entry);
-    void add(PoolEntry entry);
-
-    bool is_mutable() const override;
-
-    std::string to_string(const ValueResolver& resolver) const override;
-    std::string to_debug_string(const ValueResolver& resolver) const override;
-
-   private:
-      std::vector<PoolEntry> m_value;
-};

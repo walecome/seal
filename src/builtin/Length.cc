@@ -6,19 +6,17 @@
 namespace BuiltIn {
 
 // fn get_length(iterable: string | []) -> int
-PoolEntry get_length(const std::vector<PoolEntry>& args, Context& context) {
+Value get_length(const std::vector<Value>& args) {
     ASSERT(args.size() == 1);
 
-    const Value& target = context.get_value(args[0]);
+    Value target = args[0];
 
-    if (target.is_string()) {
-        return context.dynamic_pool().create_integer(
-            target.as_string().length());
+    if (target.is<String>()) {
+        return Value::create_integer(target.as<String>().length());
     }
 
-    if (target.is_vector()) {
-        return context.dynamic_pool().create_integer(
-            target.as_vector().length());
+    if (target.is<Vector>()) {
+        return Value::create_integer(target.as<Vector>().length());
     }
 
     ASSERT_NOT_REACHED();
