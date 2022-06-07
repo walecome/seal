@@ -15,11 +15,12 @@
 #include "ir/QuadCollection.hh"
 #include "types/CType.hh"
 
+#include "common/ConstantPool.hh"
+
 #include "interpreter/FunctionResolver.hh"
 #include "interpreter/InstructionSequencer.hh"
 #include "interpreter/LabelResolver.hh"
 #include "interpreter/RegisterWindow.hh"
-#include "interpreter/ValueFactory.hh"
 
 namespace {
 
@@ -35,16 +36,16 @@ Register return_register() {
 }  // namespace
 
 Interpreter::Interpreter(InstructionSequencer* instruction_sequencer,
-                         const ValuePool* constant_pool,
+                         const ConstantPool* constant_pool,
                          const LabelResolver* label_resolver,
                          const FunctionResolver* function_resolver,
                          bool verbose)
     : m_instruction_sequencer(instruction_sequencer),
+      m_constant_pool(constant_pool),
       m_register_windows(std::stack<RegisterWindow>()),
       m_label_resolver(label_resolver),
       m_function_resolver(function_resolver),
-      m_verbose(verbose),
-      m_context(Context(constant_pool)) {
+      m_verbose(verbose) {
 }
 
 void Interpreter::interpret() {
@@ -62,8 +63,8 @@ Value Interpreter::resolve_register(Register reg) const {
 Value Interpreter::resolve_to_value(const Operand& source) const {
     // TODO: Support functions
     ASSERT(!source.is_function());
-    if (source.is_value_entry()) {
-        return context().get_value(source.as_value_entry());
+    if (source.is_constant_entry()) {
+        return constant_pool().get_value(source.as_constant_entry());
     }
 
     if (source.is_register()) {
@@ -88,28 +89,28 @@ Value compute_binary_expression(const Value& lhs, const Value& rhs) {
         return BinaryOperator {}(a, b);
     };
 
-    if (lhs.is<Boolean>()) {
-        bool result = apply_binary_operator(lhs.as<Boolean>().value(),
-                                            rhs.as<Boolean>().value());
+    if (lhs.is_boolean()) {
+        bool result = apply_binary_operator(lhs.as_boolean().value(),
+                                            rhs.as_boolean().value());
         return Value::create_boolean(result);
     }
 
-    if (lhs.is<Integer>()) {
-        int result = apply_binary_operator(lhs.as<Integer>().value(),
-                                           rhs.as<Integer>().value());
+    if (lhs.is_integer()) {
+        int result = apply_binary_operator(lhs.as_integer().value(),
+                                           rhs.as_integer().value());
         return Value::create_integer(result);
     }
 
-    if (lhs.is<Real>()) {
-        double result = apply_binary_operator(lhs.as<Real>().value(),
-                                              rhs.as<Real>().value());
+    if (lhs.is_real()) {
+        double result =
+            apply_binary_operator(lhs.as_real().value(), rhs.as_real().value());
         return Value::create_real(result);
     }
 
     ASSERT_NOT_REACHED();
 }
 
-Value concatenate_strings(String lhs, String rhs) {
+Value concatenate_strings(const String& lhs, const String& rhs) {
     ASSERT_NOT_REACHED_MSG("concatenate_strings() not implemented");
 }
 
@@ -122,26 +123,26 @@ Value compute_binary_expression<std::plus<>>(const Value& lhs,
         return std::plus<> {}(a, b);
     };
 
-    if (lhs.is<Boolean>()) {
-        bool result = apply_binary_operator(lhs.as<Boolean>().value(),
-                                            rhs.as<Boolean>().value());
+    if (lhs.is_boolean()) {
+        bool result = apply_binary_operator(lhs.as_boolean().value(),
+                                            rhs.as_boolean().value());
         return Value::create_boolean(result);
     }
 
-    if (lhs.is<Integer>()) {
-        int result = apply_binary_operator(lhs.as<Integer>().value(),
-                                           rhs.as<Integer>().value());
+    if (lhs.is_integer()) {
+        int result = apply_binary_operator(lhs.as_integer().value(),
+                                           rhs.as_integer().value());
         return Value::create_integer(result);
     }
 
-    if (lhs.is<Real>()) {
-        double result = apply_binary_operator(lhs.as<Real>().value(),
-                                              rhs.as<Real>().value());
+    if (lhs.is_real()) {
+        double result =
+            apply_binary_operator(lhs.as_real().value(), rhs.as_real().value());
         return Value::create_real(result);
     }
 
-    if (lhs.is<String>()) {
-        return concatenate_strings(lhs.as<String>(), rhs.as<String>());
+    if (lhs.is_object() && lhs.is_string()) {
+        return concatenate_strings(lhs.as_string(), rhs.as_string());
     }
 
     ASSERT_NOT_REACHED();
@@ -196,7 +197,7 @@ void Interpreter::compare(
     auto rhs = resolve_to_value(quad.src_b());
 
     bool result = comparison_predicate(lhs, rhs);
-    set_register(quad.dest().as_register(), ValueFactory::for_boolean(result));
+    set_register(quad.dest().as_register(), Value::create_boolean(result));
 }
 
 void Interpreter::cmp_eq(const Quad& quad) {
@@ -235,14 +236,14 @@ void Interpreter::jmp(const Quad& quad) {
 
 void Interpreter::jmp_z(const Quad& quad) {
     const Value& condition = resolve_to_value(quad.src_a());
-    if (!condition.as<Boolean>().value()) {
+    if (!condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
 void Interpreter::jmp_nz(const Quad& quad) {
     const Value& condition = resolve_to_value(quad.src_a());
-    if (!condition.as<Boolean>().value()) {
+    if (!condition.as_boolean().value()) {
         jmp(quad);
     }
 }
@@ -289,8 +290,8 @@ void Interpreter::call_c(const Quad& quad) {
     }
 
     auto return_value =
-        call_c_func(resolve_to_value(quad.src_a()).as<String>().value(),
-                    resolve_to_value(quad.src_b()).as<String>().value(), args,
+        call_c_func(resolve_to_value(quad.src_a()).as_string().value(),
+                    resolve_to_value(quad.src_b()).as_string().value(), args,
                     take_pending_type_id());
 
     if (return_value.has_value()) {
@@ -300,13 +301,13 @@ void Interpreter::call_c(const Quad& quad) {
 
 void Interpreter::set_ret_type(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::SET_RET_TYPE);
-    set_pending_type_id(resolve_to_value(quad.src_a()).as<Integer>().value());
+    set_pending_type_id(resolve_to_value(quad.src_a()).as_integer().value());
 }
 
 void Interpreter::ret(const Quad&) {
     if (is_main_function()) {
         const Value& value = resolve_register(return_register());
-        exit(value.as<Integer>().value());
+        exit(value.as_integer().value());
     }
 
     ASSERT(!m_register_windows.empty());
@@ -316,8 +317,8 @@ void Interpreter::ret(const Quad&) {
 
 void Interpreter::move(const Quad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
-    const Value& value = resolve_to_value(quad.src_a());
-    set_register(quad.dest().as_register(), ValueFactory::for_copy(value));
+    Value value = resolve_to_value(quad.src_a());
+    set_register(quad.dest().as_register(), Value::copy(value));
 }
 
 template <class T>
@@ -336,38 +337,42 @@ void bounds_check(T t, int index, std::string_view name) {
     }
 }
 
-ptr_t<ValueFactory> bounds_checked_index(String target, int index) {
+Value bounds_checked_index(const String& target, int index) {
     bounds_check(target.value(), index, "string");
     char value_at_index = target.value()[index];
-    return ValueFactory::for_string(std::string(1, value_at_index));
+    return Value::create_string(std::string(1, value_at_index));
 }
 
-ptr_t<ValueFactory> bounds_checked_index(Vector target, int index) {
+Value bounds_checked_index(const Vector& target, int index) {
     bounds_check(target, index, "vector");
-    return ValueFactory::for_copy(target.at(index));
+    return Value::copy(target.at(index));
 }
 
 void Interpreter::index_move(const Quad& quad) {
-    int index = resolve_to_value(quad.src_b()).as<Integer>().value();
+    int index = resolve_to_value(quad.src_b()).as_integer().value();
 
-    const Value& target = resolve_to_value(quad.src_a());
+    Value target = resolve_to_value(quad.src_a());
 
-    ptr_t<ValueFactory> result;
-
-    if (target.is<String>()) {
-        result = bounds_checked_index(target.as<String>(), index);
-    } else if (target.is<Vector>()) {
-        result = bounds_checked_index(target.as<Vector>(), index);
-    } else {
+    if (!target.is_object()) {
         ASSERT_NOT_REACHED();
+        return;
     }
+
+    Value result = [&]() {
+        if (target.is_string()) {
+            return bounds_checked_index(target.as_string(), index);
+        } else if (target.is_vector()) {
+            return bounds_checked_index(target.as_vector(), index);
+        }
+        ASSERT_NOT_REACHED();
+    }();
 
     set_register(quad.dest().as_register(), std::move(result));
 }
 
 void Interpreter::index_assign(const Quad& quad) {
-    int index = resolve_to_value(quad.src_a()).as<Integer>().value();
-    Vector indexed = resolve_to_value(quad.dest()).as<Vector>();
+    int index = resolve_to_value(quad.src_a()).as_integer().value();
+    Vector& indexed = resolve_to_value(quad.dest()).as_vector();
 
     Value value = resolve_to_value(quad.src_b());
 
@@ -399,17 +404,10 @@ void Interpreter::set_pending_type_id(unsigned value) {
     m_pending_return_type = value;
 }
 
-Context& Interpreter::context() {
-    return m_context;
-}
-
-const Context& Interpreter::context() const {
-    return m_context;
-}
-
-std::optional<ptr_t<ValueFactory>> Interpreter::call_c_func(
-    std::string_view lib, std::string_view func, const std::vector<Value>& args,
-    unsigned return_type_id) {
+std::optional<Value> Interpreter::call_c_func(std::string_view lib,
+                                              std::string_view func,
+                                              const std::vector<Value>& args,
+                                              unsigned return_type_id) {
     Result<dynlib::DynamicLibrary*> loaded_lib_or_error = dynlib::load_lib(lib);
     if (loaded_lib_or_error.is_error()) {
         ASSERT_NOT_REACHED_MSG("Could not load expected library");
@@ -452,16 +450,16 @@ std::optional<ptr_t<ValueFactory>> Interpreter::call_c_func(
         case Primitive::INT: {
             unsigned long val =
                 *(static_cast<unsigned long*>(result_wrapper.buffer()));
-            return ValueFactory::for_integer(val);
+            return Value::create_integer(val);
         }
         case Primitive::FLOAT: {
             double val = *(reinterpret_cast<double*>(result_wrapper.buffer()));
-            return ValueFactory::for_real(val);
+            return Value::create_real(val);
         }
         case Primitive::STRING: {
             std::string val =
                 *(reinterpret_cast<char**>(result_wrapper.buffer()));
-            return ValueFactory::for_string(val);
+            return Value::create_string(val);
         }
         default:
             ASSERT_NOT_REACHED();

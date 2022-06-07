@@ -1,11 +1,11 @@
 #pragma once
 
 #include <iterator>
-#include <variant>
+#include <optional>
 #include <vector>
 
 #include "Constants.hh"
-#include "common/PoolEntry.hh"
+#include "common/ConstantPool.hh"
 #include "common/Register.hh"
 
 // This defines a struct with the identifier name. In addition it adds a member
@@ -24,7 +24,7 @@ ADD_OPERAND_TYPE(LabelOperand, unsigned)
 ADD_OPERAND_TYPE(FunctionOperand, unsigned)
 
 using operand_type_t =
-    std::variant<PoolEntry, LabelOperand, FunctionOperand, Register>;
+    std::variant<ConstantPool::Entry, LabelOperand, FunctionOperand, Register>;
 
 class IrFunction;
 
@@ -37,7 +37,7 @@ class Operand {
         return Operand();
     }
 
-    bool is_value_entry() const;
+    bool is_constant_entry() const;
     bool is_label() const;
     bool is_function() const;
     bool is_register() const;
@@ -56,7 +56,7 @@ class Operand {
 
     std::string to_debug_string() const;
 
-    PoolEntry as_value_entry() const;
+    ConstantPool::Entry as_constant_entry() const;
     LabelOperand as_label() const;
     FunctionOperand as_function() const;
     Register as_register() const;

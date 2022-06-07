@@ -31,10 +31,12 @@
 #include "ir/IrProgram.hh"
 #include "types/CType.hh"
 
+#include "common/ConstantPool.hh"
+
 #include "fmt/format.h"
 
 Generate::Generate(const CompilationUnit *compilation_unit,
-                   ValuePool *constant_pool)
+                   ConstantPool *constant_pool)
     : m_compilation_unit(compilation_unit), m_constant_pool(constant_pool) {
 }
 
@@ -45,8 +47,8 @@ QuadCollection Generate::generate() {
         m_current_ir_function = std::make_unique<IrFunction>(function_decl);
         gen_function_decl(function_decl);
 
-        env().finalize(
-            get_constant_pool().create_integer(env().register_count()));
+        env().finalize(get_constant_pool().add(
+            Value::create_integer(env().register_count())));
 
         const FunctionDecl *decl = m_current_ir_function->declaration();
         m_quad_collection.function_to_quad.insert(
@@ -91,7 +93,8 @@ void Generate::gen_block(const Block *block) {
 void Generate::gen_function_decl(const FunctionDecl *function_decl) {
     env().enter_block();
     // Temporary
-    env().add_quad(OPCode::ALLOC_REGS, Operand::empty(), Operand::empty(), Operand::empty());
+    env().add_quad(OPCode::ALLOC_REGS, Operand::empty(), Operand::empty(),
+                   Operand::empty());
 
     function_decl->parameter_list()->for_each_parameter([this](auto param) {
         Register reg =
@@ -251,14 +254,16 @@ Operand Generate::gen_function_call(const FunctionCall *func_call) {
                               : Operand { env().create_register() };
 
     if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
-        Operand lib = Operand(get_constant_pool().create_string(x->lib_name()));
-        Operand func =
-            Operand(get_constant_pool().create_string(x->identifier()));
+        Operand lib = Operand(
+            get_constant_pool().add(Value::create_string(x->lib_name())));
+        Operand func = Operand(
+            get_constant_pool().add(Value::create_string(x->identifier())));
 
         unsigned type_id = ctype::from_seal_type(x->type()).type_id;
-        env().add_quad(OPCode::SET_RET_TYPE, Operand::empty(),
-                       Operand(get_constant_pool().create_integer(type_id)),
-                       Operand::empty());
+        env().add_quad(
+            OPCode::SET_RET_TYPE, Operand::empty(),
+            Operand(get_constant_pool().add(Value::create_integer(type_id))),
+            Operand::empty());
         env().add_quad(OPCode::CALL_C, destination, Operand { lib },
                        Operand { func });
     } else {
@@ -450,7 +455,7 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
 
     if (sym == OperatorSym::MINUS) {
         auto result = env().create_register();
-        auto zero = Operand(get_constant_pool().create_integer(0));
+        auto zero = Operand(get_constant_pool().add(Value::create_integer(0)));
         env().add_quad(OPCode::SUB, Operand(result), zero, target_operand);
         return Operand { result };
     }
@@ -461,7 +466,7 @@ Operand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     Register result = var_expr ? gen_variable_expression(var_expr).as_register()
                                : env().create_register();
 
-    auto one = Operand(get_constant_pool().create_integer(1));
+    auto one = Operand(get_constant_pool().add(Value::create_integer(1)));
 
     if (sym == OperatorSym::INC) {
         env().add_quad(OPCode::ADD, Operand { result }, target_operand, one);
@@ -483,36 +488,38 @@ Operand Generate::gen_variable_expression(const VariableExpression *var_expr) {
 
 Operand Generate::create_integer_literal(
     const IntegerLiteral *integer_literal) {
-    PoolEntry entry =
-        get_constant_pool().create_integer(integer_literal->value());
+    ConstantPool::Entry entry = get_constant_pool().add(
+        Value::create_integer(integer_literal->value()));
     return Operand(entry);
 }
 
 Operand Generate::create_array_literal(const ArrayLiteral *array) {
-    std::vector<PoolEntry> values;
+    ASSERT_NOT_REACHED_MSG("Generate::create_array_literal not implemented");
+    // std::vector<ConstantPool::Entry> values;
 
-    array->for_each_element([&](auto *element) {
-        PoolEntry element_entry = gen_expression(element).as_value_entry();
-        values.push_back(element_entry);
-    });
-    return Operand(get_constant_pool().create_vector(values));
+    // array->for_each_element([&](auto *element) {
+    //     PoolEntry element_entry = gen_expression(element).as_value_entry();
+    //     values.push_back(element_entry);
+    // });
+    // return Operand(get_constant_pool().create_vector(values));
 }
 
 Operand Generate::create_boolean_literal(
     const BooleanLiteral *boolean_literal) {
-    PoolEntry entry =
-        get_constant_pool().create_boolean(boolean_literal->value());
-    return Operand(entry);
+    Operand(get_constant_pool().add(
+        Value::create_boolean(boolean_literal->value())));
 }
 
 Operand Generate::create_float_literal(const RealLiteral *real_literal) {
-    return Operand(get_constant_pool().create_real(real_literal->value()));
+    return Operand(
+        get_constant_pool().add(Value::create_real(real_literal->value())));
 }
 
 Operand Generate::create_string_literal(const StringLiteral *string_literal) {
-    return Operand(get_constant_pool().create_string(string_literal->value()));
+    return Operand(
+        get_constant_pool().add(Value::create_string(string_literal->value())));
 }
 
-ValuePool &Generate::get_constant_pool() {
+ConstantPool &Generate::get_constant_pool() {
     return *m_constant_pool;
 }

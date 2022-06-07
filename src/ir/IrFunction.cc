@@ -61,7 +61,7 @@ void IrFunction::dump_quads() const {
     }
 }
 
-void IrFunction::finalize(PoolEntry entry) {
+void IrFunction::finalize(ConstantPool::Entry entry) {
     ASSERT(m_quads.front()->opcode() == OPCode::ALLOC_REGS);
     auto quad = std::make_unique<Quad>(OPCode::ALLOC_REGS, Operand::empty(),
                                        Operand { entry }, Operand::empty());

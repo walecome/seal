@@ -7,11 +7,9 @@
 #include <stack>
 #include <vector>
 
-#include "interpreter/Context.hh"
 #include "ir/Operand.hh"
 
 #include "interpreter/InstructionAddress.hh"
-#include "interpreter/ValueFactory.hh"
 #include "interpreter/RegisterWindow.hh"
 
 class InstructionSequencer;
@@ -19,11 +17,12 @@ class Quad;
 class Register;
 class LabelResolver;
 class FunctionResolver;
+class ConstantPool;
 
 class Interpreter {
    public:
     Interpreter(InstructionSequencer* instruction_sequencer,
-                const ValuePool* constant_pool,
+                const ConstantPool* constant_pool,
                 const LabelResolver* label_resolver,
                 const FunctionResolver* function_resolver, bool verbose);
 
@@ -32,7 +31,6 @@ class Interpreter {
     Value resolve_register(Register reg) const;
     Value resolve_to_value(const Operand& source) const;
     void set_register(Register reg, Value value);
-    void set_register(Register reg, ptr_t<ValueFactory>&& value_factory);
 
    private:
     void interpret_quad(const Quad&);
@@ -68,16 +66,16 @@ class Interpreter {
         const Quad&,
         std::function<bool(const Value&, const Value&)> comparison_predicate);
 
-    std::optional<ptr_t<ValueFactory>> call_c_func(
-        std::string_view lib, std::string_view func,
-        const std::vector<Value>& args, unsigned return_type_id);
+    std::optional<Value> call_c_func(std::string_view lib,
+                                     std::string_view func,
+                                     const std::vector<Value>& args,
+                                     unsigned return_type_id);
 
     unsigned take_pending_type_id();
     void set_pending_type_id(unsigned value);
 
-    Context& context();
-    const Context& context() const;
     InstructionSequencer& sequencer();
+    const ConstantPool& constant_pool() const;
     RegisterWindow& current_register_window();
     RegisterWindow& current_register_window() const;
     const LabelResolver& label_resolver() const;
@@ -88,11 +86,11 @@ class Interpreter {
     void handle_crash();
 
     InstructionSequencer* m_instruction_sequencer;
+    const ConstantPool* m_constant_pool;
     std::stack<RegisterWindow> m_register_windows;
     const LabelResolver* m_label_resolver;
     const FunctionResolver* m_function_resolver;
     bool m_verbose;
-    Context m_context;
     std::queue<Value> m_arguments {};
     std::optional<unsigned> m_pending_return_type {};
 };

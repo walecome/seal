@@ -16,13 +16,13 @@ bool Operand::is_label() const {
     return holds<LabelOperand>();
 }
 
-bool Operand::is_value_entry() const {
-    return holds<PoolEntry>();
+bool Operand::is_constant_entry() const {
+    return holds<ConstantPool::Entry>();
 }
 
-PoolEntry Operand::as_value_entry() const {
-    ASSERT(is_value_entry());
-    return std::get<PoolEntry>(m_data.value());
+ConstantPool::Entry Operand::as_constant_entry() const {
+    ASSERT(is_constant_entry());
+    return std::get<ConstantPool::Entry>(m_data.value());
 }
 
 FunctionOperand Operand::as_function() const {
@@ -44,8 +44,8 @@ struct OperandDebugPrinter {
     const Operand* context;
     std::ostringstream oss {};
 
-    std::string operator()(PoolEntry entry) {
-        return fmt::format("C#{}", entry.key());
+    std::string operator()(ConstantPool::Entry entry) {
+        return entry.to_string();
     }
 
     std::string operator()(FunctionOperand function_id) {
@@ -63,7 +63,7 @@ struct OperandDebugPrinter {
 
 std::string Operand::to_debug_string() const {
     if (!m_data.has_value()) {
-      return "_";
+      return "NO VALUE";
     }
     return std::visit(OperandDebugPrinter { this }, m_data.value());
 }

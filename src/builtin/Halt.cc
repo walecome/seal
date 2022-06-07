@@ -6,7 +6,7 @@
 
 namespace BuiltIn {
 
-PoolEntry halt(const std::vector<PoolEntry>&, Context&) {
+builtin_return_type_t halt(const builtin_args_t&) {
     fmt::print("Builtin halt() called!\n");
     exit(0);
 }

@@ -39,12 +39,14 @@ class FunctionDecl;
 class FunctionDeclUser;
 class FunctionDeclC;
 
+class ConstantPool;
+
 class Generate {
     MAKE_NONMOVABLE(Generate)
     MAKE_NONCOPYABLE(Generate)
 
    public:
-    Generate(const CompilationUnit* compilation_unit, ValuePool* constant_pool);
+    Generate(const CompilationUnit* compilation_unit, ConstantPool* constant_pool);
 
     QuadCollection generate();
 
@@ -84,10 +86,10 @@ class Generate {
     Operand create_integer_literal(const IntegerLiteral*);
     Operand create_string_literal(const StringLiteral*);
 
-    ValuePool& get_constant_pool();
+    ConstantPool& get_constant_pool();
 
     const CompilationUnit* m_compilation_unit;
-    ValuePool* m_constant_pool;
+    ConstantPool* m_constant_pool;
     ptr_t<IrFunction> m_current_ir_function;
     // Register 0 is reserved for function returns.
     unsigned m_register_count { 0 };

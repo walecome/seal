@@ -6,10 +6,9 @@
 #include <variant>
 #include <vector>
 
-#include "common/PoolEntry.hh"
+#include "Constants.hh"
 
 class Value;
-class ValueResolver;
 
 class Boolean {
    public:
@@ -17,8 +16,8 @@ class Boolean {
 
     bool value() const;
 
-    std::string to_string(const ValueResolver& resolver) const;
-    std::string to_debug_string(const ValueResolver& resolver) const;
+    std::string to_string() const;
+    std::string to_debug_string() const;
 
    private:
     explicit Boolean(bool value);
@@ -33,8 +32,8 @@ class Integer {
 
     int value() const;
 
-    std::string to_string(const ValueResolver& resolver) const;
-    std::string to_debug_string(const ValueResolver& resolver) const;
+    std::string to_string() const;
+    std::string to_debug_string() const;
 
    private:
     explicit Integer(int value);
@@ -50,8 +49,8 @@ class Real {
 
     double value() const;
 
-    std::string to_string(const ValueResolver& resolver) const;
-    std::string to_debug_string(const ValueResolver& resolver) const;
+    std::string to_string() const;
+    std::string to_debug_string() const;
 
    private:
     explicit Real(double value);
@@ -67,8 +66,8 @@ class String {
 
     std::string_view value() const;
 
-    std::string to_string(const ValueResolver& resolver) const;
-    std::string to_debug_string(const ValueResolver& resolver) const;
+    std::string to_string() const;
+    std::string to_debug_string() const;
 
    private:
 };
@@ -84,10 +83,22 @@ class Vector {
     void set(size_t index, Value entry);
     void add(Value entry);
 
-    std::string to_string(const ValueResolver& resolver) const;
-    std::string to_debug_string(const ValueResolver& resolver) const;
+    std::string to_string() const;
+    std::string to_debug_string() const;
 
    private:
+};
+
+class Object {
+   public:
+    Object();
+    ~Object();
+
+    bool is_string() const;
+    bool is_vector() const;
+
+    String as_string() const;
+    Vector as_vector() const;
 };
 
 class Value final {
@@ -98,21 +109,25 @@ class Value final {
     static Value create_boolean(bool base_value);
     static Value create_integer(int base_value);
     static Value create_real(double base_value);
+    static Value create_string(std::string_view base_value);
     static Value copy(Value other);
 
-    std::string to_string() const;
+    std::string stringify() const;
     std::string to_debug_string() const;
 
-    template <class T>
-    bool is() const {
-        return std::holds_alternative<T>(m_base_value);
-    }
+    bool is_boolean() const;
+    bool is_integer() const;
+    bool is_real() const;
+    bool is_object() const;
+    bool is_string() const;
+    bool is_vector() const;
 
-    template <class T>
-    T as() const {
-        ASSERT(is<T>());
-        return std::get<T>(m_base_value);
-    }
+    Boolean as_boolean() const;
+    Integer as_integer() const;
+    Real as_real() const;
+
+    String& as_string() const;
+    Vector& as_vector() const;
 
     bool is_same_type(Value other) const;
 
@@ -127,5 +142,4 @@ class Value final {
 
    protected:
    private:
-    std::variant<Boolean, Integer, Real, String, Vector> m_base_value;
 };

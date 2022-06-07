@@ -1,7 +1,6 @@
 
 #include "BuiltIn.hh"
 #include "ast/ArgumentList.hh"
-#include "interpreter/Context.hh"
 #include "ir/IrFunction.hh"
 
 namespace BuiltIn {

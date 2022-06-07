@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 
-#include "common/ValuePool.hh"
 #include "ir/Quad.hh"
 
 struct QuadCollection {

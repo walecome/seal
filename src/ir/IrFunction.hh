@@ -47,7 +47,7 @@ class IrFunction {
 
     void dump_quads() const;
 
-    void finalize(PoolEntry register_count);
+    void finalize(ConstantPool::Entry register_count);
 
     // Returns the name bound to variable_id if present, otherwise
     // tmp#<variable_id>.
