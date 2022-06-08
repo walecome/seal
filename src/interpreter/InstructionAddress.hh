@@ -4,7 +4,7 @@
 
 class InstructionAddress {
   public:
-    InstructionAddress() = delete;
+    InstructionAddress();
     explicit InstructionAddress(size_t addr);
 
     InstructionAddress increment() const;
