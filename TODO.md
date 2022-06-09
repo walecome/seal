@@ -16,3 +16,6 @@
   - To print/println at least
 - [ ] Add signal handler to CrashHelper
   - Is currently only helpful on asserts failing
+- [ ] Apply relocations to quads, specifically FunctionOperand and LabelOperand
+      The interpreter should not know if there constructs, and can easily work with them
+      if they were InstructionAddress instances, as it would not need to resolve things.
