@@ -2,6 +2,15 @@
 
 #include <fmt/format.h>
 
+#include <string>
+
+ConstantPool::Entry::Entry(size_t key) : key(key) {
+}
+
+std::string ConstantPool::Entry::to_string() const {
+    return fmt::format("C#{}", key);
+}
+
 ConstantPool::ConstantPool() = default;
 
 ConstantPool::Entry ConstantPool::add(Value value) {

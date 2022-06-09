@@ -22,6 +22,8 @@ class InstructionSequencer {
 
     void dump() const;
 
+    bool is_in_main_function() const;
+
    private:
     bool get_and_set_started();
     void maybe_advance_program_counter();

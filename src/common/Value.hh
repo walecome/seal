@@ -10,8 +10,14 @@
 
 class Value;
 
+struct None {
+    std::string to_string() const;
+    std::string to_debug_string() const;
+};
+
 class Boolean {
    public:
+    explicit Boolean(bool value);
     ~Boolean();
 
     bool value() const;
@@ -20,14 +26,12 @@ class Boolean {
     std::string to_debug_string() const;
 
    private:
-    explicit Boolean(bool value);
-
-    const bool m_value;
-    friend class Value;
+    bool m_value;
 };
 
 class Integer {
    public:
+    explicit Integer(int value);
     ~Integer();
 
     int value() const;
@@ -36,15 +40,12 @@ class Integer {
     std::string to_debug_string() const;
 
    private:
-    explicit Integer(int value);
-
-    const int m_value;
-
-    friend class Value;
+    int m_value;
 };
 
 class Real {
    public:
+    explicit Real(double value);
     ~Real();
 
     double value() const;
@@ -53,15 +54,14 @@ class Real {
     std::string to_debug_string() const;
 
    private:
-    explicit Real(double value);
-
-    const double m_value;
-
-    friend class Value;
+    double m_value;
 };
 
 class String {
    public:
+    String(std::string value);
+    ~String();
+
     size_t length() const;
 
     std::string_view value() const;
@@ -70,10 +70,12 @@ class String {
     std::string to_debug_string() const;
 
    private:
+    std::string m_value;
 };
 
 class Vector {
    public:
+    Vector(std::vector<Value>&& value);
     ~Vector();
 
     const std::vector<Value>& value() const;
@@ -87,6 +89,7 @@ class Vector {
     std::string to_debug_string() const;
 
    private:
+    std::vector<Value> m_value;
 };
 
 class Object {
@@ -94,11 +97,25 @@ class Object {
     Object();
     ~Object();
 
+    std::string to_string() const;
+    std::string to_debug_string() const;
+
+    String& as_string();
+
     bool is_string() const;
     bool is_vector() const;
 
-    String as_string() const;
-    Vector as_vector() const;
+    Vector& as_vector();
+
+    const String& as_string() const;
+    const Vector& as_vector() const;
+
+   private:
+    using object_value_t = std::variant<None, String, Vector>;
+    Object(object_value_t&& value);
+
+    object_value_t m_value;
+    friend class Value;
 };
 
 class Value final {
@@ -126,8 +143,11 @@ class Value final {
     Integer as_integer() const;
     Real as_real() const;
 
-    String& as_string() const;
-    Vector& as_vector() const;
+    String& as_string();
+    Vector& as_vector();
+
+    const String& as_string() const;
+    const Vector& as_vector() const;
 
     bool is_same_type(Value other) const;
 
@@ -140,6 +160,13 @@ class Value final {
     bool operator<=(const Value& other) const;
     bool operator>=(const Value& other) const;
 
-   protected:
    private:
+    using value_t = std::variant<None, Boolean, Integer, Real, Object>;
+
+    Value(value_t&& value);
+
+    Object& as_object();
+    const Object& as_object() const;
+
+    value_t m_value;
 };

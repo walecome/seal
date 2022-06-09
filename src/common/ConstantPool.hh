@@ -15,7 +15,7 @@ class ConstantPool {
 
        private:
         explicit Entry(size_t key);
-        const size_t key;
+        size_t key;
         friend class ConstantPool;
     };
     explicit ConstantPool();

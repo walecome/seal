@@ -12,7 +12,8 @@ class RegisterWindow {
     explicit RegisterWindow(size_t register_count);
 
     void set_register_value(Register reg, Value value);
-    Value& get_from_register(Register reg);
+    Value get_from_register(Register reg) const;
 
   private:
+    std::vector<Value> m_registers;
 };

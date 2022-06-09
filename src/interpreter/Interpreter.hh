@@ -77,11 +77,9 @@ class Interpreter {
     InstructionSequencer& sequencer();
     const ConstantPool& constant_pool() const;
     RegisterWindow& current_register_window();
-    RegisterWindow& current_register_window() const;
+    const RegisterWindow& current_register_window() const;
     const LabelResolver& label_resolver() const;
     const FunctionResolver& function_resolver() const;
-
-    bool is_main_function();
 
     void handle_crash();
 

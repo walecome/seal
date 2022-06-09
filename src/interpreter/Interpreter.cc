@@ -304,8 +304,34 @@ void Interpreter::set_ret_type(const Quad& quad) {
     set_pending_type_id(resolve_to_value(quad.src_a()).as_integer().value());
 }
 
+InstructionSequencer& Interpreter::sequencer() {
+  return *m_instruction_sequencer;
+}
+
+const ConstantPool& Interpreter::constant_pool() const {
+  return *m_constant_pool;
+}
+
+RegisterWindow& Interpreter::current_register_window() {
+    ASSERT(!m_register_windows.empty());
+    return m_register_windows.top();
+}
+
+const RegisterWindow& Interpreter::current_register_window() const {
+  ASSERT(!m_register_windows.empty());
+  return m_register_windows.top();
+}
+
+const LabelResolver& Interpreter::label_resolver() const {
+    return *m_label_resolver;
+}
+
+const FunctionResolver& Interpreter::function_resolver() const {
+  return *m_function_resolver;
+}
+
 void Interpreter::ret(const Quad&) {
-    if (is_main_function()) {
+    if (sequencer().is_in_main_function()) {
         const Value& value = resolve_register(return_register());
         exit(value.as_integer().value());
     }

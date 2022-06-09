@@ -11,5 +11,7 @@ class InstructionAddress {
 
     size_t unwrap() const;
   private:
+
+    size_t m_addr;
 };
 

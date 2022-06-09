@@ -1,11 +1,15 @@
 #pragma once
 
+#include <map>
+
 #include "interpreter/InstructionAddress.hh"
 #include "ir/Operand.hh"
 
 class LabelResolver {
-  public:
+   public:
+    void add_label(LabelOperand label, InstructionAddress addr);
     InstructionAddress resolve_label(LabelOperand label) const;
-  private:
-};
 
+   private:
+    std::map<LabelOperand, InstructionAddress> m_address_map {};
+};

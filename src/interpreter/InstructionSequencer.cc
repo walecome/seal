@@ -36,6 +36,14 @@ void InstructionSequencer::ret() {
     set_jump_address(return_address);
 }
 
+void InstructionSequencer::dump() const {
+    ASSERT_NOT_REACHED_MSG("InstructionSequencer::dump() not implemented");
+}
+
+bool InstructionSequencer::is_in_main_function() const {
+    return m_call_stack.empty();
+}
+
 bool InstructionSequencer::get_and_set_started() {
     m_has_started = true;
     return m_has_started;
