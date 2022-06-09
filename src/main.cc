@@ -20,6 +20,8 @@
 #include "ir/IrProgram.hh"
 #include "ir/QuadCollection.hh"
 
+#include "CrashHelper.hh"
+
 ArgumentParser parse_args(int argc, char **argv) {
     ArgumentParser parser("CLI argument parser");
     parser.add_argument("--source", "The filename of the source file", true);
@@ -50,6 +52,7 @@ long measure_time(Function f) {
 }
 
 int main(int argc, char **argv) {
+    CrashHelper::the()->register_signals();
     ArgumentParser argument_parser = parse_args(argc, argv);
 
     std::string source_file { argument_parser.get<std::string>("source") };
