@@ -6,7 +6,7 @@ namespace {
   static CrashHelper* static_instance = nullptr;
 
   [[noreturn]] void crash() {
-    throw 1;
+      std::abort();
   }
 }
 
