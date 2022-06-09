@@ -3,8 +3,9 @@
 #include "Constants.hh"
 #include "ir/Quad.hh"
 
-InstructionSequencer::InstructionSequencer(std::vector<Quad>&& quads)
-    : m_quads(quads) {
+InstructionSequencer::InstructionSequencer(std::vector<Quad>&& quads,
+                                           InstructionAddress start_address)
+    : m_quads(quads), m_program_counter(start_address) {
 }
 
 const Quad& InstructionSequencer::fetch_next_instruction() {
