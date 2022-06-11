@@ -5,4 +5,5 @@ add_source_files(PREFIX ${CMAKE_CURRENT_LIST_DIR}
     Operand.cc
     Quad.cc
     QuadCollection.cc
+    Relocator.cc
 )

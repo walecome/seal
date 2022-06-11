@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <iterator>
+
 #include "Generate.hh"
 #include "IrFunction.hh"
 #include "Register.hh"
@@ -32,6 +35,7 @@
 #include "types/CType.hh"
 
 #include "common/ConstantPool.hh"
+#include "common/RelocatedQuad.hh"
 
 #include "fmt/format.h"
 
@@ -522,4 +526,39 @@ Operand Generate::create_string_literal(const StringLiteral *string_literal) {
 
 ConstantPool &Generate::get_constant_pool() {
     return *m_constant_pool;
+}
+
+std::vector<RelocatedQuad> Generate::relocate_quads(
+    const std::vector<Quad> &quads) {
+    std::vector<RelocatedQuad> relocated_quads {};
+    relocated_quads.reserve(quads.size());
+    std::transform(quads.begin(), quads.end(),
+                   std::back_inserter(relocated_quads),
+                   [this](const Quad &quad) { return relocate_quad(quad); });
+    return relocated_quads;
+}
+
+namespace {
+RelocatedQuad::Operand convert_operand_without_relocation(
+    const Operand &operand) {
+    if (!operand.is_used()) {
+        return RelocatedQuad::Operand::empty();
+    }
+    if (operand.is_constant_entry()) {
+        return RelocatedQuad::Operand(operand.as_constant_entry());
+    }
+    if (operand.is_register()) {
+        return RelocatedQuad::Operand(operand.as_register());
+    }
+    ASSERT_NOT_REACHED();
+}
+}  // namespace
+
+RelocatedQuad Generate::relocate_quad(const Quad &quad) {
+    if (!quad.needs_relocation()) {
+        return RelocatedQuad(quad.opcode(),
+                             convert_operand_without_relocation(quad.dest()),
+                             convert_operand_without_relocation(quad.src_a()),
+                             convert_operand_without_relocation(quad.src_b()));
+    }
 }

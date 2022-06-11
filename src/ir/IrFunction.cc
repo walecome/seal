@@ -29,7 +29,14 @@ LabelOperand IrFunction::create_and_queue_label() {
 
 void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
                           Operand src_b) {
-    m_quads.push_back(std::make_unique<Quad>(op_code, dest, src_a, src_b));
+    auto is_relocatable = [](const Operand& operand) {
+        return operand.is_function() || operand.is_label();
+    };
+    bool needs_relocation =
+        is_relocatable(dest) || is_relocatable(src_a) || is_relocatable(src_b);
+
+    m_quads.push_back(
+        std::make_unique<Quad>(op_code, dest, src_a, src_b, needs_relocation));
     bind_queued_labels(m_quads.size() - 1);
 }
 
@@ -63,8 +70,9 @@ void IrFunction::dump_quads() const {
 
 void IrFunction::finalize(ConstantPool::Entry entry) {
     ASSERT(m_quads.front()->opcode() == OPCode::ALLOC_REGS);
-    auto quad = std::make_unique<Quad>(OPCode::ALLOC_REGS, Operand::empty(),
-                                       Operand { entry }, Operand::empty());
+    auto quad =
+        std::make_unique<Quad>(OPCode::ALLOC_REGS, Operand::empty(),
+                               Operand { entry }, Operand::empty(), false);
     m_quads.front() = std::move(quad);
 }
 

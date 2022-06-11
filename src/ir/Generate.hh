@@ -38,6 +38,7 @@ class IrProgram;
 class FunctionDecl;
 class FunctionDeclUser;
 class FunctionDeclC;
+class RelocatedQuad;
 
 class ConstantPool;
 
@@ -73,6 +74,9 @@ class Generate {
     Operand gen_variable_expression(const VariableExpression*);
     Operand gen_index_expression(const IndexExpression*);
     Operand gen_unary_expression(const UnaryExpression*);
+
+    std::vector<RelocatedQuad> relocate_quads(const std::vector<Quad>& quads);
+    RelocatedQuad relocate_quad(const Quad& quad);
 
     IrFunction& env() const {
         return *m_current_ir_function;
