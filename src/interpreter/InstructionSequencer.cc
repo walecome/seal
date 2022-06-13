@@ -1,14 +1,14 @@
 #include "interpreter/InstructionSequencer.hh"
 
 #include "Constants.hh"
-#include "ir/Quad.hh"
+#include "common/RelocatedQuad.hh"
 
-InstructionSequencer::InstructionSequencer(std::vector<Quad>&& quads,
+InstructionSequencer::InstructionSequencer(std::vector<RelocatedQuad>&& quads,
                                            InstructionAddress start_address)
     : m_quads(quads), m_program_counter(start_address) {
 }
 
-const Quad& InstructionSequencer::fetch_next_instruction() {
+const RelocatedQuad& InstructionSequencer::fetch_next_instruction() {
     maybe_advance_program_counter();
 
     size_t index = m_program_counter.unwrap();

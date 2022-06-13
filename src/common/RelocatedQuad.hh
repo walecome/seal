@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "Constants.hh"
+#include "common/BuiltinFunctionAddress.hh"
 #include "common/ConstantPool.hh"
 #include "common/Register.hh"
 #include "interpreter/InstructionAddress.hh"
@@ -22,11 +23,15 @@ class RelocatedQuad {
         bool is_address() const;
         bool is_register() const;
         bool is_constant() const;
+        bool is_builtin() const;
         bool is_used() const;
 
         InstructionAddress as_address() const;
         Register as_register() const;
         ConstantPool::Entry as_constant() const;
+        BuiltinFunctionAddress as_builtin() const;
+
+        std::string to_debug_string() const;
 
        private:
         Operand();

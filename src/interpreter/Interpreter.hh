@@ -7,63 +7,58 @@
 #include <stack>
 #include <vector>
 
-#include "ir/Operand.hh"
+#include "common/RelocatedQuad.hh"
 
 #include "interpreter/InstructionAddress.hh"
 #include "interpreter/RegisterWindow.hh"
 
 class InstructionSequencer;
-class Quad;
 class Register;
-class LabelResolver;
-class FunctionResolver;
 class ConstantPool;
 
 class Interpreter {
    public:
     Interpreter(InstructionSequencer* instruction_sequencer,
-                const ConstantPool* constant_pool,
-                const LabelResolver* label_resolver,
-                const FunctionResolver* function_resolver, bool verbose);
+                const ConstantPool* constant_pool, bool verbose);
 
     void interpret();
 
     Value resolve_register(Register reg) const;
-    Value resolve_to_value(const Operand& source) const;
+    Value resolve_to_value(const RelocatedQuad::Operand& source) const;
     void set_register(Register reg, Value value);
 
    private:
-    void interpret_quad(const Quad&);
+    void interpret_quad(const RelocatedQuad&);
 
     // Interpret function for different opcodes
-    void add(const Quad&);
-    void sub(const Quad&);
-    void mult(const Quad&);
-    void div(const Quad&);
-    void cmp_eq(const Quad&);
-    void cmp_gt(const Quad&);
-    void cmp_lt(const Quad&);
-    void cmp_gteq(const Quad&);
-    void cmp_lteq(const Quad&);
-    void cmp_noteq(const Quad&);
-    void jmp(const Quad&);
-    void jmp_z(const Quad&);
-    void jmp_nz(const Quad&);
-    void push_arg(const Quad&);
-    void pop_arg(const Quad&);
-    void call(const Quad&);
-    void call_c(const Quad&);
-    void set_ret_type(const Quad&);
-    void ret(const Quad&);
-    void move(const Quad&);
-    void index_move(const Quad&);
-    void index_assign(const Quad&);
+    void add(const RelocatedQuad&);
+    void sub(const RelocatedQuad&);
+    void mult(const RelocatedQuad&);
+    void div(const RelocatedQuad&);
+    void cmp_eq(const RelocatedQuad&);
+    void cmp_gt(const RelocatedQuad&);
+    void cmp_lt(const RelocatedQuad&);
+    void cmp_gteq(const RelocatedQuad&);
+    void cmp_lteq(const RelocatedQuad&);
+    void cmp_noteq(const RelocatedQuad&);
+    void jmp(const RelocatedQuad&);
+    void jmp_z(const RelocatedQuad&);
+    void jmp_nz(const RelocatedQuad&);
+    void push_arg(const RelocatedQuad&);
+    void pop_arg(const RelocatedQuad&);
+    void call(const RelocatedQuad&);
+    void call_c(const RelocatedQuad&);
+    void set_ret_type(const RelocatedQuad&);
+    void ret(const RelocatedQuad&);
+    void move(const RelocatedQuad&);
+    void index_move(const RelocatedQuad&);
+    void index_assign(const RelocatedQuad&);
 
-    void interpret_and(const Quad&);
-    void interpret_or(const Quad&);
+    void interpret_and(const RelocatedQuad&);
+    void interpret_or(const RelocatedQuad&);
 
     void compare(
-        const Quad&,
+        const RelocatedQuad&,
         std::function<bool(const Value&, const Value&)> comparison_predicate);
 
     std::optional<Value> call_c_func(std::string_view lib,
@@ -78,16 +73,12 @@ class Interpreter {
     const ConstantPool& constant_pool() const;
     RegisterWindow& current_register_window();
     const RegisterWindow& current_register_window() const;
-    const LabelResolver& label_resolver() const;
-    const FunctionResolver& function_resolver() const;
 
     void handle_crash();
 
     InstructionSequencer* m_instruction_sequencer;
     const ConstantPool* m_constant_pool;
     std::stack<RegisterWindow> m_register_windows;
-    const LabelResolver* m_label_resolver;
-    const FunctionResolver* m_function_resolver;
     bool m_verbose;
     std::queue<Value> m_arguments {};
     std::optional<unsigned> m_pending_return_type {};

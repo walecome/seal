@@ -9,6 +9,7 @@
 #include "ast/ArgumentList.hh"
 #include "ast/Type.hh"
 
+#include "common/BuiltinFunctionAddress.hh"
 #include "common/Value.hh"
 
 class ArgumentList;
@@ -23,7 +24,7 @@ using builtin_args_t = std::vector<Value>;
 bool is_builtin(const std::string_view);
 bool is_builtin(unsigned);
 bool is_typechecked(const std::string_view);
-builtin_return_type_t call_builtin_function(unsigned, const builtin_args_t&);
+builtin_return_type_t call_builtin_function(BuiltinFunctionAddress func, const builtin_args_t&);
 size_t number_of_builtins();
 unsigned function_id_from_identifier(std::string_view);
 

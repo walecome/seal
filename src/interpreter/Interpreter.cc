@@ -1,24 +1,28 @@
-#include <fmt/format.h>
 #include <array>
 #include <string_view>
 #include <vector>
 
-#include "CTypeWrapper.hh"
+#include <fmt/format.h>
+
 #include "Constants.hh"
 #include "CrashHelper.hh"
-#include "Interpreter.hh"
-#include "OPCode.hh"
+
+#include "ir/OPCode.hh"
+
 #include "builtin/BuiltIn.hh"
+
 #include "dynlib/DynLib.hh"
 #include "dynlib/DynLibLoader.hh"
-#include "fmt/core.h"
-#include "ir/QuadCollection.hh"
+
 #include "types/CType.hh"
 
 #include "common/ConstantPool.hh"
+#include "common/RelocatedQuad.hh"
 
+#include "interpreter/CTypeWrapper.hh"
 #include "interpreter/FunctionResolver.hh"
 #include "interpreter/InstructionSequencer.hh"
+#include "interpreter/Interpreter.hh"
 #include "interpreter/LabelResolver.hh"
 #include "interpreter/RegisterWindow.hh"
 
@@ -36,15 +40,10 @@ Register return_register() {
 }  // namespace
 
 Interpreter::Interpreter(InstructionSequencer* instruction_sequencer,
-                         const ConstantPool* constant_pool,
-                         const LabelResolver* label_resolver,
-                         const FunctionResolver* function_resolver,
-                         bool verbose)
+                         const ConstantPool* constant_pool, bool verbose)
     : m_instruction_sequencer(instruction_sequencer),
       m_constant_pool(constant_pool),
       m_register_windows(std::stack<RegisterWindow>()),
-      m_label_resolver(label_resolver),
-      m_function_resolver(function_resolver),
       m_verbose(verbose) {
 }
 
@@ -60,11 +59,13 @@ Value Interpreter::resolve_register(Register reg) const {
     return current_register_window().get_from_register(reg);
 }
 
-Value Interpreter::resolve_to_value(const Operand& source) const {
-    // TODO: Support functions
-    ASSERT(!source.is_function());
-    if (source.is_constant_entry()) {
-        return constant_pool().get_value(source.as_constant_entry());
+Value Interpreter::resolve_to_value(
+    const RelocatedQuad::Operand& source) const {
+    ASSERT(source.is_used());
+    ASSERT(!source.is_address());
+
+    if (source.is_constant()) {
+        return constant_pool().get_value(source.as_constant());
     }
 
     if (source.is_register()) {
@@ -72,7 +73,7 @@ Value Interpreter::resolve_to_value(const Operand& source) const {
     }
 
     ASSERT_NOT_REACHED_MSG(
-        fmt::format("Invalid QuadSource type: {}", source.to_debug_string())
+        fmt::format("Invalid RelocatedQuad type: {}", source.to_debug_string())
             .c_str());
 }
 
@@ -150,7 +151,7 @@ Value compute_binary_expression<std::plus<>>(const Value& lhs,
 
 }  // namespace
 
-void Interpreter::add(const Quad& quad) {
+void Interpreter::add(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::ADD);
 
     auto lhs = resolve_to_value(quad.src_a());
@@ -160,7 +161,7 @@ void Interpreter::add(const Quad& quad) {
     set_register(quad.dest().as_register(), result);
 }
 
-void Interpreter::sub(const Quad& quad) {
+void Interpreter::sub(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::SUB);
 
     auto lhs = resolve_to_value(quad.src_a());
@@ -170,7 +171,7 @@ void Interpreter::sub(const Quad& quad) {
     set_register(quad.dest().as_register(), std::move(result));
 }
 
-void Interpreter::mult(const Quad& quad) {
+void Interpreter::mult(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::MULT);
 
     auto lhs = resolve_to_value(quad.src_a());
@@ -180,7 +181,7 @@ void Interpreter::mult(const Quad& quad) {
     set_register(quad.dest().as_register(), std::move(result));
 }
 
-void Interpreter::div(const Quad& quad) {
+void Interpreter::div(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::DIV);
 
     auto lhs = resolve_to_value(quad.src_a());
@@ -191,7 +192,7 @@ void Interpreter::div(const Quad& quad) {
 }
 
 void Interpreter::compare(
-    const Quad& quad,
+    const RelocatedQuad& quad,
     std::function<bool(const Value&, const Value&)> comparison_predicate) {
     auto lhs = resolve_to_value(quad.src_a());
     auto rhs = resolve_to_value(quad.src_b());
@@ -200,59 +201,58 @@ void Interpreter::compare(
     set_register(quad.dest().as_register(), Value::create_boolean(result));
 }
 
-void Interpreter::cmp_eq(const Quad& quad) {
+void Interpreter::cmp_eq(const RelocatedQuad& quad) {
     compare(quad,
             [](const Value& lhs, const Value& rhs) { return lhs == rhs; });
 }
 
-void Interpreter::cmp_gt(const Quad& quad) {
+void Interpreter::cmp_gt(const RelocatedQuad& quad) {
     compare(quad, [](const Value& lhs, const Value& rhs) { return lhs > rhs; });
 }
 
-void Interpreter::cmp_lt(const Quad& quad) {
+void Interpreter::cmp_lt(const RelocatedQuad& quad) {
     compare(quad, [](const Value& lhs, const Value& rhs) { return lhs < rhs; });
 }
 
-void Interpreter::cmp_gteq(const Quad& quad) {
+void Interpreter::cmp_gteq(const RelocatedQuad& quad) {
     compare(quad,
             [](const Value& lhs, const Value& rhs) { return lhs >= rhs; });
 }
 
-void Interpreter::cmp_lteq(const Quad& quad) {
+void Interpreter::cmp_lteq(const RelocatedQuad& quad) {
     compare(quad,
             [](const Value& lhs, const Value& rhs) { return lhs <= rhs; });
 }
 
-void Interpreter::cmp_noteq(const Quad& quad) {
+void Interpreter::cmp_noteq(const RelocatedQuad& quad) {
     compare(quad,
             [](const Value& lhs, const Value& rhs) { return lhs != rhs; });
 }
 
-void Interpreter::jmp(const Quad& quad) {
-    InstructionAddress jump_address =
-        label_resolver().resolve_label(quad.dest().as_label());
+void Interpreter::jmp(const RelocatedQuad& quad) {
+    InstructionAddress jump_address = quad.dest().as_address();
     sequencer().set_jump_address(jump_address);
 }
 
-void Interpreter::jmp_z(const Quad& quad) {
+void Interpreter::jmp_z(const RelocatedQuad& quad) {
     const Value& condition = resolve_to_value(quad.src_a());
     if (!condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
-void Interpreter::jmp_nz(const Quad& quad) {
+void Interpreter::jmp_nz(const RelocatedQuad& quad) {
     const Value& condition = resolve_to_value(quad.src_a());
     if (!condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
-void Interpreter::push_arg(const Quad& quad) {
+void Interpreter::push_arg(const RelocatedQuad& quad) {
     m_arguments.push(Value::copy(resolve_to_value(quad.src_a())));
 }
 
-void Interpreter::pop_arg(const Quad& quad) {
+void Interpreter::pop_arg(const RelocatedQuad& quad) {
     ASSERT(!m_arguments.empty());
 
     Value argument = std::move(m_arguments.front());
@@ -261,26 +261,24 @@ void Interpreter::pop_arg(const Quad& quad) {
     set_register(quad.dest().as_register(), std::move(argument));
 }
 
-void Interpreter::call(const Quad& quad) {
+void Interpreter::call(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL);
 
-    FunctionOperand func = quad.src_a().as_function();
-
-    if (BuiltIn::is_builtin(func)) {
+    if (quad.src_a().is_builtin()) {
         std::vector<Value> args {};
         while (!m_arguments.empty()) {
             args.push_back(std::move(m_arguments.front()));
             m_arguments.pop();
         }
-        Value ret = BuiltIn::call_builtin_function(func, args);
+        Value ret = BuiltIn::call_builtin_function(quad.src_a().as_builtin(), args);
         set_register(quad.dest().as_register(), std::move(ret));
         return;
     }
 
-    sequencer().call(function_resolver().resolve_function(func));
+    sequencer().call(quad.src_a().as_address());
 }
 
-void Interpreter::call_c(const Quad& quad) {
+void Interpreter::call_c(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::CALL_C);
 
     std::vector<Value> args {};
@@ -299,17 +297,17 @@ void Interpreter::call_c(const Quad& quad) {
     }
 }
 
-void Interpreter::set_ret_type(const Quad& quad) {
+void Interpreter::set_ret_type(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::SET_RET_TYPE);
     set_pending_type_id(resolve_to_value(quad.src_a()).as_integer().value());
 }
 
 InstructionSequencer& Interpreter::sequencer() {
-  return *m_instruction_sequencer;
+    return *m_instruction_sequencer;
 }
 
 const ConstantPool& Interpreter::constant_pool() const {
-  return *m_constant_pool;
+    return *m_constant_pool;
 }
 
 RegisterWindow& Interpreter::current_register_window() {
@@ -318,19 +316,11 @@ RegisterWindow& Interpreter::current_register_window() {
 }
 
 const RegisterWindow& Interpreter::current_register_window() const {
-  ASSERT(!m_register_windows.empty());
-  return m_register_windows.top();
+    ASSERT(!m_register_windows.empty());
+    return m_register_windows.top();
 }
 
-const LabelResolver& Interpreter::label_resolver() const {
-    return *m_label_resolver;
-}
-
-const FunctionResolver& Interpreter::function_resolver() const {
-  return *m_function_resolver;
-}
-
-void Interpreter::ret(const Quad&) {
+void Interpreter::ret(const RelocatedQuad&) {
     if (sequencer().is_in_main_function()) {
         const Value& value = resolve_register(return_register());
         exit(value.as_integer().value());
@@ -341,7 +331,7 @@ void Interpreter::ret(const Quad&) {
     sequencer().ret();
 }
 
-void Interpreter::move(const Quad& quad) {
+void Interpreter::move(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
     Value value = resolve_to_value(quad.src_a());
     set_register(quad.dest().as_register(), Value::copy(value));
@@ -374,7 +364,7 @@ Value bounds_checked_index(const Vector& target, int index) {
     return Value::copy(target.at(index));
 }
 
-void Interpreter::index_move(const Quad& quad) {
+void Interpreter::index_move(const RelocatedQuad& quad) {
     int index = resolve_to_value(quad.src_b()).as_integer().value();
 
     Value target = resolve_to_value(quad.src_a());
@@ -396,7 +386,7 @@ void Interpreter::index_move(const Quad& quad) {
     set_register(quad.dest().as_register(), std::move(result));
 }
 
-void Interpreter::index_assign(const Quad& quad) {
+void Interpreter::index_assign(const RelocatedQuad& quad) {
     int index = resolve_to_value(quad.src_a()).as_integer().value();
     Vector& indexed = resolve_to_value(quad.dest()).as_vector();
 
@@ -406,13 +396,13 @@ void Interpreter::index_assign(const Quad& quad) {
     indexed.set(index, value);
 }
 
-void Interpreter::interpret_and(const Quad& quad) {
+void Interpreter::interpret_and(const RelocatedQuad& quad) {
     compare(quad, [](Value lhs, Value rhs) {
         return lhs.is_truthy() && rhs.is_truthy();
     });
 }
 
-void Interpreter::interpret_or(const Quad& quad) {
+void Interpreter::interpret_or(const RelocatedQuad& quad) {
     compare(quad, [](const Value& lhs, const Value& rhs) {
         return lhs.is_truthy() || rhs.is_truthy();
     });
@@ -500,7 +490,7 @@ void Interpreter::handle_crash() {
     sequencer().dump();
 }
 
-void Interpreter::interpret_quad(const Quad& quad) {
+void Interpreter::interpret_quad(const RelocatedQuad& quad) {
     switch (quad.opcode()) {
         case OPCode::ADD:
             add(quad);

@@ -20,6 +20,8 @@
 #include "ir/IrProgram.hh"
 #include "ir/QuadCollection.hh"
 
+#include "interpreter/InstructionSequencer.hh"
+
 #include "CrashHelper.hh"
 
 ArgumentParser parse_args(int argc, char **argv) {
@@ -124,7 +126,7 @@ int main(int argc, char **argv) {
     }
 
     ASSERT_NOT_REACHED_MSG("FIXME: Add resolvers");
-    Interpreter interpreter { nullptr, nullptr, nullptr, nullptr, verbose };
+    Interpreter interpreter { nullptr, nullptr, verbose };
     interpreter.interpret();
 
     return 0;

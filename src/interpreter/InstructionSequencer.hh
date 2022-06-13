@@ -4,16 +4,15 @@
 #include <stack>
 #include <vector>
 
-class Quad;
-
 #include "interpreter/InstructionAddress.hh"
 
+class RelocatedQuad;
 class InstructionSequencer {
    public:
-    InstructionSequencer(std::vector<Quad>&& quads,
+    InstructionSequencer(std::vector<RelocatedQuad>&& quads,
                          InstructionAddress start_address);
 
-    const Quad& fetch_next_instruction();
+    const RelocatedQuad& fetch_next_instruction();
 
     void set_jump_address(InstructionAddress addr);
 
@@ -28,7 +27,7 @@ class InstructionSequencer {
     bool get_and_set_started();
     void maybe_advance_program_counter();
 
-    const std::vector<Quad> m_quads;
+    const std::vector<RelocatedQuad> m_quads;
     InstructionAddress m_program_counter;
     std::optional<InstructionAddress> m_jump_address;
     bool m_has_started { false };

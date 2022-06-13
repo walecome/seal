@@ -98,9 +98,9 @@ unsigned function_id_from_identifier(std::string_view identifier) {
     return builtin_functions.find(std::string(identifier))->second.id();
 }
 
-builtin_return_type_t call_builtin_function(unsigned function_id,
+builtin_return_type_t call_builtin_function(BuiltinFunctionAddress func,
                                             const builtin_args_t& args) {
-    return id_to_builtin.at(function_id)->call(args);
+    return id_to_builtin.at(func.id())->call(args);
 }
 
 }  // namespace BuiltIn
