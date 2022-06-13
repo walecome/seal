@@ -1,5 +1,10 @@
 # A list of random TODOs that would improve the project
 
+- [ ] Make Generate produce:
+  - A flat list of quads
+  - A list of quads that need relocation
+  - A map mapping function id to quad index
+  - A map mapping label id to quad index
 - [ ] Stacktrace from crashes and asserts
 - [ ] Forward args from 'assemble' to 'sealc'
   - Cannot run in verbose mode through 'assemble' currently
