@@ -9,13 +9,11 @@
 
 class Quad {
    public:
-    Quad(OPCode op_code, IrOperand dest, IrOperand src_a, IrOperand src_b,
-         bool needs_relocation)
+    Quad(OPCode op_code, IrOperand dest, IrOperand src_a, IrOperand src_b)
         : m_op_code { op_code },
           m_dest { dest },
           m_src_a { src_a },
-          m_src_b { src_b },
-          m_needs_relocation { needs_relocation } {
+          m_src_b { src_b } {
     }
 
     std::string to_string() const;
@@ -41,9 +39,6 @@ class Quad {
     IrOperand src_b() const {
         return m_src_b;
     }
-    bool needs_relocation() const {
-        return m_needs_relocation;
-    }
 
    private:
     std::vector<unsigned> m_label_ids {};
@@ -53,5 +48,4 @@ class Quad {
     IrOperand m_dest;
     IrOperand m_src_a;
     IrOperand m_src_b;
-    bool m_needs_relocation;
 };

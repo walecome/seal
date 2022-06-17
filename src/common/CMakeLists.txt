@@ -5,5 +5,6 @@ add_source_files(
   Operand.cc
   Register.cc
   RelocatedQuad.cc
+  Relocator.cc
   Value.cc
 )

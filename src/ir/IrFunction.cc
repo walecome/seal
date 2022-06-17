@@ -4,8 +4,8 @@
 #include <vector>
 
 #include "IrFunction.hh"
-#include "ir/IrOperand.hh"
 #include "ast/FunctionDecl.hh"
+#include "ir/IrOperand.hh"
 
 unsigned new_label_id() {
     static unsigned label_id = 0;
@@ -29,14 +29,7 @@ LabelOperand IrFunction::create_and_queue_label() {
 
 void IrFunction::add_quad(OPCode op_code, IrOperand dest, IrOperand src_a,
                           IrOperand src_b) {
-    auto is_relocatable = [](const IrOperand& operand) {
-        return operand.is_function() || operand.is_label();
-    };
-    bool needs_relocation =
-        is_relocatable(dest) || is_relocatable(src_a) || is_relocatable(src_b);
-
-    m_quads.push_back(
-        std::make_unique<Quad>(op_code, dest, src_a, src_b, needs_relocation));
+    m_quads.push_back(std::make_unique<Quad>(op_code, dest, src_a, src_b));
     bind_queued_labels(m_quads.size() - 1);
 }
 
@@ -70,9 +63,8 @@ void IrFunction::dump_quads() const {
 
 void IrFunction::finalize(ConstantPool::Entry entry) {
     ASSERT(m_quads.front()->opcode() == OPCode::ALLOC_REGS);
-    auto quad =
-        std::make_unique<Quad>(OPCode::ALLOC_REGS, IrOperand::empty(),
-                               IrOperand { entry }, IrOperand::empty(), false);
+    auto quad = std::make_unique<Quad>(OPCode::ALLOC_REGS, IrOperand::empty(),
+                                       IrOperand { entry }, IrOperand::empty());
     m_quads.front() = std::move(quad);
 }
 
