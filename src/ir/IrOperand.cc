@@ -2,46 +2,46 @@
 #include <variant>
 
 #include "ir/IrFunction.hh"
-#include "ir/Operand.hh"
+#include "ir/IrOperand.hh"
 
-bool Operand::is_function() const {
+bool IrOperand::is_function() const {
     return holds<FunctionOperand>();
 }
 
-bool Operand::is_register() const {
+bool IrOperand::is_register() const {
     return holds<Register>();
 }
 
-bool Operand::is_label() const {
+bool IrOperand::is_label() const {
     return holds<LabelOperand>();
 }
 
-bool Operand::is_constant_entry() const {
+bool IrOperand::is_constant_entry() const {
     return holds<ConstantPool::Entry>();
 }
 
-ConstantPool::Entry Operand::as_constant_entry() const {
+ConstantPool::Entry IrOperand::as_constant_entry() const {
     ASSERT(is_constant_entry());
     return std::get<ConstantPool::Entry>(m_data.value());
 }
 
-FunctionOperand Operand::as_function() const {
+FunctionOperand IrOperand::as_function() const {
     ASSERT(is_function());
     return std::get<FunctionOperand>(m_data.value());
 }
 
-Register Operand::as_register() const {
+Register IrOperand::as_register() const {
     ASSERT(is_register());
     return std::get<Register>(m_data.value());
 }
 
-LabelOperand Operand::as_label() const {
+LabelOperand IrOperand::as_label() const {
     ASSERT(is_label());
     return std::get<LabelOperand>(m_data.value());
 }
 
 struct OperandDebugPrinter {
-    const Operand* context;
+    const IrOperand* context;
     std::ostringstream oss {};
 
     std::string operator()(ConstantPool::Entry entry) {
@@ -61,7 +61,7 @@ struct OperandDebugPrinter {
     }
 };
 
-std::string Operand::to_debug_string() const {
+std::string IrOperand::to_debug_string() const {
     if (!m_data.has_value()) {
       return "NO VALUE";
     }

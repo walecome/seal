@@ -3,7 +3,7 @@
 #include <map>
 
 #include "interpreter/InstructionAddress.hh"
-#include "ir/Operand.hh"
+#include "ir/IrOperand.hh"
 
 class FunctionResolver {
    public:

@@ -4,12 +4,12 @@
 
 #include "Constants.hh"
 #include "OPCode.hh"
-#include "Operand.hh"
-#include "Register.hh"
+#include "ir/IrOperand.hh"
+#include "common/Register.hh"
 
 class Quad {
    public:
-    Quad(OPCode op_code, Operand dest, Operand src_a, Operand src_b,
+    Quad(OPCode op_code, IrOperand dest, IrOperand src_a, IrOperand src_b,
          bool needs_relocation)
         : m_op_code { op_code },
           m_dest { dest },
@@ -32,13 +32,13 @@ class Quad {
     OPCode opcode() const {
         return m_op_code;
     };
-    Operand dest() const {
+    IrOperand dest() const {
         return m_dest;
     }
-    Operand src_a() const {
+    IrOperand src_a() const {
         return m_src_a;
     }
-    Operand src_b() const {
+    IrOperand src_b() const {
         return m_src_b;
     }
     bool needs_relocation() const {
@@ -50,8 +50,8 @@ class Quad {
     bool m_has_label { false };
 
     OPCode m_op_code;
-    Operand m_dest;
-    Operand m_src_a;
-    Operand m_src_b;
+    IrOperand m_dest;
+    IrOperand m_src_a;
+    IrOperand m_src_b;
     bool m_needs_relocation;
 };

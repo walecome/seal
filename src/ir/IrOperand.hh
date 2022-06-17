@@ -28,13 +28,13 @@ using operand_type_t =
 
 class IrFunction;
 
-class Operand {
+class IrOperand {
    public:
-    explicit Operand(operand_type_t data) : m_data { data } {
+    explicit IrOperand(operand_type_t data) : m_data { data } {
     }
 
-    static Operand empty() {
-        return Operand();
+    static IrOperand empty() {
+        return IrOperand();
     }
 
     bool is_constant_entry() const;
@@ -62,7 +62,7 @@ class Operand {
     Register as_register() const;
 
    private:
-    Operand() : m_data(std::nullopt) {
+    IrOperand() : m_data(std::nullopt) {
     }
 
     template <class T>

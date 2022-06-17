@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "Constants.hh"
-#include "Operand.hh"
+#include "ir/IrOperand.hh"
 #include "Quad.hh"
 #include "Register.hh"
 
@@ -25,7 +25,7 @@ class IrFunction {
     // Construct a quad with the given opcode and operands, placing it in
     // the m_quads vector. Also binds any queued lables to the quad and
     // clears the label queue.
-    void add_quad(OPCode, Operand, Operand, Operand);
+    void add_quad(OPCode, IrOperand, IrOperand, IrOperand);
 
     LabelOperand create_label() const;
 

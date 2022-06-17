@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "IrFunction.hh"
-#include "Operand.hh"
+#include "ir/IrOperand.hh"
 #include "ast/FunctionDecl.hh"
 
 unsigned new_label_id() {
@@ -27,9 +27,9 @@ LabelOperand IrFunction::create_and_queue_label() {
     return label;
 }
 
-void IrFunction::add_quad(OPCode op_code, Operand dest, Operand src_a,
-                          Operand src_b) {
-    auto is_relocatable = [](const Operand& operand) {
+void IrFunction::add_quad(OPCode op_code, IrOperand dest, IrOperand src_a,
+                          IrOperand src_b) {
+    auto is_relocatable = [](const IrOperand& operand) {
         return operand.is_function() || operand.is_label();
     };
     bool needs_relocation =
@@ -71,8 +71,8 @@ void IrFunction::dump_quads() const {
 void IrFunction::finalize(ConstantPool::Entry entry) {
     ASSERT(m_quads.front()->opcode() == OPCode::ALLOC_REGS);
     auto quad =
-        std::make_unique<Quad>(OPCode::ALLOC_REGS, Operand::empty(),
-                               Operand { entry }, Operand::empty(), false);
+        std::make_unique<Quad>(OPCode::ALLOC_REGS, IrOperand::empty(),
+                               IrOperand { entry }, IrOperand::empty(), false);
     m_quads.front() = std::move(quad);
 }
 

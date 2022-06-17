@@ -4,8 +4,8 @@
 #include <unordered_map>
 
 #include "Constants.hh"
-#include "Operand.hh"
 #include "ir/IrFunction.hh"
+#include "ir/IrOperand.hh"
 #include "ir/Quad.hh"
 #include "ir/QuadCollection.hh"
 
@@ -47,7 +47,8 @@ class Generate {
     MAKE_NONCOPYABLE(Generate)
 
    public:
-    Generate(const CompilationUnit* compilation_unit, ConstantPool* constant_pool);
+    Generate(const CompilationUnit* compilation_unit,
+             ConstantPool* constant_pool);
 
     QuadCollection generate();
 
@@ -65,15 +66,15 @@ class Generate {
     void gen_return(const ReturnStatement*);
     void gen_for(const For*);
 
-    Operand gen_function_call(const FunctionCall*);
-    Operand gen_expression(const Expression*);
-    Operand gen_binary_expression(const BinaryExpression*);
-    Operand gen_assign_expression(const AssignExpression*);
-    Operand gen_equality_expression(const EqualityExpression*);
-    Operand gen_compare_expression(const CompareExpression*);
-    Operand gen_variable_expression(const VariableExpression*);
-    Operand gen_index_expression(const IndexExpression*);
-    Operand gen_unary_expression(const UnaryExpression*);
+    IrOperand gen_function_call(const FunctionCall*);
+    IrOperand gen_expression(const Expression*);
+    IrOperand gen_binary_expression(const BinaryExpression*);
+    IrOperand gen_assign_expression(const AssignExpression*);
+    IrOperand gen_equality_expression(const EqualityExpression*);
+    IrOperand gen_compare_expression(const CompareExpression*);
+    IrOperand gen_variable_expression(const VariableExpression*);
+    IrOperand gen_index_expression(const IndexExpression*);
+    IrOperand gen_unary_expression(const UnaryExpression*);
 
     std::vector<RelocatedQuad> relocate_quads(const std::vector<Quad>& quads);
     RelocatedQuad relocate_quad(const Quad& quad);
@@ -83,12 +84,12 @@ class Generate {
     }
 
     // Literals
-    Operand create_literal(const Literal*);
-    Operand create_array_literal(const ArrayLiteral*);
-    Operand create_boolean_literal(const BooleanLiteral*);
-    Operand create_float_literal(const RealLiteral*);
-    Operand create_integer_literal(const IntegerLiteral*);
-    Operand create_string_literal(const StringLiteral*);
+    IrOperand create_literal(const Literal*);
+    IrOperand create_array_literal(const ArrayLiteral*);
+    IrOperand create_boolean_literal(const BooleanLiteral*);
+    IrOperand create_float_literal(const RealLiteral*);
+    IrOperand create_integer_literal(const IntegerLiteral*);
+    IrOperand create_string_literal(const StringLiteral*);
 
     ConstantPool& get_constant_pool();
 
