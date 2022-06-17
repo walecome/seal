@@ -10,46 +10,13 @@
 #include "interpreter/InstructionAddress.hh"
 #include "ir/OPCode.hh"
 
+#include "common/Operand.hh"
+
 class RelocatedQuad {
    public:
-    class Operand {
-       public:
-        explicit Operand(InstructionAddress addr);
-        explicit Operand(Register reg);
-        explicit Operand(ConstantPool::Entry constant);
-
-        static Operand empty();
-
-        bool is_address() const;
-        bool is_register() const;
-        bool is_constant() const;
-        bool is_builtin() const;
-        bool is_used() const;
-
-        InstructionAddress as_address() const;
-        Register as_register() const;
-        ConstantPool::Entry as_constant() const;
-        BuiltinFunctionAddress as_builtin() const;
-
-        std::string to_debug_string() const;
-
-       private:
-        Operand();
-
-        std::optional<
-            std::variant<InstructionAddress, Register, ConstantPool::Entry>>
-            m_data;
-    };
-
     struct Stringified {};
 
-    RelocatedQuad(OPCode op_code, Operand dest, Operand src_a, Operand src_b)
-        : m_op_code { op_code },
-          m_dest { dest },
-          m_src_a { src_a },
-          m_src_b { src_b } {
-    }
-
+    RelocatedQuad(OPCode op_code, Operand dest, Operand src_a, Operand src_b);
     Stringified stringify() const;
 
     OPCode opcode() const;

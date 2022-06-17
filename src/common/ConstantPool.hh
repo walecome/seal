@@ -9,14 +9,10 @@
 
 class ConstantPool {
    public:
-    class Entry {
-       public:
+    struct Entry {
         std::string to_string() const;
-
-       private:
         explicit Entry(size_t key);
         size_t key;
-        friend class ConstantPool;
     };
     explicit ConstantPool();
 

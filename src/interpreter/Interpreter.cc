@@ -59,8 +59,7 @@ Value Interpreter::resolve_register(Register reg) const {
     return current_register_window().get_from_register(reg);
 }
 
-Value Interpreter::resolve_to_value(
-    const RelocatedQuad::Operand& source) const {
+Value Interpreter::resolve_to_value(const Operand& source) const {
     ASSERT(source.is_used());
     ASSERT(!source.is_address());
 
@@ -270,7 +269,8 @@ void Interpreter::call(const RelocatedQuad& quad) {
             args.push_back(std::move(m_arguments.front()));
             m_arguments.pop();
         }
-        Value ret = BuiltIn::call_builtin_function(quad.src_a().as_builtin(), args);
+        Value ret =
+            BuiltIn::call_builtin_function(quad.src_a().as_builtin(), args);
         set_register(quad.dest().as_register(), std::move(ret));
         return;
     }

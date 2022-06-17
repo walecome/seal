@@ -24,7 +24,7 @@ class Interpreter {
     void interpret();
 
     Value resolve_register(Register reg) const;
-    Value resolve_to_value(const RelocatedQuad::Operand& source) const;
+    Value resolve_to_value(const Operand& source) const;
     void set_register(Register reg, Value value);
 
    private:

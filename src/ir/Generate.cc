@@ -196,7 +196,8 @@ void Generate::gen_for(const For *for_statement) {
     auto stop_condition = gen_expression(for_statement->stop_condition());
 
     auto end_label = IrOperand { env().create_label() };
-    env().add_quad(OPCode::JMP_Z, end_label, stop_condition, IrOperand::empty());
+    env().add_quad(OPCode::JMP_Z, end_label, stop_condition,
+                   IrOperand::empty());
 
     gen_block(for_statement->body());
     gen_expression(for_statement->per_iteration_expression());
@@ -254,8 +255,8 @@ IrOperand Generate::gen_function_call(const FunctionCall *func_call) {
     FunctionDecl *decl = func_call->declaration();
 
     IrOperand destination = decl->type().is_void()
-                              ? IrOperand::empty()
-                              : IrOperand { env().create_register() };
+                                ? IrOperand::empty()
+                                : IrOperand { env().create_register() };
 
     if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
         IrOperand lib = IrOperand(
@@ -304,7 +305,8 @@ IrOperand Generate::gen_assign_expression(const AssignExpression *assign_expr) {
         Register indexed =
             gen_expression(index_expr->indexed_expression()).as_register();
         IrOperand index = gen_expression(index_expr->index());
-        env().add_quad(OPCode::INDEX_ASSIGN, IrOperand { indexed }, index, right);
+        env().add_quad(OPCode::INDEX_ASSIGN, IrOperand { indexed }, index,
+                       right);
         return right;
     }
 
@@ -324,7 +326,8 @@ IrOperand Generate::gen_equality_expression(
             break;
 
         case OperatorSym::NOT_EQ:
-            env().add_quad(OPCode::CMP_NOTEQ, IrOperand { result }, left, right);
+            env().add_quad(OPCode::CMP_NOTEQ, IrOperand { result }, left,
+                           right);
             break;
 
         default:
@@ -459,7 +462,8 @@ IrOperand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
 
     if (sym == OperatorSym::MINUS) {
         auto result = env().create_register();
-        auto zero = IrOperand(get_constant_pool().add(Value::create_integer(0)));
+        auto zero =
+            IrOperand(get_constant_pool().add(Value::create_integer(0)));
         env().add_quad(OPCode::SUB, IrOperand(result), zero, target_operand);
         return IrOperand { result };
     }
@@ -483,7 +487,8 @@ IrOperand Generate::gen_unary_expression(const UnaryExpression *unary_expr) {
     return IrOperand { result };
 }
 
-IrOperand Generate::gen_variable_expression(const VariableExpression *var_expr) {
+IrOperand Generate::gen_variable_expression(
+    const VariableExpression *var_expr) {
     std::optional<Register> maybe_reg =
         env().find_register_for_identifier(var_expr->identifier());
     ASSERT(maybe_reg.has_value());
@@ -539,16 +544,15 @@ std::vector<RelocatedQuad> Generate::relocate_quads(
 }
 
 namespace {
-RelocatedQuad::Operand convert_operand_without_relocation(
-    const IrOperand &operand) {
+Operand convert_operand_without_relocation(const IrOperand &operand) {
     if (!operand.is_used()) {
-        return RelocatedQuad::Operand::empty();
+        return Operand::empty();
     }
     if (operand.is_constant_entry()) {
-        return RelocatedQuad::Operand(operand.as_constant_entry());
+        return Operand(operand.as_constant_entry());
     }
     if (operand.is_register()) {
-        return RelocatedQuad::Operand(operand.as_register());
+        return Operand(operand.as_register());
     }
     ASSERT_NOT_REACHED();
 }
