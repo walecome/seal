@@ -1,5 +1,9 @@
 #include "common/Relocator.hh"
 
+#include "fmt/format.h"
+
+#include "builtin/BuiltIn.hh"
+
 namespace {
 
 bool needs_relocation(const IrOperand &operand) {
@@ -24,19 +28,22 @@ Operand relocate_operand(const IrOperand &operand,
                          const QuadCollection &quad_collection) {
     ASSERT(needs_relocation(operand));
 
-    auto to_addr = [&quad_collection](const IrOperand &operand) {
-        if (operand.is_function()) {
-            return InstructionAddress(quad_collection.function_to_quad.at(
-                operand.as_function().value));
+    if (operand.is_function()) {
+        auto function_id = operand.as_function().value;
+        if (BuiltIn::is_builtin(function_id)) {
+          return Operand(BuiltinFunctionAddress(function_id));
         }
-        if (operand.is_label()) {
-            return InstructionAddress(
-                quad_collection.label_to_quad.at(operand.as_label().value));
-        }
-        ASSERT_NOT_REACHED();
-    };
-
-    return Operand(to_addr(operand));
+        auto it =
+            quad_collection.function_to_quad.find(operand.as_function().value);
+        ASSERT(it != quad_collection.function_to_quad.end());
+        return Operand(InstructionAddress(it->second));
+    }
+    if (operand.is_label()) {
+        auto it = quad_collection.label_to_quad.find(operand.as_label().value);
+        ASSERT(it != quad_collection.label_to_quad.end());
+        return Operand(InstructionAddress(it->second));
+    }
+    ASSERT_NOT_REACHED();
 }
 
 Operand maybe_relocate_operand(const IrOperand &operand,
