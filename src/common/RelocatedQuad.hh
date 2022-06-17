@@ -14,7 +14,12 @@
 
 class RelocatedQuad {
    public:
-    struct Stringified {};
+    struct Stringified {
+        std::string opcode;
+        std::string dest;
+        std::string src_a;
+        std::string src_b;
+    };
 
     RelocatedQuad(OPCode op_code, Operand dest, Operand src_a, Operand src_b);
     Stringified stringify() const;

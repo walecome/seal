@@ -9,22 +9,29 @@ RelocatedQuad::RelocatedQuad(OPCode op_code, Operand dest, Operand src_a,
 }
 
 RelocatedQuad::Stringified RelocatedQuad::stringify() const {
-    // TODO: Return a real stringified instance
-    return Stringified();
+    Stringified stringified;
+
+    stringified.opcode = opcode_to_string(opcode());
+    stringified.dest = dest().to_debug_string();
+    stringified.src_a = src_a().to_debug_string();
+    stringified.src_b = src_b().to_debug_string();
+
+    return stringified;
+
 }
 
 OPCode RelocatedQuad::opcode() const {
-  return m_op_code;
+    return m_op_code;
 }
 
 Operand RelocatedQuad::dest() const {
-  return m_dest;
+    return m_dest;
 }
 
 Operand RelocatedQuad::src_a() const {
-  return m_src_a;
+    return m_src_a;
 }
 
 Operand RelocatedQuad::src_b() const {
-  return m_src_b;
+    return m_src_b;
 }

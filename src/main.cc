@@ -22,6 +22,8 @@
 
 #include "interpreter/InstructionSequencer.hh"
 
+#include "common/Relocator.hh"
+
 #include "CrashHelper.hh"
 
 ArgumentParser parse_args(int argc, char **argv) {
@@ -124,6 +126,43 @@ int main(int argc, char **argv) {
         constant_pool->dump();
         fmt::print("\n");
     }
+
+    std::vector<RelocatedQuad> relocated_quads =
+        relocator::relocate_quads(quads);
+
+    constexpr int width = 10 + 15 + 25*3 + 10;
+    auto print_row = [](
+                         const std::string_view a, const std::string_view b,
+                         const std::string_view c, const std::string_view d,
+                         const std::string e) {
+        // -2 for '|' and space.
+        fmt::print("|{:>{}} ", a, 10);
+        fmt::print("|{:>{}} ", b, 15);
+        fmt::print("|{:>{}} ", c, 25);
+        fmt::print("|{:>{}} ", d, 25);
+        fmt::print("|{:>{}} ", e, 25);
+        fmt::print("|\n");
+    };
+
+    auto print_separator = [] { fmt::print("{:-^{}}\n", "", width + 1); };
+
+    auto print_column_header = [print_row, print_separator] {
+        print_separator();
+        print_row("ADDRESS", "OPCODE", "DEST", "SRC_A", "SRC_B");
+        print_separator();
+    };
+
+    print_column_header();
+
+    for (size_t addr = 0; addr < relocated_quads.size(); ++addr) {
+        const auto &quad = relocated_quads[addr];
+        auto s = quad.stringify();
+        std::string address = fmt::format("{0:#x}", addr);
+        print_row(address, s.opcode, s.dest, s.src_a, s.src_b);
+    }
+    print_separator();
+
+    return 1;
 
     ASSERT_NOT_REACHED_MSG("FIXME: Add resolvers");
     Interpreter interpreter { nullptr, nullptr, verbose };
