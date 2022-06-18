@@ -8,11 +8,11 @@ RegisterWindow::RegisterWindow(size_t register_count)
 }
 
 void RegisterWindow::set_register_value(Register reg, Value value) {
-  ASSERT(m_registers.size() < reg.index());
+  ASSERT(reg.index() < m_registers.size());
   m_registers[reg.index()] = value;
 }
 
 Value RegisterWindow::get_from_register(Register reg) const {
-  ASSERT(m_registers.size() < reg.index());
+  ASSERT(reg.index() < m_registers.size());
   return m_registers[reg.index()];
 }
