@@ -45,8 +45,9 @@ bool InstructionSequencer::is_in_main_function() const {
 }
 
 bool InstructionSequencer::get_and_set_started() {
+    bool ret = m_has_started;
     m_has_started = true;
-    return m_has_started;
+    return ret;
 }
 
 void InstructionSequencer::maybe_advance_program_counter() {
