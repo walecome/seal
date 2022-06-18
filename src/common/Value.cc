@@ -46,7 +46,7 @@ struct TypeVisitor {
     }
 
     template <class T>
-    bool operator()(T) {
+    bool operator()(T, T) {
         return true;
     }
 };
