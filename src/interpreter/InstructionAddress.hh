@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <string>
 
 class InstructionAddress {
   public:
@@ -10,6 +11,8 @@ class InstructionAddress {
     InstructionAddress increment() const;
 
     size_t unwrap() const;
+
+    std::string as_hex() const;
   private:
 
     size_t m_addr;

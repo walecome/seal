@@ -130,11 +130,10 @@ int main(int argc, char **argv) {
     std::vector<RelocatedQuad> relocated_quads =
         relocator::relocate_quads(quads);
 
-    constexpr int width = 10 + 15 + 25*3 + 10;
-    auto print_row = [](
-                         const std::string_view a, const std::string_view b,
-                         const std::string_view c, const std::string_view d,
-                         const std::string e) {
+    constexpr int width = 10 + 15 + 25 * 3 + 10;
+    auto print_row = [](const std::string_view a, const std::string_view b,
+                        const std::string_view c, const std::string_view d,
+                        const std::string e) {
         // -2 for '|' and space.
         fmt::print("|{:>{}} ", a, 10);
         fmt::print("|{:>{}} ", b, 15);
@@ -162,10 +161,12 @@ int main(int argc, char **argv) {
     }
     print_separator();
 
-    return 1;
+    auto start_address =
+        InstructionAddress(quads.function_to_quad.at(quads.main_function_id));
+    auto sequencer = std::make_unique<InstructionSequencer>(
+        std::move(relocated_quads), start_address);
 
-    ASSERT_NOT_REACHED_MSG("FIXME: Add resolvers");
-    Interpreter interpreter { nullptr, nullptr, verbose };
+    Interpreter interpreter { sequencer.get(), constant_pool.get(), verbose };
     interpreter.interpret();
 
     return 0;
