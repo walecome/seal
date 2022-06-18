@@ -56,7 +56,9 @@ void Interpreter::interpret() {
 }
 
 Value Interpreter::resolve_register(Register reg) const {
-    return current_register_window().get_from_register(reg);
+    Value value = current_register_window().get_from_register(reg);
+    ASSERT(!value.is_none());
+    return value;
 }
 
 Value Interpreter::resolve_to_value(const Operand& source) const {

@@ -138,6 +138,7 @@ class Value final {
     bool is_object() const;
     bool is_string() const;
     bool is_vector() const;
+    bool is_none() const;
 
     Boolean as_boolean() const;
     Integer as_integer() const;

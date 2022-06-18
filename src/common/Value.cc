@@ -155,6 +155,10 @@ bool Value::is_vector() const {
     return is_object() && as_object().is_vector();
 }
 
+bool Value::is_none() const {
+  return std::holds_alternative<None>(m_value);
+}
+
 Boolean Value::as_boolean() const {
     ASSERT(is_boolean());
     return std::get<Boolean>(m_value);
