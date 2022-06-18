@@ -57,6 +57,8 @@ class Interpreter {
     void interpret_and(const RelocatedQuad&);
     void interpret_or(const RelocatedQuad&);
 
+    void alloc_regs(const RelocatedQuad&);
+
     void compare(
         const RelocatedQuad&,
         std::function<bool(const Value&, const Value&)> comparison_predicate);

@@ -408,6 +408,12 @@ void Interpreter::interpret_or(const RelocatedQuad& quad) {
     });
 }
 
+void Interpreter::alloc_regs(const RelocatedQuad& quad) {
+  ASSERT(quad.opcode() == OPCode::ALLOC_REGS);
+  Value count = resolve_to_value(quad.src_a());
+  m_register_windows.emplace(count.as_integer().value());
+}
+
 unsigned Interpreter::take_pending_type_id() {
     ASSERT(m_pending_return_type.has_value());
     unsigned tmp = m_pending_return_type.value();
@@ -563,6 +569,9 @@ void Interpreter::interpret_quad(const RelocatedQuad& quad) {
             break;
         case OPCode::OR:
             interpret_or(quad);
+            break;
+        case OPCode::ALLOC_REGS:
+            alloc_regs(quad);
             break;
         default:
             ASSERT_NOT_REACHED_MSG(fmt::format("Invalid OPCode: {}",
