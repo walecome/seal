@@ -68,7 +68,6 @@ void CrashHelper::unregister_signals() {
 }
 
 void CrashHelper::on_crashy_signal(int signal) {
-    unregister_signals();
     auto it = crashy_signals.find(signal);
     if (it != crashy_signals.end()) {
         fmt::print("Received signal {}\n", it->second);
@@ -77,6 +76,7 @@ void CrashHelper::on_crashy_signal(int signal) {
 }
 
 void CrashHelper::check_crash_handler_and_terminate() {
+    unregister_signals();
     if (m_in_middle_of_crash_handling) {
         fmt::print("A crash happened during a handling of another crash, crashing immediately\n");
         crash();
