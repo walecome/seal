@@ -6,15 +6,18 @@
 namespace BuiltIn {
 
 Value create_array(const std::vector<Value>& args) {
-    ASSERT_NOT_REACHED_MSG("BuiltIn::create_array not implemented");
-    // ASSERT(args.size() == 1);
-    // Value& size = context.get_value(args[0]);
-    // ASSERT(size.is_integer());
+    ASSERT(args.size() == 1);
 
-    // std::vector<PoolEntry> vec;
+    Value size = args[0];
+    ASSERT(size.is_integer());
 
-    // vec.resize(size.as_integer().value());
-    // return context.dynamic_pool().create_vector(vec);
+    Value vec = Value::create_vector();
+
+    for (int i = 0; i < size.as_integer().value(); ++i) {
+        vec.as_vector().add(Value{});
+    }
+    
+    return vec;
 }
 
 Value add_element(const std::vector<Value>& args) {
