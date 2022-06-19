@@ -250,7 +250,7 @@ void Interpreter::jmp_nz(const RelocatedQuad& quad) {
 }
 
 void Interpreter::push_arg(const RelocatedQuad& quad) {
-    m_arguments.push(Value::copy(resolve_to_value(quad.src_a())));
+    m_arguments.push(resolve_to_value(quad.src_a()));
 }
 
 void Interpreter::pop_arg(const RelocatedQuad& quad) {
@@ -348,7 +348,7 @@ void Interpreter::ret(const RelocatedQuad& quad) {
 void Interpreter::move(const RelocatedQuad& quad) {
     ASSERT(quad.opcode() == OPCode::MOVE);
     Value value = resolve_to_value(quad.src_a());
-    set_register(quad.dest().as_register(), Value::copy(value));
+    set_register(quad.dest().as_register(), value);
 }
 
 template <class T>
@@ -375,7 +375,7 @@ Value bounds_checked_index(const String& target, int index) {
 
 Value bounds_checked_index(const Vector& target, int index) {
     bounds_check(target, index, "vector");
-    return Value::copy(target.at(index));
+    return target.at(index);
 }
 
 void Interpreter::index_move(const RelocatedQuad& quad) {

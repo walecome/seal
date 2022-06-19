@@ -128,7 +128,7 @@ class Value final {
     static Value create_real(double base_value);
     static Value create_string(std::string_view base_value);
     static Value create_vector();
-    static Value copy(Value other);
+    static Value deepcopy(Value other);
 
     std::string stringify() const;
     std::string to_debug_string() const;

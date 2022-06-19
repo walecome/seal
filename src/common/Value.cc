@@ -99,7 +99,7 @@ Value Value::create_string(std::string_view base_value) {
     return Value(Object(String(std::string(base_value))));
 }
 
-Value Value::copy(Value other) {
+Value Value::deepcopy(Value other) {
     if (other.is_boolean()) {
         return create_boolean(other.as_boolean().value());
     }
@@ -119,7 +119,7 @@ Value Value::copy(Value other) {
     if (other.is_vector()) {
         Value vec = create_vector();
         for (const auto& value : *other.as_vector().value()) {
-          vec.as_vector().add(value);
+          vec.as_vector().add(deepcopy(value));
         }
         return vec;
     }
@@ -401,14 +401,6 @@ void Vector::set(size_t index, Value value) {
 
 void Vector::add(Value value) {
     m_value->push_back(value);
-}
-
-Vector Vector::deepcopy() const {
-  Vector copy = Vector();
-  for (const auto& value : *value()) {
-    copy.add(value);
-  }
-  return copy;
 }
 
 const std::vector<Value>* Vector::value() const {
