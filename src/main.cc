@@ -151,15 +151,21 @@ int main(int argc, char **argv) {
         print_separator();
     };
 
-    print_column_header();
+    auto dump_relocated_quads = [&] {
+        print_column_header();
 
-    for (size_t addr = 0; addr < relocated_quads.size(); ++addr) {
-        const auto &quad = relocated_quads[addr];
-        auto s = quad.stringify();
-        std::string address = fmt::format("{0:#x}", addr);
-        print_row(address, s.opcode, s.dest, s.src_a, s.src_b);
+        for (size_t addr = 0; addr < relocated_quads.size(); ++addr) {
+            const auto &quad = relocated_quads[addr];
+            auto s = quad.stringify();
+            std::string address = fmt::format("{0:#x}", addr);
+            print_row(address, s.opcode, s.dest, s.src_a, s.src_b);
+        }
+        print_separator();
+    };
+
+    if (verbose) {
+        dump_relocated_quads();
     }
-    print_separator();
 
     auto start_address =
         InstructionAddress(quads.function_to_quad.at(quads.main_function_id));
