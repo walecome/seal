@@ -520,7 +520,7 @@ IrOperand Generate::create_array_literal(const ArrayLiteral *array) {
 
 IrOperand Generate::create_boolean_literal(
     const BooleanLiteral *boolean_literal) {
-    IrOperand(get_constant_pool().add(
+    return IrOperand(get_constant_pool().add(
         Value::create_boolean(boolean_literal->value())));
 }
 
