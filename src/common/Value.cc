@@ -118,7 +118,7 @@ Value Value::copy(Value other) {
 
     if (other.is_vector()) {
         Value vec = create_vector();
-        for (const auto& value : other.as_vector().value()) {
+        for (const auto& value : *other.as_vector().value()) {
           vec.as_vector().add(value);
         }
         return vec;
@@ -234,7 +234,7 @@ bool Value::is_truthy() const {
     }
 
     if (is_vector()) {
-        return !as_vector().value().empty();
+        return !as_vector().value()->empty();
     }
 
     ASSERT_NOT_REACHED();
@@ -382,34 +382,42 @@ std::string String::to_debug_string() const {
     return fmt::format("\"{}\" (String)", value());
 }
 
-Vector::Vector() : m_value(std::vector<Value>()) {
+Vector::Vector() : m_value(std::make_shared<std::vector<Value>>()) {
 }
 
 Vector::~Vector() = default;
 
 size_t Vector::length() const {
-    return m_value.size();
+    return m_value->size();
 }
 
 Value Vector::at(size_t index) const {
-    return m_value.at(index);
+    return m_value->at(index);
 }
 
 void Vector::set(size_t index, Value value) {
-    m_value.at(index) = value;
+    m_value->at(index) = value;
 }
 
 void Vector::add(Value value) {
-    m_value.push_back(value);
+    m_value->push_back(value);
 }
 
-const std::vector<Value>& Vector::value() const {
-    return m_value;
+Vector Vector::deepcopy() const {
+  Vector copy = Vector();
+  for (const auto& value : *value()) {
+    copy.add(value);
+  }
+  return copy;
+}
+
+const std::vector<Value>* Vector::value() const {
+    return m_value.get();
 }
 
 std::string Vector::to_string() const {
     std::vector<std::string> stringified_values;
-    for (Value value : value()) {
+    for (Value value : *value()) {
         stringified_values.push_back(value.stringify());
     }
     return fmt::format("[{}]", fmt::join(stringified_values, ", "));
@@ -417,7 +425,7 @@ std::string Vector::to_string() const {
 
 std::string Vector::to_debug_string() const {
     std::vector<std::string> stringified_values;
-    for (Value value : value()) {
+    for (Value value : *value()) {
         stringified_values.push_back(value.to_debug_string());
     }
     return fmt::format("[{}]", fmt::join(stringified_values, ", "));

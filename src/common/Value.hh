@@ -78,7 +78,7 @@ class Vector {
     Vector();
     ~Vector();
 
-    const std::vector<Value>& value() const;
+    const std::vector<Value>* value() const;
 
     size_t length() const;
     Value at(size_t index) const;
@@ -89,7 +89,7 @@ class Vector {
     std::string to_debug_string() const;
 
    private:
-    std::vector<Value> m_value;
+    std::shared_ptr<std::vector<Value>> m_value;
 };
 
 class Object {
