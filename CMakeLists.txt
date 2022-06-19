@@ -8,6 +8,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-g -O2 -fPIC -Wall -Wextra -Weffc++ -Wnon-virtual-dtor -pedantic -fdiagnostics-color=always")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ldl")
 
+set(USE_SANITIZER "NO")
+if("${USE_SANITIZER}" STREQUAL "YES")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CSS_FLAGS} -fsanitize=undefined,address,null,vptr,nullability -fno-omit-frame-pointer")
+endif()
+
 find_program(MOLD_LINKER mold)
 
 if(MOLD_LINKER)
