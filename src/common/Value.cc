@@ -395,22 +395,27 @@ Vector::Vector() : m_value(std::make_shared<std::vector<Value>>()) {
 Vector::~Vector() = default;
 
 size_t Vector::length() const {
+    ASSERT(!!m_value);
     return m_value->size();
 }
 
 Value Vector::at(size_t index) const {
+    ASSERT(!!m_value);
     return m_value->at(index);
 }
 
 void Vector::set(size_t index, Value value) {
+    ASSERT(!!m_value);
     m_value->at(index) = value;
 }
 
 void Vector::add(Value value) {
+    ASSERT(!!m_value);
     m_value->push_back(value);
 }
 
 const std::vector<Value>* Vector::value() const {
+    ASSERT(!!m_value);
     return m_value.get();
 }
 
