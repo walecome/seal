@@ -119,7 +119,7 @@ Value Value::deepcopy(Value other) {
     if (other.is_vector()) {
         Value vec = create_vector();
         for (const auto& value : *other.as_vector().value()) {
-          vec.as_vector().add(deepcopy(value));
+            vec.as_vector().add(deepcopy(value));
         }
         return vec;
     }
@@ -361,17 +361,24 @@ const Vector& Object::as_vector() const {
     return std::get<Vector>(m_value);
 }
 
-String::String(std::string value) : m_value(std::move(value)) {
+String::String(std::string value)
+    : m_value(std::make_shared<std::string>(std::move(value))) {
 }
 
 String::~String() = default;
 
 size_t String::length() const {
-    return m_value.length();
+    if (!m_value) {
+        return 0;
+    }
+    return m_value->length();
 }
 
 std::string_view String::value() const {
-    return m_value;
+    if (!m_value) {
+        return "";
+    }
+    return *m_value;
 }
 
 std::string String::to_string() const {

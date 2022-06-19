@@ -70,7 +70,7 @@ class String {
     std::string to_debug_string() const;
 
    private:
-    std::string m_value;
+    std::shared_ptr<std::string> m_value;
 };
 
 class Vector {
