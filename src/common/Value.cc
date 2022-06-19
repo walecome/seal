@@ -91,6 +91,10 @@ Value Value::create_real(double base_value) {
     return Value(Real(base_value));
 }
 
+Value Value::create_vector() {
+    return Value(Object(Vector()));
+}
+
 Value Value::create_string(std::string_view base_value) {
     return Value(Object(String(std::string(base_value))));
 }
@@ -113,8 +117,11 @@ Value Value::copy(Value other) {
     }
 
     if (other.is_vector()) {
-        // FIXME: Copy Vector
-        ASSERT_NOT_REACHED();
+        Value vec = create_vector();
+        for (const auto& value : other.as_vector().value()) {
+          vec.as_vector().add(value);
+        }
+        return vec;
     }
 
     ASSERT_NOT_REACHED();
@@ -156,7 +163,7 @@ bool Value::is_vector() const {
 }
 
 bool Value::is_none() const {
-  return std::holds_alternative<None>(m_value);
+    return std::holds_alternative<None>(m_value);
 }
 
 Boolean Value::as_boolean() const {
@@ -375,7 +382,7 @@ std::string String::to_debug_string() const {
     return fmt::format("\"{}\" (String)", value());
 }
 
-Vector::Vector(std::vector<Value>&& value) : m_value(value) {
+Vector::Vector() : m_value(std::vector<Value>()) {
 }
 
 Vector::~Vector() = default;

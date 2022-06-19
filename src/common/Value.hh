@@ -75,7 +75,7 @@ class String {
 
 class Vector {
    public:
-    Vector(std::vector<Value>&& value);
+    Vector();
     ~Vector();
 
     const std::vector<Value>& value() const;
@@ -127,6 +127,7 @@ class Value final {
     static Value create_integer(int base_value);
     static Value create_real(double base_value);
     static Value create_string(std::string_view base_value);
+    static Value create_vector();
     static Value copy(Value other);
 
     std::string stringify() const;

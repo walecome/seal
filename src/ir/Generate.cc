@@ -508,14 +508,15 @@ IrOperand Generate::create_integer_literal(
 }
 
 IrOperand Generate::create_array_literal(const ArrayLiteral *array) {
-    ASSERT_NOT_REACHED_MSG("Generate::create_array_literal not implemented");
-    // std::vector<ConstantPool::Entry> values;
+    auto vec = IrOperand(env().create_register());
+    env().add_quad(OPCode::VEC_CREATE, vec, IrOperand::empty(), IrOperand::empty());
 
-    // array->for_each_element([&](auto *element) {
-    //     PoolEntry element_entry = gen_expression(element).as_value_entry();
-    //     values.push_back(element_entry);
-    // });
-    // return Operand(get_constant_pool().create_vector(values));
+    array->for_each_element([&](auto *element) {
+        IrOperand value = gen_expression(element);
+        env().add_quad(OPCode::VEC_ADD, vec, value, IrOperand::empty());
+    });
+
+    return vec;
 }
 
 IrOperand Generate::create_boolean_literal(

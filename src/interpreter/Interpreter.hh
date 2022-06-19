@@ -58,6 +58,8 @@ class Interpreter {
     void interpret_or(const RelocatedQuad&);
 
     void alloc_regs(const RelocatedQuad&);
+    void vec_create(const RelocatedQuad&);
+    void vec_add(const RelocatedQuad&);
 
     void compare(
         const RelocatedQuad&,

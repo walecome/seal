@@ -428,6 +428,20 @@ void Interpreter::alloc_regs(const RelocatedQuad& quad) {
     m_register_windows.emplace(count.as_integer().value());
 }
 
+void Interpreter::vec_create(const RelocatedQuad& quad) {
+    ASSERT(quad.opcode() == OPCode::VEC_CREATE);
+
+    Value vec = Value::create_vector();
+    set_register(quad.dest().as_register(), vec);
+}
+
+void Interpreter::vec_add(const RelocatedQuad& quad) {
+    ASSERT(quad.opcode() == OPCode::VEC_ADD);
+    Value vec = resolve_to_value(quad.dest());
+    Value value = resolve_to_value(quad.src_a());
+    vec.as_vector().add(value);
+}
+
 unsigned Interpreter::take_pending_type_id() {
     ASSERT(m_pending_return_type.has_value());
     unsigned tmp = m_pending_return_type.value();
@@ -586,6 +600,12 @@ void Interpreter::interpret_quad(const RelocatedQuad& quad) {
             break;
         case OPCode::ALLOC_REGS:
             alloc_regs(quad);
+            break;
+        case OPCode::VEC_CREATE:
+            vec_create(quad);
+            break;
+        case OPCode::VEC_ADD:
+            vec_add(quad);
             break;
         default:
             ASSERT_NOT_REACHED_MSG(fmt::format("Invalid OPCode: {}",
