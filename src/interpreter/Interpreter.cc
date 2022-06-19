@@ -84,7 +84,7 @@ void Interpreter::set_register(Register reg, Value value) {
 
 namespace {
 template <class BinaryOperator>
-Value compute_binary_expression(const Value& lhs, const Value& rhs) {
+Value compute_binary_expression(Value lhs, Value rhs) {
     ASSERT(lhs.is_same_type(rhs));
 
     auto apply_binary_operator = [&](const auto& a, const auto& b) {
@@ -119,8 +119,7 @@ Value concatenate_strings(String lhs, String rhs) {
 }
 
 template <>
-Value compute_binary_expression<std::plus<>>(const Value& lhs,
-                                             const Value& rhs) {
+Value compute_binary_expression<std::plus<>>(Value lhs, Value rhs) {
     ASSERT(lhs.is_same_type(rhs));
 
     auto apply_binary_operator = [&](const auto& a, const auto& b) {
@@ -196,7 +195,7 @@ void Interpreter::div(const RelocatedQuad& quad) {
 
 void Interpreter::compare(
     const RelocatedQuad& quad,
-    std::function<bool(const Value&, const Value&)> comparison_predicate) {
+    std::function<bool(Value, Value)> comparison_predicate) {
     auto lhs = resolve_to_value(quad.src_a());
     auto rhs = resolve_to_value(quad.src_b());
 
@@ -205,31 +204,27 @@ void Interpreter::compare(
 }
 
 void Interpreter::cmp_eq(const RelocatedQuad& quad) {
-    compare(quad,
-            [](const Value& lhs, const Value& rhs) { return lhs == rhs; });
+    compare(quad, [](Value lhs, Value rhs) { return lhs == rhs; });
 }
 
 void Interpreter::cmp_gt(const RelocatedQuad& quad) {
-    compare(quad, [](const Value& lhs, const Value& rhs) { return lhs > rhs; });
+    compare(quad, [](Value lhs, Value rhs) { return lhs > rhs; });
 }
 
 void Interpreter::cmp_lt(const RelocatedQuad& quad) {
-    compare(quad, [](const Value& lhs, const Value& rhs) { return lhs < rhs; });
+    compare(quad, [](Value lhs, Value rhs) { return lhs < rhs; });
 }
 
 void Interpreter::cmp_gteq(const RelocatedQuad& quad) {
-    compare(quad,
-            [](const Value& lhs, const Value& rhs) { return lhs >= rhs; });
+    compare(quad, [](Value lhs, Value rhs) { return lhs >= rhs; });
 }
 
 void Interpreter::cmp_lteq(const RelocatedQuad& quad) {
-    compare(quad,
-            [](const Value& lhs, const Value& rhs) { return lhs <= rhs; });
+    compare(quad, [](Value lhs, Value rhs) { return lhs <= rhs; });
 }
 
 void Interpreter::cmp_noteq(const RelocatedQuad& quad) {
-    compare(quad,
-            [](const Value& lhs, const Value& rhs) { return lhs != rhs; });
+    compare(quad, [](Value lhs, Value rhs) { return lhs != rhs; });
 }
 
 void Interpreter::jmp(const RelocatedQuad& quad) {
@@ -238,14 +233,14 @@ void Interpreter::jmp(const RelocatedQuad& quad) {
 }
 
 void Interpreter::jmp_z(const RelocatedQuad& quad) {
-    const Value& condition = resolve_to_value(quad.src_a());
+    Value condition = resolve_to_value(quad.src_a());
     if (!condition.as_boolean().value()) {
         jmp(quad);
     }
 }
 
 void Interpreter::jmp_nz(const RelocatedQuad& quad) {
-    const Value& condition = resolve_to_value(quad.src_a());
+    Value condition = resolve_to_value(quad.src_a());
     if (!condition.as_boolean().value()) {
         jmp(quad);
     }
@@ -404,7 +399,7 @@ void Interpreter::index_move(const RelocatedQuad& quad) {
 
 void Interpreter::index_assign(const RelocatedQuad& quad) {
     int index = resolve_to_value(quad.src_a()).as_integer().value();
-    Vector& indexed = resolve_to_value(quad.dest()).as_vector();
+    Vector indexed = resolve_to_value(quad.dest()).as_vector();
 
     Value value = resolve_to_value(quad.src_b());
 
@@ -419,7 +414,7 @@ void Interpreter::interpret_and(const RelocatedQuad& quad) {
 }
 
 void Interpreter::interpret_or(const RelocatedQuad& quad) {
-    compare(quad, [](const Value& lhs, const Value& rhs) {
+    compare(quad, [](Value lhs, Value rhs) {
         return lhs.is_truthy() || rhs.is_truthy();
     });
 }

@@ -61,9 +61,8 @@ class Interpreter {
     void vec_create(const RelocatedQuad&);
     void vec_add(const RelocatedQuad&);
 
-    void compare(
-        const RelocatedQuad&,
-        std::function<bool(const Value&, const Value&)> comparison_predicate);
+    void compare(const RelocatedQuad&,
+                 std::function<bool(Value, Value)> comparison_predicate);
 
     std::optional<Value> call_c_func(std::string_view lib,
                                      std::string_view func,
