@@ -324,8 +324,13 @@ const RegisterWindow& Interpreter::current_register_window() const {
 
 void Interpreter::ret(const RelocatedQuad& quad) {
     if (sequencer().is_in_main_function()) {
-        Value value = resolve_register(return_register());
-        exit(value.as_integer().value());
+        // Assume 0 exit code if we have no explicit return value from main.
+        if (!quad.src_a().is_used()) {
+          exit(0);
+        }
+
+        Value return_value = resolve_to_value(quad.src_a());
+        exit(return_value.as_integer().value());
     }
 
     Value return_value =
