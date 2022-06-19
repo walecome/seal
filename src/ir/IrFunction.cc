@@ -66,6 +66,7 @@ void IrFunction::finalize(ConstantPool::Entry entry) {
     auto quad = std::make_unique<Quad>(OPCode::ALLOC_REGS, IrOperand::empty(),
                                        IrOperand { entry }, IrOperand::empty());
     m_quads.front() = std::move(quad);
+    add_quad(OPCode::FUNC_END, IrOperand::empty(), IrOperand::empty(), IrOperand::empty());
 }
 
 unsigned IrFunction::id() const {
