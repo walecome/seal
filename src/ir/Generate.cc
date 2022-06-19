@@ -189,6 +189,7 @@ void Generate::gen_while(const While *while_statement) {
 }
 
 void Generate::gen_for(const For *for_statement) {
+    env().enter_block();
     gen_variable_decl(for_statement->initial_expression());
 
     auto condition_label = IrOperand { env().create_and_queue_label() };
@@ -205,6 +206,7 @@ void Generate::gen_for(const For *for_statement) {
                    IrOperand::empty());
 
     env().queue_label(end_label.as_label());
+    env().exit_block();
 }
 
 void Generate::gen_return(const ReturnStatement *return_statement) {
@@ -509,7 +511,8 @@ IrOperand Generate::create_integer_literal(
 
 IrOperand Generate::create_array_literal(const ArrayLiteral *array) {
     auto vec = IrOperand(env().create_register());
-    env().add_quad(OPCode::VEC_CREATE, vec, IrOperand::empty(), IrOperand::empty());
+    env().add_quad(OPCode::VEC_CREATE, vec, IrOperand::empty(),
+                   IrOperand::empty());
 
     array->for_each_element([&](auto *element) {
         IrOperand value = gen_expression(element);
