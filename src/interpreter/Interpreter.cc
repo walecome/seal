@@ -297,7 +297,7 @@ void Interpreter::call_c(const RelocatedQuad& quad) {
                     take_pending_type_id());
 
     if (return_value.has_value()) {
-        set_register(quad.dest().as_register(), std::move(*return_value));
+        set_register(return_register(), std::move(*return_value));
     }
 }
 
