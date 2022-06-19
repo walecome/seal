@@ -112,8 +112,10 @@ Value compute_binary_expression(const Value& lhs, const Value& rhs) {
     ASSERT_NOT_REACHED();
 }
 
-Value concatenate_strings(const String& lhs, const String& rhs) {
-    ASSERT_NOT_REACHED_MSG("concatenate_strings() not implemented");
+Value concatenate_strings(String lhs, String rhs) {
+    std::string_view a = lhs.value();
+    std::string_view b = rhs.value();
+    return Value::create_string(std::string(a) + std::string(b));
 }
 
 template <>
@@ -326,7 +328,7 @@ void Interpreter::ret(const RelocatedQuad& quad) {
     if (sequencer().is_in_main_function()) {
         // Assume 0 exit code if we have no explicit return value from main.
         if (!quad.src_a().is_used()) {
-          exit(0);
+            exit(0);
         }
 
         Value return_value = resolve_to_value(quad.src_a());
