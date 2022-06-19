@@ -96,5 +96,6 @@ class IrFunction {
     std::vector<std::map<std::string_view, Register>> m_variables {};
     std::map<LabelOperand, size_t> m_labels {};
     std::vector<LabelOperand> m_waiting_labels {};
-    size_t m_register_count { 0 };
+    // Register 0 is reserved for return values
+    size_t m_register_count { 1 };
 };

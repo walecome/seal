@@ -83,6 +83,8 @@ class Generate {
         return *m_current_ir_function;
     }
 
+    Register return_register() const;
+
     // Literals
     IrOperand create_literal(const Literal*);
     IrOperand create_array_literal(const ArrayLiteral*);

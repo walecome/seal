@@ -254,10 +254,6 @@ IrOperand Generate::gen_function_call(const FunctionCall *func_call) {
 
     FunctionDecl *decl = func_call->declaration();
 
-    IrOperand destination = decl->type().is_void()
-                                ? IrOperand::empty()
-                                : IrOperand { env().create_register() };
-
     if (auto *x = dynamic_cast<FunctionDeclC *>(decl)) {
         IrOperand lib = IrOperand(
             get_constant_pool().add(Value::create_string(x->lib_name())));
@@ -269,13 +265,22 @@ IrOperand Generate::gen_function_call(const FunctionCall *func_call) {
             OPCode::SET_RET_TYPE, IrOperand::empty(),
             IrOperand(get_constant_pool().add(Value::create_integer(type_id))),
             IrOperand::empty());
-        env().add_quad(OPCode::CALL_C, destination, IrOperand { lib },
+        env().add_quad(OPCode::CALL_C, IrOperand::empty(), IrOperand { lib },
                        IrOperand { func });
     } else {
         auto function_id = func_call->declaration()->function_id();
         FunctionOperand func = env().create_function_from_id(function_id);
-        env().add_quad(OPCode::CALL, destination, IrOperand { func },
+        env().add_quad(OPCode::CALL, IrOperand::empty(), IrOperand { func },
                        IrOperand::empty());
+    }
+
+    IrOperand destination = decl->type().is_void()
+                                ? IrOperand::empty()
+                                : IrOperand { env().create_register() };
+
+    if (destination.is_used()) {
+        env().add_quad(OPCode::MOVE, destination,
+                       IrOperand { return_register() }, IrOperand::empty());
     }
 
     return destination;
@@ -533,3 +538,6 @@ ConstantPool &Generate::get_constant_pool() {
     return *m_constant_pool;
 }
 
+Register Generate::return_register() const {
+    return Register(0);
+}

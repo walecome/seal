@@ -322,15 +322,22 @@ const RegisterWindow& Interpreter::current_register_window() const {
     return m_register_windows.top();
 }
 
-void Interpreter::ret(const RelocatedQuad&) {
+void Interpreter::ret(const RelocatedQuad& quad) {
     if (sequencer().is_in_main_function()) {
-        const Value& value = resolve_register(return_register());
+        Value value = resolve_register(return_register());
         exit(value.as_integer().value());
     }
+
+    Value return_value =
+        quad.src_a().is_used() ? resolve_to_value(quad.src_a()) : Value();
 
     ASSERT(!m_register_windows.empty());
     m_register_windows.pop();
     sequencer().ret();
+
+    if (!return_value.is_none()) {
+        set_register(return_register(), return_value);
+    }
 }
 
 void Interpreter::move(const RelocatedQuad& quad) {
@@ -411,9 +418,9 @@ void Interpreter::interpret_or(const RelocatedQuad& quad) {
 }
 
 void Interpreter::alloc_regs(const RelocatedQuad& quad) {
-  ASSERT(quad.opcode() == OPCode::ALLOC_REGS);
-  Value count = resolve_to_value(quad.src_a());
-  m_register_windows.emplace(count.as_integer().value());
+    ASSERT(quad.opcode() == OPCode::ALLOC_REGS);
+    Value count = resolve_to_value(quad.src_a());
+    m_register_windows.emplace(count.as_integer().value());
 }
 
 unsigned Interpreter::take_pending_type_id() {
