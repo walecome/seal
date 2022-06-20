@@ -6,6 +6,7 @@ import sys
 import glob
 import re
 import difflib
+from pathlib import Path
 
 RED='\033[1;31m'
 GREEN='\033[1;32m'
@@ -89,6 +90,9 @@ def run_file(path):
 
 def read_expected(test_file):
     target = SCRIPT_DIR + "/expected_output/" + os.path.relpath(test_file, SCRIPT_DIR)
+    if not Path(target).exists():
+        print(f"Warning: Expected output for {test_file} doesn't exist at path {target}")
+        return None
     with open(target, 'r') as f:
         return f.read()
 
@@ -98,6 +102,9 @@ def check_diffs():
     for file in target_files:
         actual_output = run_file(file)
         expected_output = read_expected(file)
+        if expected_output is None:
+            failed_diffs.append(file)
+            continue
         diff = difflib.context_diff(actual_output, expected_output)
         if len(list(diff)) != 0:
             failed_diffs.append(file)
