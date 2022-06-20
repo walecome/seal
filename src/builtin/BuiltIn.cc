@@ -85,10 +85,6 @@ bool is_typechecked(const std::string_view identifier) {
         ->second.typechecked();
 }
 
-size_t number_of_builtins() {
-    return builtin_functions.size();
-}
-
 unsigned function_id_from_identifier(std::string_view identifier) {
     ASSERT(is_builtin(identifier));
     return builtin_functions.find(std::string(identifier))->second.id();

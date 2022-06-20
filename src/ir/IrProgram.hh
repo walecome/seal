@@ -12,7 +12,6 @@ class IrProgram {
 
    public:
     void add_function(ptr_t<IrFunction>& function);
-    const IrFunction* get_function_from_id(unsigned id) const;
 
     void dump() const;
 

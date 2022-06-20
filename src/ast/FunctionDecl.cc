@@ -4,7 +4,7 @@
 #include "builtin/BuiltIn.hh"
 
 int new_function_id() {
-    static int function_id = BuiltIn::number_of_builtins();
+    static int function_id = 0;
     return function_id++;
 }
 
