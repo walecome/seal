@@ -8,6 +8,10 @@ bool IrOperand::is_function() const {
     return holds<FunctionOperand>();
 }
 
+bool IrOperand::is_builtin_function() const {
+    return holds<BuiltinFunctionOperand>();
+}
+
 bool IrOperand::is_register() const {
     return holds<Register>();
 }
@@ -30,6 +34,11 @@ FunctionOperand IrOperand::as_function() const {
     return std::get<FunctionOperand>(m_data.value());
 }
 
+BuiltinFunctionOperand IrOperand::as_builtin_function() const {
+    ASSERT(is_builtin_function());
+    return std::get<BuiltinFunctionOperand>(m_data.value());
+}
+
 Register IrOperand::as_register() const {
     ASSERT(is_register());
     return std::get<Register>(m_data.value());
@@ -50,6 +59,10 @@ struct OperandDebugPrinter {
 
     std::string operator()(FunctionOperand function_id) {
         return fmt::format("function#{}", function_id);
+    }
+
+    std::string operator()(BuiltinFunctionOperand function_id) {
+        return fmt::format("builtinfunction#{}", function_id);
     }
 
     std::string operator()(LabelOperand label_id) {

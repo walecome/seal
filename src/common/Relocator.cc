@@ -21,6 +21,10 @@ Operand convert_operand_without_relocation(const IrOperand &operand) {
     if (operand.is_register()) {
         return Operand(operand.as_register());
     }
+    if (operand.is_builtin_function()) {
+        return Operand(
+            BuiltinFunctionAddress(operand.as_builtin_function().value));
+    }
     ASSERT_NOT_REACHED();
 }
 
@@ -29,10 +33,6 @@ Operand relocate_operand(const IrOperand &operand,
     ASSERT(needs_relocation(operand));
 
     if (operand.is_function()) {
-        auto function_id = operand.as_function().value;
-        if (BuiltIn::is_builtin(function_id)) {
-          return Operand(BuiltinFunctionAddress(function_id));
-        }
         auto it =
             quad_collection.function_to_quad.find(operand.as_function().value);
         ASSERT(it != quad_collection.function_to_quad.end());

@@ -35,6 +35,7 @@ class IrFunction {
         std::string_view identifier);
 
     FunctionOperand create_function_from_id(unsigned) const;
+    BuiltinFunctionOperand create_builtin_function_from_id(unsigned) const;
 
     LabelOperand create_and_queue_label();
 

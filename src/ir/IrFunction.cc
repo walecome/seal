@@ -21,6 +21,11 @@ FunctionOperand IrFunction::create_function_from_id(
     return FunctionOperand { function_id };
 }
 
+BuiltinFunctionOperand IrFunction::create_builtin_function_from_id(
+    unsigned function_id) const {
+    return BuiltinFunctionOperand { function_id };
+}
+
 LabelOperand IrFunction::create_and_queue_label() {
     auto label = create_label();
     queue_label(label);

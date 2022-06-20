@@ -22,9 +22,11 @@
 // For named operands (label, variable, function)
 ADD_OPERAND_TYPE(LabelOperand, unsigned)
 ADD_OPERAND_TYPE(FunctionOperand, unsigned)
+ADD_OPERAND_TYPE(BuiltinFunctionOperand, unsigned)
 
 using operand_type_t =
-    std::variant<ConstantPool::Entry, LabelOperand, FunctionOperand, Register>;
+    std::variant<ConstantPool::Entry, LabelOperand, BuiltinFunctionOperand,
+                 FunctionOperand, Register>;
 
 class IrFunction;
 
@@ -40,6 +42,7 @@ class IrOperand {
     bool is_constant_entry() const;
     bool is_label() const;
     bool is_function() const;
+    bool is_builtin_function() const;
     bool is_register() const;
 
     bool is_used() const {
@@ -59,6 +62,7 @@ class IrOperand {
     ConstantPool::Entry as_constant_entry() const;
     LabelOperand as_label() const;
     FunctionOperand as_function() const;
+    BuiltinFunctionOperand as_builtin_function() const;
     Register as_register() const;
 
    private:

@@ -80,10 +80,6 @@ bool is_builtin(const std::string_view identifier) {
            std::end(builtin_functions);
 }
 
-bool is_builtin(unsigned function_id) {
-    return function_id < number_of_builtins();
-}
-
 bool is_typechecked(const std::string_view identifier) {
     return builtin_functions.find(std::string(identifier))
         ->second.typechecked();
