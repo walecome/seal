@@ -268,8 +268,8 @@ void Interpreter::call(const RelocatedQuad& quad) {
             args.push_back(std::move(m_arguments.front()));
             m_arguments.pop();
         }
-        Value ret =
-            BuiltIn::call_builtin_function(quad.src_a().as_builtin(), args);
+        auto& builtin_func = BuiltIn::get_builtin(quad.src_a().as_builtin());
+        Value ret = builtin_func.call(args);
         set_register(quad.dest().as_register(), std::move(ret));
         return;
     }

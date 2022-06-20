@@ -2,97 +2,220 @@
 #include <functional>
 #include <map>
 
+#include "fmt/format.h"
+
 #include "BuiltIn.hh"
 
-namespace BuiltIn {
+#include "common/Value.hh"
 
-using builtin_func_t =
-    std::function<builtin_return_type_t(const builtin_args_t&)>;
-
-class FuncInfo {
-   public:
-    FuncInfo(const std::string&& identifier, const builtin_func_t func,
-             const bool is_typechecked, const unsigned id)
-        : m_identifier { std::move(identifier) },
-          m_func { func },
-          m_is_typechecked { is_typechecked },
-          m_id { id } {
-    }
-
-    bool typechecked() const {
-        return m_is_typechecked;
-    }
-
-    builtin_return_type_t call(const builtin_args_t& args) const {
-        return m_func(args);
-    }
-
-    unsigned id() const {
-        return m_id;
-    }
-
-   private:
-    const std::string m_identifier;
-    const builtin_func_t m_func;
-    const bool m_is_typechecked;
-    const unsigned m_id;
-};
-
+namespace {
 unsigned get_and_increment_func_id() {
     static unsigned func_id = 0;
     return func_id++;
 }
 
-#define BUILTIN_ENTRY(func_ident, typechecked)          \
-    {                                                   \
-        (#func_ident), {                                \
-            (#func_ident), (func_ident), (typechecked), \
-                get_and_increment_func_id()             \
-        }                                               \
+Value print(const std::vector<Value>& args) {
+    std::vector<std::string> stringified_args {};
+    for (auto arg : args) {
+        stringified_args.push_back(arg.stringify());
+    }
+    std::string s = fmt::format("{}", fmt::join(stringified_args, ""));
+    fmt::print("{}", s);
+    return Value::create_integer(s.size());
+}
+
+class Print : public BuiltIn::BuiltinFunction {
+   public:
+    using BuiltIn::BuiltinFunction::BuiltinFunction;
+    ~Print() override = default;
+
+    Type typecheck() const override {
+        return Type { Primitive::DONT_CARE };
     }
 
-// @TODO: std::function sucks, replace with something else
-static const std::map<std::string, FuncInfo> builtin_functions {
-    BUILTIN_ENTRY(print, false),        BUILTIN_ENTRY(println, false),
-    BUILTIN_ENTRY(create_array, false), BUILTIN_ENTRY(add_element, false),
-    BUILTIN_ENTRY(get_length, false),   BUILTIN_ENTRY(halt, false),
-    // BUILTIN_ENTRY(input, false)
+    Value call(const std::vector<Value>& args) const override {
+        return print(args);
+    }
+
+    std::string_view name() const override {
+        return "print";
+    }
 };
 
-std::vector<const FuncInfo*> map_id_to_func() {
-    std::vector<const FuncInfo*> ret {};
+class Println : public BuiltIn::BuiltinFunction {
+   public:
+    using BuiltIn::BuiltinFunction::BuiltinFunction;
+    ~Println() override = default;
 
-    for (auto it = builtin_functions.begin(); it != builtin_functions.end();
-         ++it) {
-        ret.push_back(&(it->second));
+    Type typecheck() const override {
+        return Type { Primitive::DONT_CARE };
     }
 
-    std::sort(ret.begin(), ret.end(),
-              [](auto a, auto b) { return a->id() < b->id(); });
+    Value call(const std::vector<Value>& args) const override {
+        unsigned long chars_printed = print(args).as_integer().value();
+        fmt::print("\n");
+        return Value::create_integer(chars_printed + 1);
+    }
 
-    return ret;
+    std::string_view name() const override {
+        return "println";
+    }
+};
+
+class CreateArray : public BuiltIn::BuiltinFunction {
+   public:
+    using BuiltIn::BuiltinFunction::BuiltinFunction;
+    ~CreateArray() override = default;
+
+    Type typecheck() const override {
+        return Type { Primitive::DONT_CARE };
+    }
+
+    Value call(const std::vector<Value>& args) const override {
+        ASSERT(args.size() == 1);
+        Value size = args[0];
+
+        ASSERT(size.is_integer());
+        Value vec = Value::create_vector();
+
+        for (int i = 0; i < size.as_integer().value(); ++i) {
+            vec.as_vector().add(Value {});
+        }
+
+        return vec;
+    }
+
+    std::string_view name() const override {
+        return "create_array";
+    }
+};
+
+class AddElement : public BuiltIn::BuiltinFunction {
+   public:
+    using BuiltIn::BuiltinFunction::BuiltinFunction;
+    ~AddElement() override = default;
+
+    Type typecheck() const override {
+        return Type { Primitive::DONT_CARE };
+    }
+
+    Value call(const std::vector<Value>& args) const override {
+        ASSERT(args.size() == 2);
+
+        Value vec = args[0];
+        ASSERT(vec.is_vector());
+        vec.as_vector().add(args[1]);
+
+        return Value::create_integer(vec.as_vector().length());
+    }
+
+    std::string_view name() const override {
+        return "add_element";
+    }
+};
+
+class GetLength : public BuiltIn::BuiltinFunction {
+   public:
+    using BuiltIn::BuiltinFunction::BuiltinFunction;
+    ~GetLength() override = default;
+
+    Type typecheck() const override {
+        return Type { Primitive::DONT_CARE };
+    }
+
+    Value call(const std::vector<Value>& args) const override {
+        ASSERT(args.size() == 1);
+
+        Value target = args[0];
+
+        if (target.is_string()) {
+            return Value::create_integer(target.as_string().length());
+        }
+
+        if (target.is_vector()) {
+            return Value::create_integer(target.as_vector().length());
+        }
+
+        ASSERT_NOT_REACHED();
+    }
+
+    std::string_view name() const override {
+        return "get_length";
+    }
+};
+
+class Halt : public BuiltIn::BuiltinFunction {
+   public:
+    using BuiltIn::BuiltinFunction::BuiltinFunction;
+    ~Halt() override = default;
+
+    Type typecheck() const override {
+        return Type { Primitive::DONT_CARE };
+    }
+
+    Value call(const std::vector<Value>&) const override {
+        fmt::print("Builtin halt() called!\n");
+        exit(0);
+    }
+
+    std::string_view name() const override {
+        return "halt";
+    }
+};
+
+template <class T>
+void add_map_entry(std::map<std::string_view, BuiltIn::BuiltinFunction*>& map) {
+    T* func = new T(get_and_increment_func_id());
+    map.insert({ func->name(), func });
 }
 
-static const std::vector<const FuncInfo*> id_to_builtin = map_id_to_func();
+static const std::map<std::string_view, BuiltIn::BuiltinFunction*>
+    func_name_map = [] {
+        std::map<std::string_view, BuiltIn::BuiltinFunction*> func_map {};
 
-bool is_builtin(const std::string_view identifier) {
-    return builtin_functions.find(std::string(identifier)) !=
-           std::end(builtin_functions);
+        add_map_entry<Print>(func_map);
+        add_map_entry<Println>(func_map);
+        add_map_entry<CreateArray>(func_map);
+        add_map_entry<AddElement>(func_map);
+        add_map_entry<GetLength>(func_map);
+        add_map_entry<Halt>(func_map);
+
+        return func_map;
+    }();
+
+static const std::vector<BuiltIn::BuiltinFunction*> func_id_map = [] {
+    std::vector<BuiltIn::BuiltinFunction*> id_map {};
+    id_map.resize(func_name_map.size());
+    for (const auto& entry : func_name_map) {
+        id_map[entry.second->id()] = entry.second;
+    }
+    return id_map;
+}();
+
+}  // namespace
+
+namespace BuiltIn {
+
+BuiltinFunction::BuiltinFunction(size_t id) : m_id(id) {
 }
 
-bool is_typechecked(const std::string_view identifier) {
-    return builtin_functions.find(std::string(identifier))
-        ->second.typechecked();
+BuiltinFunction::~BuiltinFunction() = default;
+
+size_t BuiltinFunction::id() const {
+    return m_id;
 }
 
-unsigned function_id_from_identifier(std::string_view identifier) {
-    ASSERT(is_builtin(identifier));
-    return builtin_functions.find(std::string(identifier))->second.id();
+BuiltinFunction* find_builtin(std::string_view name) {
+    auto it = func_name_map.find(name);
+    if (it == func_name_map.end()) {
+      return nullptr;
+    }
+    return it->second;
 }
 
-builtin_return_type_t call_builtin_function(BuiltinFunctionAddress func,
-                                            const builtin_args_t& args) {
-    return id_to_builtin.at(func.id())->call(args);
+BuiltinFunction& get_builtin(BuiltinFunctionAddress addr) {
+    ASSERT(addr.id() < func_id_map.size());
+    return *func_id_map[addr.id()];
 }
 
 }  // namespace BuiltIn

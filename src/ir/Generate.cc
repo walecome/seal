@@ -242,12 +242,11 @@ IrOperand Generate::gen_function_call(const FunctionCall *func_call) {
                            IrOperand::empty());
         });
 
-    bool is_builtin = BuiltIn::is_builtin(func_call->identifier());
+    auto *builtin_func = BuiltIn::find_builtin(func_call->identifier());
 
-    if (is_builtin) {
-        unsigned function_id =
-            BuiltIn::function_id_from_identifier(func_call->identifier());
-        BuiltinFunctionOperand func = env().create_builtin_function_from_id(function_id);
+    if (builtin_func) {
+        BuiltinFunctionOperand func =
+            env().create_builtin_function_from_id(builtin_func->id());
         IrOperand destination = IrOperand { env().create_register() };
         env().add_quad(OPCode::CALL, destination, IrOperand { func },
                        IrOperand::empty());

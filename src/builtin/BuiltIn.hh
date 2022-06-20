@@ -6,7 +6,6 @@
 #include <vector>
 
 #include "Constants.hh"
-#include "ast/ArgumentList.hh"
 #include "ast/Type.hh"
 
 #include "common/BuiltinFunctionAddress.hh"
@@ -17,21 +16,22 @@ class Context;
 
 namespace BuiltIn {
 
-using builtin_arg_t = Value;
-using builtin_return_type_t = Value;
-using builtin_args_t = std::vector<Value>;
+class BuiltinFunction {
+   public:
+    BuiltinFunction(size_t id);
+    virtual ~BuiltinFunction();
+    virtual Type typecheck() const = 0;
+    virtual Value call(const std::vector<Value>& args) const = 0;
+    virtual std::string_view name() const = 0;
 
-bool is_builtin(const std::string_view);
-bool is_typechecked(const std::string_view);
-builtin_return_type_t call_builtin_function(BuiltinFunctionAddress func, const builtin_args_t&);
-unsigned function_id_from_identifier(std::string_view);
+    size_t id() const;
 
-// Built-in functions
-builtin_return_type_t print(const builtin_args_t&);
-builtin_return_type_t println(const builtin_args_t&);
-builtin_return_type_t create_array(const builtin_args_t&);
-builtin_return_type_t add_element(const builtin_args_t&);
-builtin_return_type_t get_length(const builtin_args_t&);
-builtin_return_type_t halt(const builtin_args_t&);
+   protected:
+   private:
+    size_t m_id;
+};
+
+BuiltinFunction* find_builtin(std::string_view name);
+BuiltinFunction& get_builtin(BuiltinFunctionAddress addr);
 
 }  // namespace BuiltIn

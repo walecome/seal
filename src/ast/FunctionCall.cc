@@ -7,11 +7,10 @@ void FunctionCall::analyze(Scope *scope) {
     // Resolves the type for the arguments
     m_argument_list->analyze(scope);
 
-    if (BuiltIn::is_builtin(identifier())) {
-        if (BuiltIn::is_typechecked(identifier())) {
-            // @TODO: Handle typechecking for built in
-        }
-        m_type = Type { Primitive::DONT_CARE };
+    BuiltIn::BuiltinFunction* builtin_func = BuiltIn::find_builtin(identifier());
+
+    if (builtin_func) {
+        m_type = builtin_func->typecheck();
         return;
     }
 
