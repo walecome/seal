@@ -6,6 +6,7 @@
 
 #include "BuiltIn.hh"
 
+#include "ast/FunctionCall.hh"
 #include "common/Value.hh"
 
 namespace {
@@ -29,7 +30,7 @@ class Print : public BuiltIn::BuiltinFunction {
     using BuiltIn::BuiltinFunction::BuiltinFunction;
     ~Print() override = default;
 
-    Type typecheck() const override {
+    Type typecheck(const FunctionCall&) const override {
         return Type { Primitive::DONT_CARE };
     }
 
@@ -47,7 +48,7 @@ class Println : public BuiltIn::BuiltinFunction {
     using BuiltIn::BuiltinFunction::BuiltinFunction;
     ~Println() override = default;
 
-    Type typecheck() const override {
+    Type typecheck(const FunctionCall&) const override {
         return Type { Primitive::DONT_CARE };
     }
 
@@ -67,7 +68,7 @@ class CreateArray : public BuiltIn::BuiltinFunction {
     using BuiltIn::BuiltinFunction::BuiltinFunction;
     ~CreateArray() override = default;
 
-    Type typecheck() const override {
+    Type typecheck(const FunctionCall&) const override {
         return Type { Primitive::DONT_CARE };
     }
 
@@ -95,7 +96,7 @@ class AddElement : public BuiltIn::BuiltinFunction {
     using BuiltIn::BuiltinFunction::BuiltinFunction;
     ~AddElement() override = default;
 
-    Type typecheck() const override {
+    Type typecheck(const FunctionCall&) const override {
         return Type { Primitive::DONT_CARE };
     }
 
@@ -119,7 +120,7 @@ class GetLength : public BuiltIn::BuiltinFunction {
     using BuiltIn::BuiltinFunction::BuiltinFunction;
     ~GetLength() override = default;
 
-    Type typecheck() const override {
+    Type typecheck(const FunctionCall&) const override {
         return Type { Primitive::DONT_CARE };
     }
 
@@ -149,7 +150,7 @@ class Halt : public BuiltIn::BuiltinFunction {
     using BuiltIn::BuiltinFunction::BuiltinFunction;
     ~Halt() override = default;
 
-    Type typecheck() const override {
+    Type typecheck(const FunctionCall&) const override {
         return Type { Primitive::DONT_CARE };
     }
 

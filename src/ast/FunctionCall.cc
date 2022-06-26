@@ -10,7 +10,7 @@ void FunctionCall::analyze(Scope *scope) {
     BuiltIn::BuiltinFunction* builtin_func = BuiltIn::find_builtin(identifier());
 
     if (builtin_func) {
-        m_type = builtin_func->typecheck();
+        m_type = builtin_func->typecheck(*this);
         return;
     }
 

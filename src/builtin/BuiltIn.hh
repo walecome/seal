@@ -13,6 +13,7 @@
 
 class ArgumentList;
 class Context;
+class FunctionCall;
 
 namespace BuiltIn {
 
@@ -20,7 +21,7 @@ class BuiltinFunction {
    public:
     BuiltinFunction(size_t id);
     virtual ~BuiltinFunction();
-    virtual Type typecheck() const = 0;
+    virtual Type typecheck(const FunctionCall& call) const = 0;
     virtual Value call(const std::vector<Value>& args) const = 0;
     virtual std::string_view name() const = 0;
 
