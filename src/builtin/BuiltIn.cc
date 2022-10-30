@@ -165,14 +165,15 @@ class Halt : public BuiltIn::BuiltinFunction {
 };
 
 template <class T>
-void add_map_entry(std::map<std::string_view, BuiltIn::BuiltinFunction*>& map) {
-    T* func = new T(get_and_increment_func_id());
-    map.insert({ func->name(), func });
+void add_map_entry(
+    std::map<std::string_view, ptr_t<BuiltIn::BuiltinFunction>>& map) {
+    auto func = std::make_unique<T>(get_and_increment_func_id());
+    map.insert({ func->name(), std::move(func) });
 }
 
-static const std::map<std::string_view, BuiltIn::BuiltinFunction*>
+static const std::map<std::string_view, ptr_t<BuiltIn::BuiltinFunction>>
     func_name_map = [] {
-        std::map<std::string_view, BuiltIn::BuiltinFunction*> func_map {};
+        std::map<std::string_view, ptr_t<BuiltIn::BuiltinFunction>> func_map {};
 
         add_map_entry<Print>(func_map);
         add_map_entry<Println>(func_map);
@@ -188,7 +189,7 @@ static const std::vector<BuiltIn::BuiltinFunction*> func_id_map = [] {
     std::vector<BuiltIn::BuiltinFunction*> id_map {};
     id_map.resize(func_name_map.size());
     for (const auto& entry : func_name_map) {
-        id_map[entry.second->id()] = entry.second;
+        id_map[entry.second->id()] = entry.second.get();
     }
     return id_map;
 }();
@@ -209,9 +210,9 @@ size_t BuiltinFunction::id() const {
 BuiltinFunction* find_builtin(std::string_view name) {
     auto it = func_name_map.find(name);
     if (it == func_name_map.end()) {
-      return nullptr;
+        return nullptr;
     }
-    return it->second;
+    return it->second.get();
 }
 
 BuiltinFunction& get_builtin(BuiltinFunctionAddress addr) {
