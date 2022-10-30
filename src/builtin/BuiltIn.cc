@@ -164,6 +164,66 @@ class Halt : public BuiltIn::BuiltinFunction {
     }
 };
 
+namespace {
+
+std::string format_string(std::string_view format_spec,
+                          const std::vector<std::string_view>& format_values) {
+  std::vector<std::string_view> concrete_parts{};
+
+  auto did_find = [] (size_t pos) { return pos != std::string::npos; };
+
+  std::string_view remaining = format_spec;
+  constexpr std::string_view format_token = "{}";
+  size_t cut_start = 0;
+  while (true) {
+    size_t cut_count = remaining.find(format_token);
+    if (!did_find(cut_count)) {
+      break;
+    }
+    auto concrete_part = remaining.substr(cut_start, cut_count);
+    if (!concrete_part.empty()) {
+        concrete_parts.push_back(concrete_part);
+    }
+    remaining = remaining.substr(cut_count + format_token.size());
+  }
+
+  if (!remaining.empty()) {
+    concrete_parts.push_back(remaining);
+  }
+}
+
+}  // namespace
+
+class Format : public BuiltIn::BuiltinFunction {
+   public:
+    using BuiltIn::BuiltinFunction::BuiltinFunction;
+    ~Format() override = default;
+
+    Type typecheck(const FunctionCall&) const override {
+        return Type { Primitive::STRING };
+    }
+
+    Value call(const std::vector<Value>& args) const override {
+        if (args.empty()) {
+            ASSERT_NOT_REACHED_MSG(
+                ""
+                "function");
+        }
+        auto format_spec = args[0];
+        if (!format_spec.is_string()) {
+            ASSERT_NOT_REACHED_MSG(
+                "Format spec (first argument of builtin `format()` needs to be "
+                "a string");
+        }
+
+        return Value::create_string(format_spec.as_string().value());
+    }
+
+    std::string_view name() const override {
+        return "format";
+    }
+};
+
 template <class T>
 void add_map_entry(
     std::map<std::string_view, ptr_t<BuiltIn::BuiltinFunction>>& map) {
@@ -181,6 +241,7 @@ static const std::map<std::string_view, ptr_t<BuiltIn::BuiltinFunction>>
         add_map_entry<AddElement>(func_map);
         add_map_entry<GetLength>(func_map);
         add_map_entry<Halt>(func_map);
+        add_map_entry<Format>(func_map);
 
         return func_map;
     }();
@@ -197,7 +258,6 @@ static const std::vector<BuiltIn::BuiltinFunction*> func_id_map = [] {
 }  // namespace
 
 namespace BuiltIn {
-
 BuiltinFunction::BuiltinFunction(size_t id) : m_id(id) {
 }
 
