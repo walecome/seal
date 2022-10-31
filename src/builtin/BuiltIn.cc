@@ -17,14 +17,85 @@ unsigned get_and_increment_func_id() {
     return func_id++;
 }
 
-Value print(const std::vector<Value>& args) {
-    std::vector<std::string> stringified_args {};
-    for (auto arg : args) {
-        stringified_args.push_back(arg.stringify());
+struct ConsumedContent {
+    std::string_view target;
+    size_t size;
+};
+
+std::string format_string(std::string_view format_spec,
+                          const std::vector<std::string>& format_values) {
+    constexpr std::string_view format_token = "{}";
+
+    std::string_view remaining = format_spec;
+    std::stringstream ss {};
+    auto current_format_it = std::begin(format_values);
+    size_t cut_start = 0;
+    size_t chars_until_format_token = remaining.find(format_token);
+
+    auto eat_concrete_text = [&]() {
+        ConsumedContent consumed_content;
+        consumed_content.target = remaining.substr(0, chars_until_format_token);
+        consumed_content.size = consumed_content.target.size();
+        return consumed_content;
+    };
+
+    auto eat_format_value = [&]() {
+        ConsumedContent consumed_content;
+        consumed_content.target = *current_format_it;
+        consumed_content.size = format_token.size();
+
+        std::next(current_format_it);
+        return consumed_content;
+    };
+
+    auto eat = [&]() {
+        auto consumed_content = [&]() {
+            if (!chars_until_format_token) {
+                return eat_format_value();
+            } else {
+                return eat_concrete_text();
+            }
+        }();
+
+        remaining = remaining.substr(consumed_content.size);
+        chars_until_format_token = remaining.find(format_token);
+
+        return consumed_content.target;
+    };
+
+    while (chars_until_format_token != std::string::npos) {
+        ss << eat();
     }
-    std::string s = fmt::format("{}", fmt::join(stringified_args, ""));
-    fmt::print("{}", s);
-    return Value::create_integer(s.size());
+
+    return ss.str();
+}
+
+std::string format_string(const std::vector<Value>& args) {
+    if (args.empty()) {
+        ASSERT_NOT_REACHED_MSG(
+            ""
+            "function");
+    }
+    auto format_spec = args[0];
+    if (!format_spec.is_string()) {
+        ASSERT_NOT_REACHED_MSG(
+            "Format spec (first argument of builtin `format()` needs to be "
+            "a string");
+    }
+
+    auto start = std::next(args.begin());
+    std::vector<std::string> stringified_values {};
+    std::transform(std::next(args.begin()), args.end(),
+                   std::back_inserter(stringified_values),
+                   [](const auto& value) { return value.stringify(); });
+
+    return format_string(format_spec.as_string().value(), stringified_values);
+}
+
+Value print(const std::vector<Value>& args) {
+    std::string formatted_string = format_string(args);
+    fmt::print("{}", formatted_string);
+    return Value::create_integer(formatted_string.size());
 }
 
 class Print : public BuiltIn::BuiltinFunction {
@@ -166,63 +237,6 @@ class Halt : public BuiltIn::BuiltinFunction {
     }
 };
 
-namespace {
-
-struct ConsumedContent {
-    std::string_view target;
-    size_t size;
-};
-
-std::string format_string(std::string_view format_spec,
-                          const std::vector<std::string>& format_values) {
-    constexpr std::string_view format_token = "{}";
-
-    std::string_view remaining = format_spec;
-    std::stringstream ss {};
-    auto current_format_it = std::begin(format_values);
-    size_t cut_start = 0;
-    size_t chars_until_format_token = remaining.find(format_token);
-
-    auto eat_concrete_text = [&]() {
-        ConsumedContent consumed_content;
-        consumed_content.target = remaining.substr(0, chars_until_format_token);
-        consumed_content.size = consumed_content.target.size();
-        return consumed_content;
-    };
-
-    auto eat_format_value = [&]() {
-        ConsumedContent consumed_content;
-        consumed_content.target = *current_format_it;
-        consumed_content.size = format_token.size();
-
-        std::next(current_format_it);
-        return consumed_content;
-    };
-
-    auto eat = [&]() {
-        auto consumed_content = [&]() {
-            if (!chars_until_format_token) {
-                return eat_format_value();
-            } else {
-                return eat_concrete_text();
-            }
-        }();
-
-        remaining = remaining.substr(consumed_content.size);
-        chars_until_format_token = remaining.find(format_token);
-
-        return consumed_content.target;
-    };
-
-    while (chars_until_format_token != std::string::npos) {
-        ss << eat();
-    }
-
-    return ss.str();
-}
-
-}  // namespace
-
 class Format : public BuiltIn::BuiltinFunction {
    public:
     using BuiltIn::BuiltinFunction::BuiltinFunction;
@@ -233,28 +247,7 @@ class Format : public BuiltIn::BuiltinFunction {
     }
 
     Value call(const std::vector<Value>& args) const override {
-        if (args.empty()) {
-            ASSERT_NOT_REACHED_MSG(
-                ""
-                "function");
-        }
-        auto format_spec = args[0];
-        if (!format_spec.is_string()) {
-            ASSERT_NOT_REACHED_MSG(
-                "Format spec (first argument of builtin `format()` needs to be "
-                "a string");
-        }
-
-        auto start = std::next(args.begin());
-        std::vector<std::string> stringified_values {};
-        std::transform(std::next(args.begin()), args.end(),
-                       std::back_inserter(stringified_values),
-                       [](const auto& value) { return value.stringify(); });
-
-        auto formatted_string =
-            format_string(format_spec.as_string().value(), stringified_values);
-
-        return Value::create_string(formatted_string);
+        return Value::create_string(format_string(args));
     }
 
     std::string_view name() const override {
