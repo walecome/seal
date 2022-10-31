@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <functional>
 #include <map>
+#include <numeric>
+#include <optional>
 
 #include "fmt/format.h"
 
@@ -166,30 +168,57 @@ class Halt : public BuiltIn::BuiltinFunction {
 
 namespace {
 
+struct ConsumedContent {
+    std::string_view target;
+    size_t size;
+};
+
 std::string format_string(std::string_view format_spec,
-                          const std::vector<std::string_view>& format_values) {
-  std::vector<std::string_view> concrete_parts{};
+                          const std::vector<std::string>& format_values) {
+    constexpr std::string_view format_token = "{}";
 
-  auto did_find = [] (size_t pos) { return pos != std::string::npos; };
+    std::string_view remaining = format_spec;
+    std::stringstream ss {};
+    auto current_format_it = std::begin(format_values);
+    size_t cut_start = 0;
+    size_t chars_until_format_token = remaining.find(format_token);
 
-  std::string_view remaining = format_spec;
-  constexpr std::string_view format_token = "{}";
-  size_t cut_start = 0;
-  while (true) {
-    size_t cut_count = remaining.find(format_token);
-    if (!did_find(cut_count)) {
-      break;
+    auto eat_concrete_text = [&]() {
+        ConsumedContent consumed_content;
+        consumed_content.target = remaining.substr(0, chars_until_format_token);
+        consumed_content.size = consumed_content.target.size();
+        return consumed_content;
+    };
+
+    auto eat_format_value = [&]() {
+        ConsumedContent consumed_content;
+        consumed_content.target = *current_format_it;
+        consumed_content.size = format_token.size();
+
+        std::next(current_format_it);
+        return consumed_content;
+    };
+
+    auto eat = [&]() {
+        auto consumed_content = [&]() {
+            if (!chars_until_format_token) {
+                return eat_format_value();
+            } else {
+                return eat_concrete_text();
+            }
+        }();
+
+        remaining = remaining.substr(consumed_content.size);
+        chars_until_format_token = remaining.find(format_token);
+
+        return consumed_content.target;
+    };
+
+    while (chars_until_format_token != std::string::npos) {
+        ss << eat();
     }
-    auto concrete_part = remaining.substr(cut_start, cut_count);
-    if (!concrete_part.empty()) {
-        concrete_parts.push_back(concrete_part);
-    }
-    remaining = remaining.substr(cut_count + format_token.size());
-  }
 
-  if (!remaining.empty()) {
-    concrete_parts.push_back(remaining);
-  }
+    return ss.str();
 }
 
 }  // namespace
@@ -216,7 +245,16 @@ class Format : public BuiltIn::BuiltinFunction {
                 "a string");
         }
 
-        return Value::create_string(format_spec.as_string().value());
+        auto start = std::next(args.begin());
+        std::vector<std::string> stringified_values {};
+        std::transform(std::next(args.begin()), args.end(),
+                       std::back_inserter(stringified_values),
+                       [](const auto& value) { return value.stringify(); });
+
+        auto formatted_string =
+            format_string(format_spec.as_string().value(), stringified_values);
+
+        return Value::create_string(formatted_string);
     }
 
     std::string_view name() const override {
