@@ -1,14 +1,15 @@
-
-
 fn main() -> int {
 
-    formatted := format("{} + {} = {}", 1, 2, 3);
+    formatted := fmt("{} + {} = {}", 1, 2, 3);
 
     println(formatted);
 
-    println("{} {}", "hello", "world");
+    other_formatted := fmt("hello world!");
+    println(other_formatted);
+    println(fmt("Concrete string"));
 
-    println("{} has is [1, 2, 3]", [1, 2, 3]);
+    println(fmt("{} {}", "hello", "world"));
 
+    println(fmt("{} is [1, 2, 3]", [1, 2, 3]));
     return 0;
 }

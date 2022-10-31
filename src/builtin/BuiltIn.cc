@@ -259,7 +259,7 @@ class Format : public BuiltIn::BuiltinFunction {
     }
 
     std::string_view name() const override {
-        return "format";
+        return "fmt";
     }
 };
 
