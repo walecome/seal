@@ -44,7 +44,7 @@ std::string format_string(std::string_view format_spec,
         consumed_content.target = *current_format_it;
         consumed_content.size = format_token.size();
 
-        std::next(current_format_it);
+        current_format_it = std::next(current_format_it);
         return consumed_content;
     };
 
