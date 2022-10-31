@@ -97,9 +97,13 @@ std::string format_string(const std::vector<Value>& args) {
 }
 
 Value print(const std::vector<Value>& args) {
-    std::string formatted_string = format_string(args);
-    fmt::print("{}", formatted_string);
-    return Value::create_integer(formatted_string.size());
+    std::vector<std::string> stringified_args {};
+    for (auto arg : args) {
+        stringified_args.push_back(arg.stringify());
+    }
+    std::string s = fmt::format("{}", fmt::join(stringified_args, ""));
+    fmt::print("{}", s);
+    return Value::create_integer(s.size());
 }
 
 class Print : public BuiltIn::BuiltinFunction {
