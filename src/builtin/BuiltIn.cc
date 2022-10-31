@@ -67,6 +67,10 @@ std::string format_string(std::string_view format_spec,
         ss << eat();
     }
 
+    if (!remaining.empty()) {
+        ss << remaining;
+    }
+
     return ss.str();
 }
 
