@@ -101,7 +101,7 @@ Value print(const std::vector<Value>& args) {
     for (auto arg : args) {
         stringified_args.push_back(arg.stringify());
     }
-    std::string s = fmt::format("{}", fmt::join(stringified_args, ""));
+    std::string s = fmt::format("{}", fmt::join(stringified_args, " "));
     fmt::print("{}", s);
     return Value::create_integer(s.size());
 }
